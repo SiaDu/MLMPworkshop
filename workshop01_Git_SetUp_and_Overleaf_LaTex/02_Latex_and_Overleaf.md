@@ -390,7 +390,8 @@ In Overleaf, create a new file called:
 references.bib
 ```
 
-Add the following example reference:
+Add the following example reference:(which can be find in google scholar)
+![bibtex](images/bibtex.png)
 
 ```bibtex
 @article{vaswani2017attention,
