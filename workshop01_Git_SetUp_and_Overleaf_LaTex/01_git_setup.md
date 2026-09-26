@@ -6,18 +6,18 @@ Check whether Git is already installed.
 git --version
 ```
 
-1. Sign up
+## 1. Sign up
    - [GitHub sign up](https://github.com/join)
    - Recommended: use your BU student email
 
-2. First-time Git setup
+## 2. First-time Git setup
 
 ```bash
 git config --global user.name "YourName"
 git config --global user.email yourstudentid@bournemouth.ac.uk
 ```
 
-3. Generate a new SSH key on the lab computer
+## 3. Generate a new SSH key on the lab computer
    - Do not copy your personal private SSH key to a shared machine.
    - After the workshop, remove the lab computer's public key from GitHub.
 
@@ -58,7 +58,7 @@ Copy the entire line, which typically looks like this:
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...... BU-lab-computer
 ```
 
-4. Add the public key to GitHub
+## 4. Add the public key to GitHub
 
 Go to:
 - GitHub
@@ -70,7 +70,7 @@ Title: you can write `BU Lab PC`
 
 Key type: select `Authentication Key`
 
-5. Add/load the private key on the lab computer
+## 5. Add/load the private key on the lab computer
 
 Then run:
 
@@ -106,7 +106,7 @@ Save the file, then set the correct permissions:
 chmod 600 ~/.ssh/config
 ```
 
-6. Test the SSH connection
+## 6. Test the SSH connection
 
 ```bash
 ssh -T git@github.com
@@ -127,14 +127,14 @@ On success, you should see a message similar to:
 Hi YourGitHubUsername! You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
-7. Create a local project
+## 7. Create a local project
 
 ```bash
 uv init ~/Desktop/MLMPworkshop
 cd MLMPworkshop
 ```
 
-8. Create an empty repository on GitHub
+## 8. Create an empty repository on GitHub
 
 Create a new repository on the GitHub website.
 
@@ -143,20 +143,20 @@ Do not select:
 - .gitignore
 - License
 
-9. First commit
+## 9. First commit
 
 ```bash
 git add .
 git commit -m "first commit"
 ```
 
-10. Set the default branch name
+## 10. Set the default branch name
 
 ```bash
 git branch -M main
 ```
 
-11. Connect the remote repository
+## 11. Connect the remote repository
 
 ```bash
 git remote add origin git@github.com:yourusername/MLMPworkshop.git
@@ -164,7 +164,7 @@ git remote add origin git@github.com:yourusername/MLMPworkshop.git
 
 Replace `yourusername` with your GitHub username.
 
-12. Push the project
+## 12. Push the project
 
 ```bash
 git push -u origin main
@@ -180,3 +180,29 @@ eval "$(ssh-agent -s)"
 Then run `ssh-add ~/.ssh/id_ed25519_bu_lab` again.
 - If GitHub still asks for a password, make sure you are using SSH instead of HTTPS for the remote URL.
 
+## 13. Make changes and push updates
+
+After editing your files, you can push the latest changes to GitHub using either **VS Code Source Control** or the **Terminal**.
+
+### Option 1: Use VS Code Source Control
+
+1. Open **Source Control** from the left sidebar in VS Code.
+
+2. Review the changed files.
+
+3. Click the ✨ **Generate Commit Message** button to automatically generate a commit message.
+
+4. Click **Commit & Push** to commit your changes and push them to GitHub.
+
+> If the Generate Commit Message option is not available, you can type your own commit message manually.
+
+![VS Code Source Control](images/vscode_source_control.png)
+
+### Option 2: Use the Terminal
+
+You can also do the same thing manually in the terminal:
+
+```bash
+git add .
+git commit -m "your commit message"
+git push
