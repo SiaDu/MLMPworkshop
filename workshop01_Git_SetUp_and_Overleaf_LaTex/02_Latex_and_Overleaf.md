@@ -359,6 +359,24 @@ You can refer to the table using:
 ```latex
 Table~\ref{tab:results} shows the experimental results.
 ```
+### Table Generator
+
+For larger or more complex tables, you can use an online table generator:
+
+[https://www.tablesgenerator.com/](https://www.tablesgenerator.com/)
+
+You can create the table visually and then export it as **LaTeX code**.
+
+Typical workflow:
+
+1. Open [Tables Generator](https://www.tablesgenerator.com/).
+2. Choose **LaTeX Tables**.
+3. Create or paste your table.
+4. Click **Generate**.
+5. Copy the generated LaTeX code.
+6. Paste it into your Overleaf document.
+
+This is often much faster than writing a complex table manually.
 
 ---
 
