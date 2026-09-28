@@ -118,6 +118,7 @@ chmod 600 ~/.ssh/config
 ```bash
 ssh -T git@github.com
 ```
+![6](images/6.png)
 
 The first time, it may ask:
 `Are you sure you want to continue connecting (yes/no/[fingerprint])?`
@@ -140,15 +141,18 @@ Hi YourGitHubUsername! You've successfully authenticated, but GitHub does not pr
 uv init ~/Desktop/MLMPworkshop
 cd MLMPworkshop
 ```
+![7](images/7.png)
 
 ## 8. Create an empty repository on GitHub
 
 Create a new repository on the GitHub website.
+![8](images/8.png)
 
 Do not select:
 - README
 - .gitignore
 - License
+![8.1](images/8.1.png)
 
 ## 9. First commit
 
@@ -156,12 +160,14 @@ Do not select:
 git add .
 git commit -m "first commit"
 ```
+![9](images/9.png)
 
 ## 10. Set the default branch name
 
 ```bash
 git branch -M main
 ```
+![10](images/10.png)
 
 ## 11. Connect the remote repository
 
@@ -170,12 +176,14 @@ git remote add origin git@github.com:yourusername/MLMPworkshop.git
 ```
 
 Replace `yourusername` with your GitHub username.
+![11](images/11.png)
 
 ## 12. Push the project
 
 ```bash
 git push -u origin main
 ```
+![12](images/12.png)
 
 Notes:
 - If `ssh-add` reports that there is no running SSH agent, you can start one with:
