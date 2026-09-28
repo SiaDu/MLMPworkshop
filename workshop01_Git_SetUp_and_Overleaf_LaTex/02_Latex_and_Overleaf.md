@@ -54,6 +54,7 @@ Go to:
 Go to Overleaf and create a new project:
 
 **New Project → Blank Project**
+![b1](images/b1.png)
 
 Name your project:
 
@@ -67,6 +68,7 @@ You should see two main areas:
 - **PDF Preview** — where you see the compiled document
 
 Click **Recompile** whenever you want to update the PDF.
+![b2](images/b2.png)
 
 ---
 
@@ -103,6 +105,7 @@ Your content goes here.
 
 \end{document}
 ```
+![b3](images/b3.png)
 
 ### Important commands
 
@@ -165,6 +168,7 @@ This section contains the results.
 
 This is the conclusion.
 ```
+![b4](images/b4.png)
 
 You do not need to manually type section numbers such as:
 
@@ -209,6 +213,7 @@ The result is \textit{statistically significant}.
 
 The implementation was written in \texttt{Python}.
 ```
+![b5](images/b5.png)
 
 ---
 
@@ -264,6 +269,7 @@ Then refer to the equation in your text:
 ```latex
 Equation~\ref{eq:mse} shows the Mean Squared Error.
 ```
+![b6](images/b6.png)
 
 ---
 
@@ -317,6 +323,7 @@ Figure 1
 ```
 
 Using `\ref{}` allows LaTeX to automatically update the figure number if the document changes.
+![b7](images/b7.png)
 
 ---
 
@@ -359,6 +366,8 @@ You can refer to the table using:
 ```latex
 Table~\ref{tab:results} shows the experimental results.
 ```
+![b8](images/b8.png)
+
 ### Table Generator
 
 For larger or more complex tables, you can use an online table generator:
@@ -377,7 +386,8 @@ Typical workflow:
 6. Paste it into your Overleaf document.
 
 This is often much faster than writing a complex table manually.
-
+![b9](images/b9.png)
+![b10](images/b10.png)
 ---
 
 ## 8. Citations
@@ -401,6 +411,7 @@ Add the following example reference:(which can be find in google scholar)
   year={2017}
 }
 ```
+![b11](images/b11.png)
 
 In your `.tex` file, cite the paper using:
 
@@ -429,6 +440,7 @@ This is the conclusion.
 ```
 
 LaTeX will automatically generate the reference list.
+![b12](images/b12.png)
 
 ---
 
@@ -478,5 +490,5 @@ For example:
 
 https://www.overleaf.com/...
 ```
-
+![b13](images/b13.png)
 Then commit and push your updated `README.md` to GitHub.
