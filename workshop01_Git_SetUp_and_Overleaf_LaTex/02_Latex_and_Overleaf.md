@@ -229,6 +229,14 @@ Use `$...$` to include an equation inside a sentence:
 The loss function is defined as $L = y - \hat{y}$.
 ```
 
+For example, you can include multiple mathematical expressions directly inside normal text:
+
+```latex
+The area of a circle is $A = \pi r^2$, where $r$ is the radius.
+```
+
+Inline equations stay within the paragraph instead of appearing on a separate line.
+
 ### Standalone Equation
 
 Use the `equation` environment to create a standalone numbered equation:
