@@ -5,6 +5,7 @@ Check whether Git is already installed.
 ```bash
 git --version
 ```
+![1](images/1.png)
 
 ## 1. Sign up
    - [GitHub sign up](https://github.com/join)
@@ -16,6 +17,7 @@ git --version
 git config --global user.name "YourName"
 git config --global user.email yourstudentid@bournemouth.ac.uk
 ```
+![2](images/2.png)
 
 ## 3. Generate a new SSH key on the lab computer
    - Do not copy your personal private SSH key to a shared machine.
@@ -33,8 +35,9 @@ It will ask:
 It is recommended not to use the default filename to avoid overwriting an existing key. Enter:
 
 ```bash
-~/.ssh/id_ed25519_bu_lab
+/home/yourID/.ssh/id_ed25519_bu_lab
 ```
+![3](images/3.png)
 
 Then it will ask for a passphrase. On a shared/public computer, it is a good idea to set a passphrase instead of leaving it empty (eg. labcomputer2026).
 
@@ -57,6 +60,7 @@ Copy the entire line, which typically looks like this:
 ```bash
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...... BU-lab-computer
 ```
+![3.1](images/3.1.png)
 
 ## 4. Add the public key to GitHub
 
