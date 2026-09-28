@@ -73,6 +73,7 @@ Go to:
 Title: you can write `BU Lab PC`
 
 Key type: select `Authentication Key`
+![4](images/4.png)
 
 ## 5. Add/load the private key on the lab computer
 
@@ -103,12 +104,14 @@ Host github.com
     IdentityFile ~/.ssh/id_ed25519_bu_lab
     IdentitiesOnly yes
 ```
+![5.1](images/5.1.png)
 
 Save the file, then set the correct permissions:
 
 ```bash
 chmod 600 ~/.ssh/config
 ```
+![5](images/5.png)
 
 ## 6. Test the SSH connection
 
