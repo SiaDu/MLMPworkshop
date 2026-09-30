@@ -21,7 +21,7 @@ git config --global user.email yourstudentid@bournemouth.ac.uk
 
 ## 3. Generate a new SSH key on the lab computer
    - Do not copy your personal private SSH key to a shared machine.
-   - After the workshop, remove the lab computer's public key from GitHub.
+   - After graduate, remove the lab computer's public key from GitHub.
 
 On the school computer, generate a dedicated key:
 
@@ -135,7 +135,7 @@ On success, you should see a message similar to:
 Hi YourGitHubUsername! You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
-## 7. Create a local project
+## 7. Create a local project 😊
 
 ```bash
 uv init ~/Desktop/MLMPworkshop
@@ -185,14 +185,6 @@ git push -u origin main
 ```
 ![12](images/12.png)
 
-Notes:
-- If `ssh-add` reports that there is no running SSH agent, you can start one with:
-
-```bash
-eval "$(ssh-agent -s)"
-```
-
-Then run `ssh-add ~/.ssh/id_ed25519_bu_lab` again.
 - If GitHub still asks for a password, make sure you are using SSH instead of HTTPS for the remote URL.
 
 ## 13. Make changes and push updates
