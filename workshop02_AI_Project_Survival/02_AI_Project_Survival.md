@@ -144,26 +144,18 @@ You only need to locate five things:
 | **Input** | What does the model receive? | image, video, audio, text |
 | **Output** | What should be produced? | image, text, mask, depth map, result folder |
 
+This is a common pattern, not a fixed standard. Real AI repositories may organise the same roles differently.
+
 ### Quick example
 
-You open a repo and find:
+Let’s look at a real repository https://github.com/ultralytics/yolov5 and try to look for:
 
 ```text
-requirements.txt
-detect.py
-weights/yolov5s.pt
-data/images/bus.jpg
-runs/detect/
-```
-
-So:
-
-```text
-Environment → requirements.txt
-Entry point → detect.py
-Model       → yolov5s.pt
-Input       → bus.jpg
-Output      → runs/detect/
+Environment: __________________
+Entry point: __________________
+Model: ________________________
+Input: ________________________
+Output: _______________________     
 ```
 
 This gives us the basic deployment flow:
@@ -180,13 +172,6 @@ Output
 
 Before installing anything, you should be able to complete:
 
-```text
-Environment: __________________
-Entry point: __________________
-Model: ________________________
-Input: ________________________
-Output: _______________________
-```
 
 ## What belongs in Git?
 
