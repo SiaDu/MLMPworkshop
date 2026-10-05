@@ -239,6 +239,35 @@ One error may disappear, but the project may now fail somewhere else.
 
 > **Do not randomly install or upgrade packages until the error disappears.**
 
+## Use a Separate Working Directory
+
+Do **not** clone your assigned AI repository inside `MLMPworkshop`.
+
+`MLMPworkshop` is your **submission repository**.  
+The assigned AI repository is your **working repository**.
+
+For example:
+
+```text
+~/
+├── MLMPworkshop/          ← submit your work here
+│
+└── workshop02_projects/   ← clone and test AI projects here
+    └── yolov5/
+        ├── .git/
+        └── .venv/
+```
+
+```bash
+mkdir -p ~/workshop02_projects
+cd ~/workshop02_projects
+
+git clone <repository-url>
+cd <repository-name>
+```
+
+> **Clone first, then create the environment inside the cloned repository.**
+
 ## Use `uv`
 
 ### If the repo already has a usable `pyproject.toml`
