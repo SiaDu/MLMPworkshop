@@ -79,8 +79,6 @@ The goal is to **identify the cause before changing the environment**.
 
 # 1. Inspect Before You Install
 
-Do not start with `pip install ...`.
-
 Start with the **README**.
 
 Look for sections such as:
