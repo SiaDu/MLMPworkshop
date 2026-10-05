@@ -118,10 +118,20 @@ awesome-ai-project/
 └── tests/
 ```
 
+| Folder | Usually contains |
+|---|---|
+| `src/` | Core project code |
+| `scripts/` | Runnable tasks such as training or inference |
+| `utils/` | Small reusable helper functions |
+| `configs/` | Settings and parameters |
+| `data/` | Dataset-related files or sample inputs |
+| `checkpoints/` | Pretrained model weights |
+| `outputs/` | Generated results |
+| `tests/` | Code used to check that the project works |
+
 Different projects use different names and structures.
 
-The **entry point** may be in the project root, `src/`, or `scripts/`.  
-`utils/` usually contains helper functions rather than the main script you run.
+The **entry point** may be in the project root, `src/`, or `scripts/`.
 
 You do **not** need to understand every file.  
 You only need to locate five things:
