@@ -118,16 +118,16 @@ awesome-ai-project/
 └── tests/
 ```
 
-| Folder | Usually contains |
-|---|---|
-| `src/` | Core project code |
-| `scripts/` | Runnable tasks such as training or inference |
-| `utils/` | Small reusable helper functions |
-| `configs/` | Settings and parameters |
-| `data/` | Dataset-related files or sample inputs |
-| `checkpoints/` | Pretrained model weights |
-| `outputs/` | Generated results |
-| `tests/` | Code used to check that the project works |
+| Folder | Common file types | Usually contains |
+|---|---|---|
+| `src/` | `.py` | Core Python code |
+| `utils/` | `.py` | Helper functions |
+| `scripts/` | `.py`, `.sh` | Runnable scripts / commands |
+| `configs/` | `.yaml`, `.yml`, `.json`, `.toml` | Settings and parameters |
+| `data/` | `.json`, `.csv`, images, audio, text, etc. | Dataset-related files |
+| `checkpoints/` | `.pt`, `.pth`, `.ckpt`, `.safetensors`, `.onnx` | Model weights |
+| `outputs/` | images, `.json`, `.txt`, `.csv`, etc. | Generated results |
+| `tests/` | `.py` | Code used to check that the project works |
 
 Different projects use different names and structures.
 
