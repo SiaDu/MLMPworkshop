@@ -2,7 +2,7 @@
 
 > **Mission:** Take an unfamiliar AI repository and get **one pretrained model** working on an example input.
 
-Today is not about understanding the whole model.
+Today is not about understanding the whole model.  
 It is about learning how to **reproduce an AI project without breaking its environment**.
 
 ---
@@ -41,13 +41,121 @@ You are finished only when:
 
 > **Codex saying “Done” is not evidence. The output is evidence.**
 
+### Why AI projects fail
+
+Usually the model itself is not the problem.
+
+Common causes are:
+
+```text
+Python version
+dependencies
+CUDA / GPU
+missing checkpoint
+missing dataset / input
+wrong file path
+wrong config
+incomplete instructions
+```
+
+Typical errors:
+
+```text
+ModuleNotFoundError
+
+FileNotFoundError: checkpoint.pth
+
+CUDA out of memory
+
+RuntimeError: expected CUDA...
+
+Version conflict
+```
+
+These errors are normal.  
+The goal is to **identify the cause before changing the environment**.
+
 ---
 
 # 1. Inspect Before You Install
 
 Do not start with `pip install ...`.
 
-First find these five things:
+Start with the **README**.
+
+Look for sections such as:
+
+```text
+Installation
+Requirements
+Pretrained Models
+Dataset
+Inference
+Examples
+```
+
+Before typing commands, try to answer:
+
+```text
+1. Which Python version?
+2. How are dependencies installed?
+3. Where are the pretrained weights?
+4. What is the example input?
+5. What command runs inference?
+6. Where will the output go?
+```
+
+## A typical AI repository
+
+```text
+awesome-ai-project/
+│
+├── README.md
+├── pyproject.toml
+├── uv.lock
+├── .gitignore
+│
+├── src/
+│   ├── model.py
+│   ├── dataset.py
+│   └── inference.py
+│
+├── configs/
+├── data/
+├── checkpoints/
+├── outputs/
+└── tests/
+```
+
+The names will change between projects, but always ask:
+
+> **Where is the code?**  
+> **Where is the input?**  
+> **Where is the model?**  
+> **Where is the output?**
+
+### Code, data and model are different things
+
+| Code | Data / Input | Model |
+|---|---|---|
+| `.py` | images | `.pt` |
+| scripts | videos | `.pth` |
+| configs | text / CSV | `.ckpt` |
+| utilities | audio | `.safetensors` |
+
+A simple mental model:
+
+```text
+Input
+  ↓
+Code + pretrained model
+  ↓
+Inference
+  ↓
+Output
+```
+
+## Five things to find
 
 | Find | Example |
 |---|---|
@@ -90,15 +198,45 @@ Input: _______________________________
 Output: ______________________________
 ```
 
+## What belongs in Git?
+
+Usually commit:
+
+```text
+✓ code
+✓ README
+✓ configs
+✓ environment files
+✓ small examples
+```
+
+Usually do not commit:
+
+```text
+✗ .venv/
+✗ large datasets
+✗ large checkpoints
+✗ generated outputs
+✗ API keys / secrets
+```
+
+Why not `.venv/`?
+
+- it is large;
+- it is machine-specific;
+- it should be recreated from the environment definition.
+
+That is what `.gitignore` is for.
+
 ---
 
 # 2. Keep the Environment Clean
 
-An environment is the combination of:
+Your environment is the combination of:
 
 ```text
 Python version
-+ packages
++ installed packages
 + package versions
 + CUDA / PyTorch compatibility
 ```
@@ -168,7 +306,7 @@ uv venv --python 3.11
 
 # 3. Use Codex as a Helper, Not a Guessing Machine
 
-Codex can read the repo, run commands and change files.
+Codex can read the repo, run commands and change files.  
 That is useful, but you must still check what it does.
 
 Before starting:
