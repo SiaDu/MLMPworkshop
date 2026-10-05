@@ -39,7 +39,7 @@ You are finished only when:
 - the output exists;
 - the output makes sense.
 
-> **Codex saying “Done” is not evidence. The output is evidence.**
+> **An AI coding agent saying “Done” is not evidence. The output is evidence.**
 
 ### Why AI projects fail
 
@@ -268,7 +268,7 @@ cd <repository-name>
 
 > **Clone first, then create the environment inside the cloned repository.**
 
-## Use `uv` with Codex
+## Use `uv` with an AI Coding Agent
 
 First identify:
 
@@ -277,13 +277,22 @@ Python version
 Dependency source
 ```
 
-Codex can help create the environment, but **do not let it guess or freely upgrade dependency versions**.
+An AI coding agent can help create the environment, but **do not let it guess or freely upgrade dependency versions**.
+
+Recommended options:
+
+- **GitHub Copilot Free / Copilot Student**
+- Codex
+- Claude Code
+- another equivalent coding agent
+
+> **Using an AI coding agent is optional. You are responsible for checking what it changes.**
 
 ### If the repo already has `pyproject.toml`
 
 Keep the existing project configuration.
 
-Ask Codex:
+Ask your AI coding agent:
 
 ```text
 Inspect this repository and determine the required Python version.
@@ -308,7 +317,7 @@ uv run <command>
 
 ### If the repo only has `requirements.txt` or `setup.py`
 
-You may ask Codex to create a minimal uv-managed project configuration.
+You may ask your AI coding agent to create a minimal uv-managed project configuration.
 
 ```text
 Inspect the README, requirements.txt and setup.py.
@@ -342,15 +351,15 @@ uv sync
 .venv
 ```
 
-> **Codex may organise the environment, but it must follow the repository's dependency requirements.**
+> **The AI agent may organise the environment, but it must follow the repository's dependency requirements.**
 
 > **Reproduce first. Modernise later.**
 
 ---
 
-# 3. Use Codex as a Helper, Not a Guessing Machine
+# 3. Use an AI Coding Agent as a Helper, Not a Guessing Machine
 
-Codex can read the repo, run commands and change files.  
+An AI coding agent can read the repo, run commands and change files.  
 That is useful, but you must still check what it does.
 
 Before starting:
@@ -516,14 +525,14 @@ You do **not** need to:
 [ ] I know where it was saved
 ```
 
-## Step 5 — Check Codex changes
+## Step 5 — Check AI agent changes
 
 ```bash
 git status
 git diff
 ```
 
-You should be able to explain every changed file.
+If you used an AI agent, you should be able to explain every changed file.
 
 ---
 
@@ -598,10 +607,11 @@ Root cause:
 Minimal fix:
 ```
 
-### Codex check
+### AI agent check
 
 ```text
-What did Codex change?
+Did you use an AI coding agent? If yes:
+What did it change?
 How did you verify it?
 ```
 
