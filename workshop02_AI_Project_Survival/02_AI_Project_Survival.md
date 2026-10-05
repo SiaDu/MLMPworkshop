@@ -554,6 +554,24 @@ Update your README
 
 Start again from a **fresh clone** of your assigned repository.
 
+A fresh clone means cloning the repository again into a **new folder**.
+
+For example:
+
+```bash
+cd ~/workshop02_projects
+git clone https://github.com/ultralytics/yolov5.git yolov5_fresh
+cd yolov5_fresh
+```
+
+This creates:
+
+```text
+~/workshop02_projects/
+├── yolov5/
+└── yolov5_fresh/
+```
+
 Do not reuse the `.venv` from class.
 
 Reproduce one pretrained inference and document exactly how you did it.
