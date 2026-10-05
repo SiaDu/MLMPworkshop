@@ -536,17 +536,29 @@ If you used an AI agent, you should be able to explain every changed file.
 
 ---
 
-# 7. Homework — Fresh Clone Test
+# 7. Homework — Reproducibility Test
 
-Running it once in class is not enough.
+Running the project once in class is not enough.
 
-Your homework is to prove that another person can reproduce it.
+The homework has **two parts**:
 
-## Start from a fresh clone
+```text
+Part 1 — Build and Document
+          ↓
+Part 2 — Peer Reproduction
+          ↓
+Update your README
+```
+
+## Part 1 — Build and Document
+
+Start again from a **fresh clone** of your assigned repository.
 
 Do not reuse the `.venv` from class.
 
-Submit:
+Reproduce one pretrained inference and document exactly how you did it.
+
+Submit to your `MLMPworkshop` repository:
 
 ```text
 workshop02_AI_Project_Survival/
@@ -572,10 +584,10 @@ model caches
 ```text
 Repository:
 Commit:
-Task:
+Inference task:
 ```
 
-Get the commit with:
+Get the exact commit with:
 
 ```bash
 git rev-parse HEAD
@@ -591,15 +603,17 @@ Input:
 Output:
 ```
 
-### Setup
+### Environment setup
 
-Give the exact `uv` commands.
+Give the **exact uv commands** needed to reproduce your environment.
 
 ### Inference
 
-Give the exact inference command.
+Give the **exact command** needed to reproduce the result.
 
 ### One real failure
+
+Document one real problem:
 
 ```text
 Category:
@@ -609,17 +623,42 @@ Minimal fix:
 
 ### AI agent check
 
+If you used an AI coding agent:
+
 ```text
-Did you use an AI coding agent? If yes:
+Which AI coding agent did you use?
 What did it change?
-How did you verify it?
+How did you verify the change?
 ```
 
-### Final test
+---
+
+## Part 2 — Peer Reproduction
+
+Exchange your README with another student.
+
+Your partner must start from a **fresh clone** and try to reproduce your result using **only your README**.
+
+Do not give extra instructions unless the README is incomplete.
+
+The reviewer records:
 
 ```text
-Fresh-clone reproduction: PASS / FAIL
+Reviewer:
+Reproduction result: PASS / FAIL
+
+If FAIL:
+Failed step:
+Missing information:
+Suggested fix:
 ```
+
+## Final step
+
+Use the peer feedback to update your own README.
+
+Your final README should contain enough information for another person to reproduce the inference without asking you for help.
+
 
 ---
 
