@@ -92,16 +92,7 @@ Inference
 Examples
 ```
 
-Before typing commands, try to answer:
-
-```text
-1. Which Python version?
-2. How are dependencies installed?
-3. Where are the pretrained weights?
-4. What is the example input?
-5. What command runs inference?
-6. Where will the output go?
-```
+The README tells you **how the author expects the project to run**.
 
 ## A typical AI repository
 
@@ -109,8 +100,7 @@ Before typing commands, try to answer:
 awesome-ai-project/
 │
 ├── README.md
-├── pyproject.toml
-├── uv.lock
+├── pyproject.toml / requirements.txt / setup.py
 ├── .gitignore
 │
 ├── src/
@@ -119,49 +109,25 @@ awesome-ai-project/
 │   └── inference.py
 │
 ├── configs/
+├── utils/
 ├── data/
 ├── checkpoints/
 ├── outputs/
 └── tests/
 ```
 
-The names will change between projects, but always ask:
+Different projects use different names and structures.
 
-> **Where is the code?**  
-> **Where is the input?**  
-> **Where is the model?**  
-> **Where is the output?**
+You do **not** need to understand every file.  
+You only need to locate five things:
 
-### Code, data and model are different things
-
-| Code | Data / Input | Model |
+| Find | Question | Example |
 |---|---|---|
-| `.py` | images | `.pt` |
-| scripts | videos | `.pth` |
-| configs | text / CSV | `.ckpt` |
-| utilities | audio | `.safetensors` |
-
-A simple mental model:
-
-```text
-Input
-  ↓
-Code + pretrained model
-  ↓
-Inference
-  ↓
-Output
-```
-
-## Five things to find
-
-| Find | Example |
-|---|---|
-| **Environment** | `pyproject.toml`, `requirements.txt`, Python version |
-| **Entry point** | `inference.py`, `detect.py`, CLI command |
-| **Model** | `.pt`, `.pth`, `.ckpt`, `.onnx`, model download |
-| **Input** | image, video, audio, text |
-| **Output** | image, text, mask, depth map, result folder |
+| **Environment** | What does this project need to run? | `pyproject.toml`, `requirements.txt`, Python version |
+| **Entry point** | What should I run? | `inference.py`, `detect.py`, CLI command |
+| **Model** | Where are the pretrained weights? | `.pt`, `.pth`, `.ckpt`, `.onnx` |
+| **Input** | What does the model receive? | image, video, audio, text |
+| **Output** | What should be produced? | image, text, mask, depth map, result folder |
 
 ### Quick example
 
@@ -175,7 +141,7 @@ data/images/bus.jpg
 runs/detect/
 ```
 
-You already know:
+So:
 
 ```text
 Environment → requirements.txt
@@ -185,15 +151,26 @@ Input       → bus.jpg
 Output      → runs/detect/
 ```
 
-Before installing anything, complete:
+This gives us the basic deployment flow:
 
 ```text
-This project does: ____________________
-Environment: _________________________
-Entry point: _________________________
-Model: _______________________________
-Input: _______________________________
-Output: ______________________________
+Input
+  ↓
+Entry point + pretrained model
+  ↓
+Inference
+  ↓
+Output
+```
+
+Before installing anything, you should be able to complete:
+
+```text
+Environment: __________________
+Entry point: __________________
+Model: ________________________
+Input: ________________________
+Output: _______________________
 ```
 
 ## What belongs in Git?
