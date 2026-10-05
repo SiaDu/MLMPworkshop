@@ -1,6 +1,6 @@
 # Workshop 02 — AI Project Survival
 
-> **Mission:** Take an unfamiliar AI repository and make **one pretrained inference** work.
+> **Mission:** Take an unfamiliar AI repository and successfully run **one pretrained model** on an example input.
 
 Today is **not** about understanding the whole model.
 Today is about learning how to **reproduce someone else's AI project without breaking the environment**.
