@@ -1,104 +1,144 @@
 # Workshop 02 — AI Project Survival
 
-> **Mission:** Take an unfamiliar AI repository and successfully run **one pretrained model** on an example input.
+> **Mission:** Take an unfamiliar AI repository and get **one pretrained model** working on an example input.
 
-Today is **not** about understanding the whole model.
-Today is about learning how to **reproduce someone else's AI project without breaking the environment**.
+Today is not about understanding the whole model.
+It is about learning how to **reproduce an AI project without breaking its environment**.
 
 ---
 
 ## 0. What counts as success?
 
-A successful deployment means:
+One successful inference is enough:
 
 ```text
-repository
-   ↓
-working Python environment
-   ↓
-pretrained model / checkpoint
-   ↓
-sample input
-   ↓
-inference command
-   ↓
-verified output
+input
+  ↓
+pretrained model
+  ↓
+inference
+  ↓
+output
 ```
 
-**Codex saying “Done” is not evidence.**
+### Example — YOLO
 
-Evidence means:
+```text
+bus.jpg
+  ↓
+YOLO pretrained weights
+  ↓
+detect.py
+  ↓
+image with bounding boxes
+```
 
-- the command finishes successfully;
-- the expected output actually exists;
-- the output makes sense for the task.
+You are finished only when:
+
+- the command runs;
+- the output exists;
+- the output makes sense.
+
+> **Codex saying “Done” is not evidence. The output is evidence.**
 
 ---
 
-# 1. Triage Before Typing
+# 1. Inspect Before You Install
 
-When you open an unfamiliar repository, do **not** install things immediately.
+Do not start with `pip install ...`.
 
-Find these five things first:
+First find these five things:
 
-| Question | What are you looking for? |
+| Find | Example |
 |---|---|
-| **Environment** | `pyproject.toml`, `requirements.txt`, `setup.py`, Python version |
-| **Entry point** | `inference.py`, `predict.py`, `detect.py`, CLI command, demo script |
-| **Model** | checkpoint / weights / pretrained model download |
-| **Input** | image, video, audio, text, folder, config |
-| **Output** | image, mask, depth map, text, embedding, result folder |
+| **Environment** | `pyproject.toml`, `requirements.txt`, Python version |
+| **Entry point** | `inference.py`, `detect.py`, CLI command |
+| **Model** | `.pt`, `.pth`, `.ckpt`, `.onnx`, model download |
+| **Input** | image, video, audio, text |
+| **Output** | image, text, mask, depth map, result folder |
 
-### 90-second repo scan
+### Quick example
 
-Before running anything, you should be able to complete:
+You open a repo and find:
 
 ```text
-This project does: __________________________
+requirements.txt
+detect.py
+weights/yolov5s.pt
+data/images/bus.jpg
+runs/detect/
+```
 
-Environment definition: ____________________
-Inference entry point: _____________________
-Checkpoint / model: ________________________
-Example input: _____________________________
-Expected output: ___________________________
+You already know:
+
+```text
+Environment → requirements.txt
+Entry point → detect.py
+Model       → yolov5s.pt
+Input       → bus.jpg
+Output      → runs/detect/
+```
+
+Before installing anything, complete:
+
+```text
+This project does: ____________________
+Environment: _________________________
+Entry point: _________________________
+Model: _______________________________
+Input: _______________________________
+Output: ______________________________
 ```
 
 ---
 
-# 2. Using `uv` with Someone Else's Project
+# 2. Keep the Environment Clean
 
-We use **uv** for Python environments in this module.
+An environment is the combination of:
 
-But different repositories describe their dependencies differently.
+```text
+Python version
++ packages
++ package versions
++ CUDA / PyTorch compatibility
+```
 
-## Case A — modern project
+A **broken environment** means these parts no longer work together.
 
-You find a standard Python project with dependency metadata in `pyproject.toml`.
+### Example
+
+The project expects:
+
+```text
+Python 3.10
+torch 2.2
+numpy 1.26
+```
+
+You randomly upgrade to:
+
+```text
+torch 2.8
+numpy 2.x
+```
+
+One error may disappear, but the project may now fail somewhere else.
+
+> **Do not randomly install or upgrade packages until the error disappears.**
+
+## Use `uv`
+
+### If the repo already has a usable `pyproject.toml`
 
 ```bash
 uv sync
 uv run <command>
 ```
 
-## Case B — legacy / research project
-
-You find files such as:
-
-```text
-requirements.txt
-setup.py
-environment.yml
-```
-
-Create an isolated environment first:
+### If the repo uses `requirements.txt` or `setup.py`
 
 ```bash
 uv venv
-```
-
-Then reproduce the repository's dependency instructions using uv, for example:
-
-```bash
 uv pip install -r requirements.txt
 ```
 
@@ -108,35 +148,28 @@ or:
 uv pip install -e .
 ```
 
-Then run inside the environment:
+Then run:
 
 ```bash
 uv run <command>
 ```
 
-## Python version problem?
+### Wrong Python version?
 
 Do not change the system Python.
-
-Ask uv for the required version instead:
 
 ```bash
 uv venv --python 3.11
 ```
 
-### Rule for today
-
 > **Reproduce first. Modernise later.**
-
-Do not rewrite somebody else's project structure before you have reproduced the original inference.
 
 ---
 
-# 3. Codex as a Deployment Agent
+# 3. Use Codex as a Helper, Not a Guessing Machine
 
-Codex may inspect files, run commands and modify the repository.
-
-That is useful — but **you are still responsible for the environment**.
+Codex can read the repo, run commands and change files.
+That is useful, but you must still check what it does.
 
 Before starting:
 
@@ -145,35 +178,45 @@ pwd
 git status
 ```
 
-Use this as your starting prompt:
+Use this prompt:
 
 ```text
-You are helping me reproduce one pretrained inference in this repository.
+Help me reproduce one pretrained inference in this repository.
 
 Rules:
-1. Work only inside the current repository.
-2. Use uv for the Python environment and Python dependencies.
-3. Do not use sudo and do not modify the global Python environment.
-4. Do not access credentials, SSH keys, or files outside this repository.
-5. Do not train the model.
-6. Before changing anything, inspect the README, dependency files,
-   inference entry point, checkpoint requirements, input and output paths.
-7. Preserve the upstream project structure and dependency files unless a
-   minimal change is required.
-8. If a command fails, diagnose the root cause before changing files or
-   installing additional packages.
-9. Make the smallest necessary change.
-10. Stop after one pretrained inference succeeds and verify the output exists.
+- work only inside this repository
+- use uv
+- do not use sudo
+- do not modify the global Python environment
+- do not train the model
+- inspect before changing anything
+- diagnose errors before installing new packages
+- make the smallest necessary change
+- stop after one inference succeeds
 
-Start by inspecting the repository.
+First inspect the repository.
 Do not modify anything yet.
+```
+
+### Bad request
+
+```text
+Fix everything.
+```
+
+### Better request
+
+```text
+Explain why this command failed.
+Do not change anything yet.
+Find the root cause first.
 ```
 
 ---
 
 # 4. Diagnose Before You Fix
 
-When something fails, classify the failure first.
+Most deployment errors fit one of these groups:
 
 ```text
 DEPENDENCY
@@ -184,84 +227,53 @@ DEVICE / CUDA
 COMMAND / CONFIG
 ```
 
-Use:
+### Example 1
 
 ```text
-The last command failed.
-
-Classify the failure as one of:
-dependency / Python version / checkpoint-asset / path / device / command-config.
-
-Explain the root cause before changing anything.
-Then propose the smallest possible fix.
+ModuleNotFoundError: No module named 'cv2'
 ```
 
-### Bad debugging
+Likely category:
 
 ```text
-Error
- ↓
-pip install something
- ↓
-new error
- ↓
-pip install something else
- ↓
-???
+DEPENDENCY
 ```
 
-### Better debugging
+### Example 2
 
 ```text
-Error
- ↓
+FileNotFoundError: checkpoints/model.pth
+```
+
+Likely category:
+
+```text
+CHECKPOINT / ASSET
+```
+
+Do not solve Example 2 by installing more Python packages.
+
+Use this debugging flow:
+
+```text
+error
+  ↓
 classify
- ↓
+  ↓
 find root cause
- ↓
-minimal change
- ↓
+  ↓
+smallest fix
+  ↓
 run again
- ↓
-verify
+  ↓
+verify output
 ```
 
 ---
 
-# 5. Live Deployment
+# 5. Project Lottery
 
-During the demonstration, track the process rather than copying commands.
-
-```text
-SCAN
- ↓
-PLAN
- ↓
-ENVIRONMENT
- ↓
-MODEL / ASSETS
- ↓
-INFERENCE
- ↓
-ERROR?
- ↓
-DIAGNOSE
- ↓
-VERIFY
-```
-
-Questions to answer while watching:
-
-1. What information did we find **before** installing anything?
-2. Why did we choose that uv workflow?
-3. What did Codex change?
-4. How did we verify that the final inference really worked?
-
----
-
-# 6. Project Lottery
-
-You will receive **one unfamiliar repository**.
+You will receive **one unfamiliar AI repository**.
 
 | ID | Repository | Task |
 |---|---|---|
@@ -269,105 +281,81 @@ You will receive **one unfamiliar repository**.
 | **B** | [danielgatis/rembg](https://github.com/danielgatis/rembg) | Background removal |
 | **C** | [JaidedAI/EasyOCR](https://github.com/JaidedAI/EasyOCR) | Text recognition |
 | **D** | [openai/CLIP](https://github.com/openai/CLIP) | Image–text classification |
-| **E** | [DepthAnything/Depth-Anything-V2](https://github.com/DepthAnything/Depth-Anything-V2) | Monocular depth estimation |
-| **F** | [timesler/facenet-pytorch](https://github.com/timesler/facenet-pytorch) | Face detection / face crop |
+| **E** | [DepthAnything/Depth-Anything-V2](https://github.com/DepthAnything/Depth-Anything-V2) | Depth estimation |
+| **F** | [timesler/facenet-pytorch](https://github.com/timesler/facenet-pytorch) | Face detection |
 
-Your task is **not** to train or understand the full architecture.
+Your goal is simple:
 
-Your task is:
+> **Get one example input through one pretrained model and produce one valid output.**
 
-> **Get one supplied example through one pretrained inference successfully.**
+You do **not** need to:
+
+- train the model;
+- understand the whole architecture;
+- improve the model;
+- rewrite the project.
 
 ---
 
-# 7. Deployment Sprint
+# 6. Deployment Sprint
 
-## You have 28 minutes.
-
-### Stage 1 — Inspect
-
-Do not install anything until you can identify:
+## Step 1 — Inspect
 
 ```text
-[ ] dependency definition
-[ ] inference entry point
-[ ] model / checkpoint source
-[ ] sample input
-[ ] expected output
+[ ] environment
+[ ] entry point
+[ ] model / checkpoint
+[ ] input
+[ ] output
 ```
 
-### Stage 2 — Environment
+## Step 2 — Set up
 
 ```text
-[ ] environment is local to this repository
-[ ] uv is managing the Python environment
-[ ] no sudo
-[ ] no global pip installation
+[ ] local uv environment
+[ ] correct Python version
+[ ] required dependencies
+[ ] no sudo / global pip
 ```
 
-### Stage 3 — Run
+## Step 3 — Run
 
 ```text
-[ ] pretrained model is available
-[ ] sample input is available
-[ ] one inference command runs
+[ ] pretrained model available
+[ ] sample input available
+[ ] inference command runs
 ```
 
-### Stage 4 — Verify
+## Step 4 — Verify
 
 ```text
 [ ] output exists
 [ ] output makes sense
-[ ] I know where it was written
+[ ] I know where it was saved
 ```
 
-### Stage 5 — Audit Codex
+## Step 5 — Check Codex changes
 
 ```bash
 git status
 git diff
 ```
 
-You should be able to explain **every file Codex changed**.
+You should be able to explain every changed file.
 
 ---
 
-# 8. Checkpoint
-
-Before you say **finished**, you must be able to answer:
-
-```text
-1. What is the inference entry point?
-2. Where did the model weights come from?
-3. What was the input?
-4. Where was the output written?
-5. What was the most important dependency/environment decision?
-6. Did Codex modify anything? Why?
-```
-
-If you cannot answer these, you have not finished the task yet.
-
----
-
-# 9. Homework — Fresh Clone Reproduction
+# 7. Homework — Fresh Clone Test
 
 Running it once in class is not enough.
 
-Your homework is to prove that the deployment is **reproducible**.
+Your homework is to prove that another person can reproduce it.
 
-## Step 1
+## Start from a fresh clone
 
-Start again from a **fresh clone / clean working directory**.
+Do not reuse the `.venv` from class.
 
-Do not reuse your working `.venv`.
-
-## Step 2
-
-Reproduce the inference using only your documented instructions.
-
-## Step 3
-
-Submit the following to your workshop repository:
+Submit:
 
 ```text
 workshop02_AI_Project_Survival/
@@ -386,9 +374,9 @@ datasets
 model caches
 ```
 
-## README requirements
+## README must include
 
-### 1. Assigned project
+### Project
 
 ```text
 Repository:
@@ -396,33 +384,31 @@ Commit:
 Task:
 ```
 
-Get the exact commit with:
+Get the commit with:
 
 ```bash
 git rev-parse HEAD
 ```
 
-### 2. Repo map
+### Repo map
 
 ```text
-Environment definition:
-Inference entry point:
-Checkpoint / model:
+Environment:
+Entry point:
+Model:
 Input:
 Output:
 ```
 
-### 3. Environment setup
+### Setup
 
-Give the **exact uv commands** required to reproduce your environment.
+Give the exact `uv` commands.
 
-### 4. Inference
+### Inference
 
-Give the **exact command** required to reproduce the result.
+Give the exact inference command.
 
-### 5. One failure
-
-Document one real problem using:
+### One real failure
 
 ```text
 Category:
@@ -430,23 +416,21 @@ Root cause:
 Minimal fix:
 ```
 
-### 6. Codex audit
-
-Answer briefly:
+### Codex check
 
 ```text
 What did Codex change?
-How did you verify the change?
+How did you verify it?
 ```
 
-### 7. Fresh-clone test
+### Final test
 
 ```text
-Reproduction result: PASS / FAIL
+Fresh-clone reproduction: PASS / FAIL
 ```
 
 ---
 
 # Final Rule
 
-> **If another person cannot reproduce your result from your instructions, the project is not deployed yet.**
+> **If another person cannot reproduce your result from your instructions, the deployment is not finished.**
