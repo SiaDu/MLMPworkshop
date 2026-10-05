@@ -268,41 +268,81 @@ cd <repository-name>
 
 > **Clone first, then create the environment inside the cloned repository.**
 
-## Use `uv`
+## Use `uv` with Codex
 
-### If the repo already has a usable `pyproject.toml`
+First identify:
+
+```text
+Python version
+Dependency source
+```
+
+Codex can help create the environment, but **do not let it guess or freely upgrade dependency versions**.
+
+### If the repo already has `pyproject.toml`
+
+Keep the existing project configuration.
+
+Ask Codex:
+
+```text
+Inspect this repository and determine the required Python version.
+
+Use uv to create or sync a local .venv using the existing pyproject.toml.
+
+Do not upgrade or change dependency versions unless required.
+Do not modify the source code.
+
+When finished, show me:
+1. the Python version used
+2. the dependencies installed
+3. the commands you ran
+```
+
+The usual workflow is:
 
 ```bash
 uv sync
 uv run <command>
 ```
 
-### If the repo uses `requirements.txt` or `setup.py`
+### If the repo only has `requirements.txt` or `setup.py`
 
-```bash
-uv venv
-uv pip install -r requirements.txt
+You may ask Codex to create a minimal uv-managed project configuration.
+
+```text
+Inspect the README, requirements.txt and setup.py.
+
+Determine the required Python version.
+
+Create a local uv environment using that Python version.
+
+Create a minimal pyproject.toml and add the project's required dependencies with uv.
+
+Preserve the dependency versions and constraints from the original repository.
+Do not upgrade packages unnecessarily.
+Do not modify the source code.
+
+When finished, show me:
+1. the Python version used
+2. the dependencies added
+3. the final pyproject.toml
+4. the commands you ran
 ```
 
-or:
+The goal is:
 
-```bash
-uv pip install -e .
+```text
+original dependency information
+        ↓
+pyproject.toml
+        ↓
+uv sync
+        ↓
+.venv
 ```
 
-Then run:
-
-```bash
-uv run <command>
-```
-
-### Wrong Python version?
-
-Do not change the system Python.
-
-```bash
-uv venv --python 3.11
-```
+> **Codex may organise the environment, but it must follow the repository's dependency requirements.**
 
 > **Reproduce first. Modernise later.**
 
