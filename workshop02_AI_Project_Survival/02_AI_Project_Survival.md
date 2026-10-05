@@ -105,11 +105,13 @@ awesome-ai-project/
 │
 ├── src/
 │   ├── model.py
-│   ├── dataset.py
+│   └── dataset.py
+│
+├── scripts/
 │   └── inference.py
 │
-├── configs/
 ├── utils/
+├── configs/
 ├── data/
 ├── checkpoints/
 ├── outputs/
@@ -117,6 +119,9 @@ awesome-ai-project/
 ```
 
 Different projects use different names and structures.
+
+The **entry point** may be in the project root, `src/`, or `scripts/`.  
+`utils/` usually contains helper functions rather than the main script you run.
 
 You do **not** need to understand every file.  
 You only need to locate five things:
