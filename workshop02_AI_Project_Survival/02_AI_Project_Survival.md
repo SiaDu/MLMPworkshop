@@ -270,7 +270,24 @@ cd <repository-name>
 
 ## Inspect the Environment Before Installing
 
-Before installing anything, use an AI coding agent only to **inspect and report**.
+Create and activate a local virtual environment first:
+
+```bash
+uv venv
+source .venv/bin/activate
+```
+
+Check where you are and which Python you are using:
+
+```bash
+pwd
+which python
+python --version
+```
+
+Your `which python` output should point to the `.venv` inside this repository.
+
+Now use an AI coding agent only to **inspect the repository and check compatibility**.
 
 Recommended options:
 
@@ -281,59 +298,46 @@ Recommended options:
 
 > **Do not ask the AI coding agent to configure the environment for you.**
 
-Ask your AI coding agent:
+Copy the outputs from the commands above into this prompt:
 
 ```text
-Inspect this repository and my current Python environment.
+Inspect this repository and compare its Python requirements with my current environment.
+
+My current environment:
+
+pwd:
+<PASTE OUTPUT>
+
+which python:
+<PASTE OUTPUT>
+
+python --version:
+<PASTE OUTPUT>
 
 Do not install anything.
 Do not modify any files.
 Do not create or change a virtual environment.
 
-Report:
+Tell me:
 
-1. What dependency file(s) does this repository use?
-   Examples: pyproject.toml, requirements.txt, setup.py, environment.yml
-
-2. What Python version does the repository require or recommend?
-
-3. What Python executable and Python version am I currently using?
-
-4. What virtual environment am I currently using?
-   Give me the full environment path.
-   If there is no active virtual environment, say so.
-
-5. Is there any Python version conflict between my current environment
+1. Is there any Python version conflict between my current environment
    and the repository requirements?
 
-6. Based on the repository files, which installation command should I run manually:
+2. Based on the repository files and README, which installation command
+   should I run manually:
    uv sync
    or
    uv pip install -r requirements.txt
    or another repository-specific command?
 
+Explain briefly why.
+
 Do not run the installation command.
 ```
 
-Check the answer before continuing.
+If there is a Python version conflict, stop and recreate the `.venv` with a compatible Python version before installing dependencies.
 
-### If there is no Python version conflict
-
-Create and activate the local environment yourself if needed:
-
-```bash
-uv venv
-source .venv/bin/activate
-```
-
-Check that you are using the expected environment:
-
-```bash
-which python
-python --version
-```
-
-Then install the dependencies **manually**.
+If there is no Python version conflict, install the dependencies **manually**.
 
 If the repository already has a suitable `pyproject.toml`:
 
@@ -347,15 +351,7 @@ If the repository uses `requirements.txt`:
 uv pip install -r requirements.txt
 ```
 
-Do not use:
-
-```bash
-sudo pip install ...
-```
-
 > **Inspect first. Install second. Let the repository define the environment.**
-
-If there is a Python version conflict, stop and resolve the version requirement before installing packages.
 
 > **Reproduce first. Modernise later.**
 
@@ -552,7 +548,6 @@ You do **not** need to:
 [ ] local uv environment
 [ ] correct Python version
 [ ] required dependencies
-[ ] no sudo / global pip
 ```
 
 ## Step 3 — Run
