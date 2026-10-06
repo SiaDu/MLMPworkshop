@@ -37,6 +37,7 @@ Root cause: the full declared dependency set is not resolvable for Python 3.8 be
 Minimal fix: change to Python 3.10
 
 **AI agent check**
+
 Which AI coding agent did you use?: copilot
 
 What did it change?: only venv python version
@@ -45,6 +46,7 @@ How did you verify the change?: I asked it to do this
 
 
 **Reviewer:**
+
 Peer Repo: https://github.com/SiaDu/MLMPworkshop/blob/main/workshop02_AI_Project_Survival/README.md
 
 Reproduction result: PASS

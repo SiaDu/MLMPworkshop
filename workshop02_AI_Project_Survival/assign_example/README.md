@@ -30,6 +30,7 @@ python detect.py --weights yolov5s.pt --source '/home/sdu/Desktop/workshop02_pro
 ```
 
 **One real failure**
+
 Category: Version conflict
 
 Root cause: the full declared dependency set is not resolvable for Python 3.8 because the optional export extra includes keras>=3.5.0,<=3.12.0, which requires Python >=3.9 / >=3.10 depending on version. So the effective minimum for the full dependency set is Python 3.9+, while the repo metadata still says >=3.8.
@@ -37,6 +38,7 @@ Root cause: the full declared dependency set is not resolvable for Python 3.8 be
 Minimal fix: change to Python 3.10
 
 **AI agent check**
+
 Which AI coding agent did you use?: copilot
 
 What did it change?: only venv python version
