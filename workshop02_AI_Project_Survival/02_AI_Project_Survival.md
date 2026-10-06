@@ -601,23 +601,21 @@ model caches
 
 ```text
 Repository:
-Commit:
+
 Inference task:
-```
-
-Get the exact commit with:
-
-```bash
-git rev-parse HEAD
 ```
 
 ### Repo map
 
 ```text
 Environment:
+
 Entry point:
+
 Model:
+
 Input:
+
 Output:
 ```
 
@@ -635,7 +633,9 @@ Document one real problem:
 
 ```text
 Category:
+
 Root cause:
+
 Minimal fix:
 ```
 
@@ -644,9 +644,11 @@ Minimal fix:
 If you used an AI coding agent:
 
 ```text
-Which AI coding agent did you use?
-What did it change?
-How did you verify the change?
+Which AI coding agent did you use?:
+
+What did it change?:
+
+How did you verify the change?:
 ```
 
 ---
@@ -662,12 +664,16 @@ Do not give extra instructions unless the README is incomplete.
 The reviewer records:
 
 ```text
-Reviewer:
+**Reviewer:**
+
 Reproduction result: PASS / FAIL
 
 If FAIL:
+
 Failed step:
+
 Missing information:
+
 Suggested fix:
 ```
 
