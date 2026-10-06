@@ -7,6 +7,7 @@ Inference task: Object detection
 **Repo map**
 
 Environment: pyproject.toml & requirements.txt
+
 Entry point: detect.py
 
 Model: The detect.py automatically downloads models from the latest YOLOv5 release 

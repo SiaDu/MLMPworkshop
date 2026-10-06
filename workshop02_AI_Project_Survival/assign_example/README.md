@@ -5,6 +5,7 @@ Repository: https://github.com/ultralytics/yolov5
 Inference task: Object detection
 
 **Repo map**
+
 Environment: pyproject.toml & requirements.txt
 
 Entry point: detect.py
