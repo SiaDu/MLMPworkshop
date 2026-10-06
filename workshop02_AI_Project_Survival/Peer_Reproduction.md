@@ -2,8 +2,6 @@
 
 Repository: https://github.com/ultralytics/yolov5
 
-Commit: 4add2aff6e3d926586a3eab4659f3b498dd444a1
-
 Inference task: Object detection
 
 **Repo map**
