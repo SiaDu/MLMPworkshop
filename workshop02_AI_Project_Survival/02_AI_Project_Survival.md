@@ -268,16 +268,9 @@ cd <repository-name>
 
 > **Clone first, then create the environment inside the cloned repository.**
 
-## Use `uv` with an AI Coding Agent
+## Inspect the Environment Before Installing
 
-First identify:
-
-```text
-Python version
-Dependency source
-```
-
-An AI coding agent can help create the environment, but **do not let it guess or freely upgrade dependency versions**.
+Before installing anything, use an AI coding agent only to **inspect and report**.
 
 Recommended options:
 
@@ -286,122 +279,127 @@ Recommended options:
 - Claude Code
 - another equivalent coding agent
 
-> **Using an AI coding agent is optional. You are responsible for checking what it changes.**
-
-### If the repo already has `pyproject.toml`
-
-Keep the existing project configuration.
+> **Do not ask the AI coding agent to configure the environment for you.**
 
 Ask your AI coding agent:
 
 ```text
-Inspect this repository and determine the required Python version.
+Inspect this repository and my current Python environment.
 
-Use uv to create or sync a local .venv using the existing pyproject.toml.
+Do not install anything.
+Do not modify any files.
+Do not create or change a virtual environment.
 
-Do not upgrade or change dependency versions unless required.
-Do not modify the source code.
+Report:
 
-When finished, show me:
-1. the Python version used
-2. the dependencies installed
-3. the commands you ran
+1. What dependency file(s) does this repository use?
+   Examples: pyproject.toml, requirements.txt, setup.py, environment.yml
+
+2. What Python version does the repository require or recommend?
+
+3. What Python executable and Python version am I currently using?
+
+4. What virtual environment am I currently using?
+   Give me the full environment path.
+   If there is no active virtual environment, say so.
+
+5. Is there any Python version conflict between my current environment
+   and the repository requirements?
+
+6. Based on the repository files, which installation command should I run manually:
+   uv sync
+   or
+   uv pip install -r requirements.txt
+   or another repository-specific command?
+
+Do not run the installation command.
 ```
 
-The usual workflow is:
+Check the answer before continuing.
+
+### If there is no Python version conflict
+
+Create and activate the local environment yourself if needed:
+
+```bash
+uv venv
+source .venv/bin/activate
+```
+
+Check that you are using the expected environment:
+
+```bash
+which python
+python --version
+```
+
+Then install the dependencies **manually**.
+
+If the repository already has a suitable `pyproject.toml`:
 
 ```bash
 uv sync
-uv run <command>
 ```
 
-### If the repo only has `requirements.txt` or `setup.py`
+If the repository uses `requirements.txt`:
 
-You may ask your AI coding agent to create a minimal uv-managed project configuration.
-
-```text
-Inspect the README, requirements.txt and setup.py.
-
-Determine the required Python version.
-
-Create a local uv environment using that Python version.
-
-Create a minimal pyproject.toml and add the project's required dependencies with uv.
-
-Preserve the dependency versions and constraints from the original repository.
-Do not upgrade packages unnecessarily.
-Do not modify the source code.
-
-When finished, show me:
-1. the Python version used
-2. the dependencies added
-3. the final pyproject.toml
-4. the commands you ran
+```bash
+uv pip install -r requirements.txt
 ```
 
-The goal is:
+Do not use:
 
-```text
-original dependency information
-        ↓
-pyproject.toml
-        ↓
-uv sync
-        ↓
-.venv
+```bash
+sudo pip install ...
 ```
 
-> **The AI agent may organise the environment, but it must follow the repository's dependency requirements.**
+> **Inspect first. Install second. Let the repository define the environment.**
+
+If there is a Python version conflict, stop and resolve the version requirement before installing packages.
 
 > **Reproduce first. Modernise later.**
 
 ---
 
-# 3. Use an AI Coding Agent as a Helper, Not a Guessing Machine
+# 3. Ask for an Inference Command — Do Not Let the Agent Run It
 
-An AI coding agent can read the repo, run commands and change files.  
-That is useful, but you must still check what it does.
+Once the environment is ready, use the AI coding agent to help you **find the correct inference command**.
 
-Before starting:
-
-```bash
-pwd
-git status
-```
+The AI coding agent should inspect the repository and explain what to run, but **you should run the command yourself**.
 
 Use this prompt:
 
 ```text
-Help me reproduce one pretrained inference in this repository.
+Give me one command to reproduce one pretrained inference in this repository.
 
-Rules:
-- work only inside this repository
-- use uv
-- do not use sudo
-- do not modify the global Python environment
-- do not train the model
-- inspect before changing anything
-- diagnose errors before installing new packages
-- make the smallest necessary change
-- stop after one inference succeeds
+Do not run the command.
+Do not install anything.
+Do not modify any files.
 
-First inspect the repository.
-Do not modify anything yet.
+Before giving me the command, tell me:
+
+1. which pretrained model / checkpoint is required;
+2. where the checkpoint should be placed;
+3. what example input I can use;
+4. what output I should expect;
+5. where the output will be saved.
+
+Then give me one inference command to run manually.
+
+Use the repository's own scripts and instructions where possible.
+Do not train the model.
 ```
 
-### Bad request
+Before running the command yourself, check:
 
 ```text
-Fix everything.
+[ ] the checkpoint exists
+[ ] the input path exists
+[ ] the command matches the repository README
+[ ] I know where the output should appear
 ```
 
-### Better request
-
-```text
-Explain why this command failed.
-Do not change anything yet.
-Find the root cause first.
-```
+> **The AI coding agent suggests. You execute and verify.**
 
 ---
 
@@ -416,6 +414,48 @@ CHECKPOINT / ASSET
 PATH
 DEVICE / CUDA
 COMMAND / CONFIG
+```
+
+When a command fails, **do not immediately install another package**.
+
+Copy both:
+
+1. the exact command you ran;
+2. the complete error message.
+
+Then send them to your AI coding agent:
+
+```text
+I ran this command:
+
+<PASTE THE EXACT COMMAND>
+
+It failed with this error:
+
+<PASTE THE COMPLETE ERROR>
+
+Do not run anything.
+Do not install anything.
+Do not modify any files.
+
+Please:
+
+1. classify the error as one of:
+   DEPENDENCY
+   PYTHON VERSION
+   CHECKPOINT / ASSET
+   PATH
+   DEVICE / CUDA
+   COMMAND / CONFIG
+
+2. identify the most likely root cause;
+
+3. suggest the smallest fix;
+
+4. explain why that fix addresses this error.
+
+If there is not enough information, tell me which read-only command
+I should run to collect the missing information.
 ```
 
 ### Example 1
@@ -447,18 +487,22 @@ Do not solve Example 2 by installing more Python packages.
 Use this debugging flow:
 
 ```text
-error
-  ↓
-classify
-  ↓
+command + error
+      ↓
+ask AI to classify
+      ↓
 find root cause
-  ↓
-smallest fix
-  ↓
-run again
-  ↓
+      ↓
+choose the smallest fix
+      ↓
+you run the fix
+      ↓
+run the inference again
+      ↓
 verify output
 ```
+
+> **Do not ask the AI coding agent to "fix everything". Diagnose one failure at a time.**
 
 ---
 
@@ -527,14 +571,16 @@ You do **not** need to:
 [ ] I know where it was saved
 ```
 
-## Step 5 — Check AI agent changes
+## Step 5 — Check What Changed
 
 ```bash
 git status
 git diff
 ```
 
-If you used an AI agent, you should be able to explain every changed file.
+You should know what changed during deployment and why.
+
+The AI coding agent should not make changes for you in this workshop.
 
 ---
 
@@ -642,9 +688,11 @@ If you used an AI coding agent:
 ```text
 Which AI coding agent did you use?:
 
-What did it change?:
+What advice did it give?:
 
-How did you verify the change?:
+What command or fix did you choose to run yourself?:
+
+How did you verify the result?:
 ```
 
 ---
