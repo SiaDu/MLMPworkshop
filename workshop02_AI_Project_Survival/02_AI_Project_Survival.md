@@ -464,16 +464,18 @@ verify output
 
 # 5. Project Lottery
 
-You will receive **one unfamiliar AI repository**.
+The instructor demo uses [ultralytics/yolov5](https://github.com/ultralytics/yolov5).
+
+You will receive **one unfamiliar AI repository** to reproduce yourself.
 
 | ID | Repository | Task |
 |---|---|---|
-| **A** | [ultralytics/yolov5](https://github.com/ultralytics/yolov5) | Object detection |
-| **B** | [danielgatis/rembg](https://github.com/danielgatis/rembg) | Background removal |
-| **C** | [JaidedAI/EasyOCR](https://github.com/JaidedAI/EasyOCR) | Text recognition |
-| **D** | [openai/CLIP](https://github.com/openai/CLIP) | Image–text classification |
-| **E** | [DepthAnything/Depth-Anything-V2](https://github.com/DepthAnything/Depth-Anything-V2) | Depth estimation |
-| **F** | [timesler/facenet-pytorch](https://github.com/timesler/facenet-pytorch) | Face detection |
+| **A** | [DepthAnything/Depth-Anything-V2](https://github.com/DepthAnything/Depth-Anything-V2) | Depth estimation |
+| **B** | [facebookresearch/segment-anything](https://github.com/facebookresearch/segment-anything) | Image segmentation |
+| **C** | [xinntao/Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) | Image super-resolution |
+| **D** | [junyanz/pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) | Image-to-image translation |
+| **E** | [TencentARC/GFPGAN](https://github.com/TencentARC/GFPGAN) | Face restoration |
+| **F** | [richzhang/colorization](https://github.com/richzhang/colorization) | Image colorization |
 
 Your goal is simple:
 
@@ -560,17 +562,11 @@ For example:
 
 ```bash
 cd ~/workshop02_projects
-git clone https://github.com/ultralytics/yolov5.git yolov5_fresh
-cd yolov5_fresh
+git clone <repository-url> <repository-name>_fresh
+cd <repository-name>_fresh
 ```
 
-This creates:
-
-```text
-~/workshop02_projects/
-├── yolov5/
-└── yolov5_fresh/
-```
+This gives you a new copy of the repository, separate from the one you used in class.
 
 Do not reuse the `.venv` from class.
 
