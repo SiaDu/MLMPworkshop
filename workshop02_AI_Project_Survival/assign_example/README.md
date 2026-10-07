@@ -20,9 +20,9 @@ Output: run/detect/exp
 ```text
 git clone https://github.com/ultralytics/yolov5
 cd yolov5
-uv venv
-source .venv/bin/activate
 uv python install 3.10
+uv venv --python 3.10
+source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
