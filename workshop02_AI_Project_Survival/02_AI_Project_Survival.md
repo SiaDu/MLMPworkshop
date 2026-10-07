@@ -298,6 +298,16 @@ Based on the repository files, README, dependency files, and package version req
 Give me one recommended Python version and briefly explain why.
 ```
 
+Then make sure the recommended Python version is available.
+
+If needed, install that Python version with uv:
+
+```bash
+uv python install 3.10
+```
+
+Replace `3.10` with the recommended version.
+
 Then create the local virtual environment yourself.
 
 If the project works with your default Python:
