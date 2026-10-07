@@ -270,10 +270,53 @@ cd <repository-name>
 
 ## Inspect the Environment Before Installing
 
-Create and activate a local virtual environment first:
+Before creating the virtual environment, first use an AI coding agent to inspect the repository and determine which Python version is appropriate.
+
+Recommended options:
+
+- **GitHub Copilot Free / Copilot Student**
+- Codex
+- Claude Code
+- another equivalent coding agent
+
+> **Do not ask the AI coding agent to install anything or configure the environment for you.**
+
+Use this prompt:
+
+```text
+Inspect this repository and its README.
+
+Do not install anything.
+Do not modify any files.
+Do not create or change a virtual environment.
+
+Based on the repository files, README, dependency files, and package version requirements:
+
+1. Which Python version should I use for this project?
+2. Which Python version is least likely to cause dependency conflicts?
+
+Give me one recommended Python version and briefly explain why.
+```
+
+Then create the local virtual environment yourself.
+
+If the project works with your default Python:
 
 ```bash
 uv venv
+```
+
+If a specific Python version is recommended:
+
+```bash
+uv venv --python 3.10
+```
+
+Replace `3.10` with the recommended version.
+
+Activate the environment:
+
+```bash
 source .venv/bin/activate
 ```
 
@@ -287,57 +330,34 @@ python --version
 
 Your `which python` output should point to the `.venv` inside this repository.
 
-Now use an AI coding agent only to **inspect the repository and check compatibility**.
+## Decide How to Install the Dependencies
 
-Recommended options:
+Now ask the AI coding agent to inspect how the repository expects its dependencies to be installed.
 
-- **GitHub Copilot Free / Copilot Student**
-- Codex
-- Claude Code
-- another equivalent coding agent
-
-> **Do not ask the AI coding agent to configure the environment for you.**
-
-Copy the outputs from the commands above into this prompt:
+Use this prompt:
 
 ```text
-Inspect this repository and compare its Python requirements with my current environment.
+Based on the repository files and README, which installation command
+should I run manually?
 
-My current environment:
+For example:
 
-pwd:
-<PASTE OUTPUT>
+uv sync
 
-which python:
-<PASTE OUTPUT>
+or
 
-python --version:
-<PASTE OUTPUT>
+uv pip install -r requirements.txt
 
-Do not install anything.
-Do not modify any files.
-Do not create or change a virtual environment.
-
-Tell me:
-
-1. Is there any Python version conflict between my current environment
-   and the repository requirements?
-
-2. Based on the repository files and README, which installation command
-   should I run manually:
-   uv sync
-   or
-   uv pip install -r requirements.txt
-   or another repository-specific command?
-
-Explain briefly why.
+or another repository-specific command.
 
 Do not run the installation command.
+Do not install anything.
+Do not modify any files.
+
+Tell me the recommended command and briefly explain why.
 ```
 
-If there is a Python version conflict, stop and recreate the `.venv` with a compatible Python version before installing dependencies.
-
-If there is no Python version conflict, install the dependencies **manually**.
+Then run the recommended installation command yourself.
 
 If the repository already has a suitable `pyproject.toml`:
 
@@ -345,15 +365,60 @@ If the repository already has a suitable `pyproject.toml`:
 uv sync
 ```
 
-If the repository uses `requirements.txt`:
+If the repository provides a `requirements.txt`:
 
 ```bash
 uv pip install -r requirements.txt
 ```
 
-> **Inspect first. Install second. Let the repository define the environment.**
+### What if there is no dependency file?
 
-> **Reproduce first. Modernise later.**
+Some repositories may not provide either:
+
+```text
+pyproject.toml
+requirements.txt
+```
+
+In that case, do **not** start installing packages one by one at random.
+
+Ask the AI coding agent to inspect the repository code and README and propose a minimal `requirements.txt` for the pretrained inference task.
+
+Use this prompt:
+
+```text
+This repository does not contain a pyproject.toml or requirements.txt.
+
+Inspect the README, import statements, installation instructions,
+and the code needed for pretrained inference.
+
+Do not install anything.
+Do not modify any files.
+
+Tell me what should be included in a new requirements.txt so that I can
+run the repository's pretrained inference.
+
+Include only the packages that are actually required.
+
+If the repository indicates specific package versions, preserve them.
+If a version cannot be determined from the repository, do not invent
+an exact version unless compatibility requires one.
+
+Return the proposed contents of requirements.txt and briefly explain
+where each dependency came from.
+```
+
+Review the suggested dependencies before creating the file.
+
+Then create `requirements.txt` and install it manually:
+
+```bash
+uv pip install -r requirements.txt
+```
+
+> **Inspect first. Create the environment second. Install dependencies third.**
+
+> **Let the repository define the environment whenever possible. Reproduce first. Modernise later.**
 
 ---
 
