@@ -18,6 +18,8 @@ Output: run/detect/exp
 
 **Environment setup**
 ```text
+git clone https://github.com/ultralytics/yolov5
+cd yolov5
 uv venv
 source .venv/bin/activate
 uv python install 3.10
