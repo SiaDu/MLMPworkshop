@@ -247,20 +247,32 @@ function drawQuiz() {
 }
 
 function setupNavigation() {
-  const visited=new Set();
-  const sections=["intro","comparison","anatomy","loop","quiz"];
-  const observer=new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting) {
-        visited.add(entry.target.id);
-        const percent=Math.round(visited.size/sections.length*100);
-        $("#progress-number").textContent=percent+"%";
-        $("#progress-bar").style.width=percent+"%";
-        document.querySelectorAll(".nav-item").forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+entry.target.id));
+  // The sidebar lists all seven major sections; it does not track progress.
+  const sections = ["intro", "s2-start", "s3", "s4", "s5", "s6", "s7"];
+  const links = [...document.querySelectorAll(".side-nav .nav-item")];
+
+  const updateActiveSection = () => {
+    let active = "intro";
+    const topBoundary = window.scrollY + 170;
+
+    for (const id of sections) {
+      const element = document.getElementById(id);
+      if (element && element.getBoundingClientRect().top + window.scrollY <= topBoundary) {
+        active = id;
       }
-    });
-  },{rootMargin:"-20% 0px -62% 0px",threshold:0});
-  sections.forEach(id=>observer.observe(document.getElementById(id)));
+    }
+
+    for (const link of links) {
+      const selected = link.getAttribute("href") === "#" + active;
+      link.classList.toggle("active", selected);
+      if (selected) link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
+    }
+  };
+
+  window.addEventListener("scroll", updateActiveSection, {passive: true});
+  window.addEventListener("hashchange", updateActiveSection);
+  updateActiveSection();
 }
 
 $("#scenario-condition").addEventListener("change", (event) => {
