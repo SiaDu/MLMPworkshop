@@ -600,6 +600,11 @@ def search_papers(query: str, limit: int = 5) -> list[dict]:
             f"({paper.get('year') or 'unknown year'})",
             flush=True,
         )
+        print(f"     DOI: {paper.get('doi') or 'not available'}", flush=True)
+        print(
+            f"     OpenAlex: {paper.get('openalex_url') or 'not available'}",
+            flush=True,
+        )
 
     # Returning a list gives these real records back to Gemini via the SDK.
     return papers
