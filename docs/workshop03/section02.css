@@ -77,3 +77,25 @@
 .s2-footer{font-size:11px;color:var(--faint);padding:23px 0;border-top:1px solid var(--line)}
 @media(max-width:900px){.s2-route{grid-template-columns:1fr 1fr}.s2-flow{grid-template-columns:1fr;gap:7px}.s2-flow-arrow{transform:rotate(90deg);justify-self:center}.s2-three{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.s2-intro{padding-top:40px}.s2-objective,.s2-section-head{flex-direction:column;align-items:start}.s2-route,.s2-three,.s2-dual,.s2-demo-body{grid-template-columns:1fr}.s2-lab-body{padding:13px}.s2-step{gap:9px}.s2-code pre{font-size:10.5px}.s2-demo-top{flex-direction:column;align-items:stretch}.s2-tabs{width:100%}.s2-tabs button{flex:1}.s2-response{min-height:0}}
+
+
+/* One continuous workshop page: a course syllabus, not a student progress tracker. */
+.sidebar .side-nav{gap:5px}
+.sidebar .nav-item{line-height:1.35;font-size:12px;min-height:47px}
+.sidebar .nav-num{font-size:11px;min-width:16px;display:inline-block}
+.sidebar-card-eyebrow{font-size:9px;letter-spacing:.12em;font-weight:850;color:var(--accent);display:block;margin-bottom:8px}
+.sidebar-bottom strong{display:block;font-size:12px;line-height:1.35;color:#f1f8fb}
+.sidebar-bottom p{color:var(--muted);font-size:11px;margin:10px 0 0}
+.s2-intro .s2-objective{align-items:start}
+.s2-intro .s2-objective>div{flex:1}
+.s2-section{scroll-margin-top:95px}
+.s2-select-label{display:block;font-weight:750;font-size:12px;color:#cbd5e9;margin:0 0 8px}
+.s2-sample-select{max-width:100%;width:100%;padding:11px 13px;border:1px solid #555e7d;background:#232c40;border-radius:9px;color:#f0f6ff;font-size:12px}
+.s2-sample-select:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+.s2-roadmap{padding:22px 0 12px}
+.s2-roadmap .s2-section-head{margin-bottom:4px}
+.s2-roadmap h3{font-size:24px;margin:6px 0}
+.s2-roadmap p{font-size:12px}
+.s2-roadmap:last-of-type{margin-bottom:28px}
+.s2-code pre{tab-size:4}
+@media(max-width:900px){.sidebar .side-nav{gap:5px}}
