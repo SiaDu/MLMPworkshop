@@ -158,16 +158,36 @@
 
 <section class="s2-section" id="s2-api">
   <div class="s2-section-head"><div><span class="s2-index">01 / UNDERSTAND</span><h3>What is an LLM API?</h3><p>An API lets Python send a prompt to a model and receive its answer. Both directions travel through the same API.</p></div></div>
-  <div class="s2-flow" role="img" aria-label="Two-way communication between Python, the Gemini API, and the LLM model. Requests go right; responses return left.">
-    <div class="s2-flow-cell"><span>⌨</span><b>Python Program</b><small>Sends a prompt; receives text or JSON</small></div>
-    <div class="s2-flow-arrow" aria-hidden="true">⇄</div>
-    <div class="s2-flow-cell"><span>⇄</span><b>Gemini API</b><small>Transfers requests and responses</small></div>
-    <div class="s2-flow-arrow" aria-hidden="true">⇄</div>
-    <div class="s2-flow-cell"><span>✳</span><b>LLM Model</b><small>Processes the prompt and generates output</small></div>
-  </div>
-  <div class="s2-message-paths">
-    <div><b>REQUEST →</b><span>Python → API → Model</span></div>
-    <div><b>← RESPONSE</b><span>Model → API → Python (text / JSON)</span></div>
+  <div class="s2-client-cloud" role="img" aria-label="The Python program runs locally on your computer. It sends an API request over the internet to Google's cloud, where the Gemini API connects to the LLM model. The response travels back to Python.">
+    <div class="s2-zone s2-local-zone">
+      <span class="s2-zone-label">LOCAL · YOUR COMPUTER</span>
+      <div class="s2-zone-content">
+        <span class="s2-big-icon" aria-hidden="true">⌨</span>
+        <b>Python Script</b>
+        <small>Runs on your PC and calls the Gemini API</small>
+      </div>
+    </div>
+    <div class="s2-exchange" aria-hidden="true">
+      <span>REQUEST →</span>
+      <span>← RESPONSE</span>
+      <small>Over the Internet</small>
+    </div>
+    <div class="s2-zone s2-cloud-zone">
+      <span class="s2-zone-label">GOOGLE CLOUD · REMOTE SERVICE</span>
+      <div class="s2-cloud-parts">
+        <div class="s2-zone-content">
+          <span class="s2-big-icon" aria-hidden="true">⇄</span>
+          <b>Gemini API</b>
+          <small>Receives requests and sends responses</small>
+        </div>
+        <span class="s2-cloud-arrow" aria-hidden="true">⇄</span>
+        <div class="s2-zone-content">
+          <span class="s2-big-icon" aria-hidden="true">✳</span>
+          <b>LLM Model</b>
+          <small>Processes the prompt and generates output</small>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="s2-three">
     <div class="s2-concept"><strong>API Key</strong><p>A private credential linked to your account. Keep it out of GitHub.</p></div>
