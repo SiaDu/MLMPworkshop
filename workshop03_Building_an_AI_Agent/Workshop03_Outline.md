@@ -61,6 +61,8 @@ By the end of the workshop, students should be able to:
 - Request and validate structured JSON output
 - Basic API-key safety, token usage, and rate limits
 
+**Starter code and beginner instructions:** [Section 2 — LLM API + Structured Outputs](literature_research_agent_starter/README.md). Includes `~/.bashrc` setup, the `uv` project, two commented Python scripts, and a prepared OpenAlex tool for Section 3.
+
 ### 3. Function Calling + OpenAlex Paper Search — Required Hands-on (35 min)
 
 - Create or use a `search_papers(query)` Python tool backed by the OpenAlex API
