@@ -186,6 +186,159 @@ if response.usage_metadata:
   <div class="s2-note"><strong>Key distinction:</strong> writing “please return JSON” in a prompt is not the same as providing an actual schema in the API request. In the next example we will supply the schema through <code>GenerateContentConfig</code>.</div>
 </section>
 
-<!-- CONTENT_APPEND -->
+
+<section class="s2-section" id="s2-schema">
+  <div class="s2-section-head"><div><span class="s2-index">04 / HANDS-ON</span><h3>Structured Outputs with Pydantic</h3><p>Describe the fields Python expects, request matching JSON from Gemini, check the returned values, and save them.</p></div></div>
+  <div class="s2-three">
+    <div class="s2-concept"><strong>topic: str</strong><p>A string (text) describing your survey topic.</p></div>
+    <div class="s2-concept"><strong>search_queries: list[str]</strong><p>A list in which every item is a string.</p></div>
+    <div class="s2-concept"><strong>start_year: int</strong><p>An integer (whole number) for the publication year.</p></div>
+  </div>
+  <div class="s2-code"><div class="s2-code-bar"><span>PYTHON · OUR EXPECTED DATA MODEL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python"># Import the Pydantic base class used to define a data structure.
+from pydantic import BaseModel
+
+# Each attribute specifies the type we expect in the JSON.
+class SearchPlan(BaseModel):
+    topic: str                # A text string.
+    search_queries: list[str] # A list of search-query strings.
+    start_year: int           # An integer.</code></pre></div>
+  <div class="s2-note"><strong>Key API settings:</strong> <code>response_mime_type="application/json"</code> requests JSON, and <code>response_schema=SearchPlan</code> tells Gemini which fields/types to return. Afterwards, <code>SearchPlan.model_validate_json(response.text)</code> validates the JSON as a Python object.</div>
+  <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL · RUN SECOND SCRIPT</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Generate structured JSON and save a local research plan.
+python 02_structured_output.py</code></pre></div>
+  <p class="s2-caption">This is the complete provided Python file. Read the comments — you do not need to type the entire program.</p>
+  <div class="s2-code"><div class="s2-code-bar"><span>02_structured_output.py · FULL ANNOTATED PYTHON</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python">&quot;&quot;&quot;
+Workshop 03 — Section 2B: Ask Gemini for a structured JSON SearchPlan.
+
+Student task:
+1. Run this file.
+2. Change TOPIC to your survey topic and run it again.
+3. Find search_plan.json. This file will help with the next section.
+Optional: add a 'research_focus: str' field to SearchPlan.
+&quot;&quot;&quot;
+
+import os  # Reads the GEMINI_API_KEY environment variable.
+from datetime import date  # Gets the current year for a simple check.
+from pathlib import Path  # Helps save our JSON output to a file.
+
+from google import genai  # The official Google Gemini Python SDK.
+from google.genai import types  # Configuration options for Gemini.
+from pydantic import BaseModel, Field  # Define and describe a data schema.
+
+
+# EDIT THIS: use your own survey topic.
+TOPIC = &quot;AI facial animation&quot;
+MODEL = &quot;gemini-3.5-flash-lite&quot;
+
+
+# A Pydantic class defines the exact fields that Python expects.
+# This is NOT an LLM agent or a paper-search function.
+class SearchPlan(BaseModel):
+    # str = a piece of text, such as &quot;AI facial animation&quot;.
+    topic: str = Field(description=&quot;The student's academic survey topic&quot;)
+
+    # list[str] = a list of text strings (search queries).
+    search_queries: list[str] = Field(
+        description=&quot;Three distinct queries suitable for academic paper search&quot;
+    )
+
+    # int = an integer, such as 2022.
+    start_year: int = Field(
+        description=&quot;Earliest publication year to search from&quot;
+    )
+
+
+# Stop with a useful message if the student's key is not configured.
+if not os.getenv(&quot;GEMINI_API_KEY&quot;):
+    raise SystemExit(&quot;Missing GEMINI_API_KEY. See the README.&quot;)
+
+# Set up our API client; the key comes from the environment.
+client = genai.Client()
+
+# Tell Gemini what we need. The schema below enforces the data FORMAT.
+prompt = (
+    f&quot;Create a literature search plan for the topic: {TOPIC}. &quot;
+    &quot;Give exactly three different academic search queries. &quot;
+    &quot;Focus on publications from 2022 onwards. &quot;
+    &quot;Do not invent specific paper titles or citations.&quot;
+)
+
+# Request JSON whose fields follow our Pydantic model.
+response = client.models.generate_content(
+    model=MODEL,
+    contents=prompt,
+    config=types.GenerateContentConfig(
+        response_mime_type=&quot;application/json&quot;,
+        response_schema=SearchPlan,
+    ),
+)
+
+# A successful response should contain JSON text, not an empty response.
+if not response.text:
+    raise SystemExit(&quot;The model did not return any JSON text.&quot;)
+
+# This checks the returned JSON against our expected Python field types.
+# If a field is missing or the wrong type, Pydantic reports an error.
+plan = SearchPlan.model_validate_json(response.text)
+
+# Extra RULES for the lesson: correct JSON types are not enough.
+# We also want EXACTLY three queries and a sensible publication year.
+if len(plan.search_queries) != 3:
+    raise ValueError(&quot;Expected exactly three search queries.&quot;)
+
+if not (2000 &lt;= plan.start_year &lt;= date.today().year):
+    raise ValueError(&quot;The start_year is outside the allowed range.&quot;)
+
+# Convert the validated Python model back into neatly formatted JSON.
+json_output = plan.model_dump_json(indent=2)
+
+print(&quot;\n--- Validated SearchPlan (JSON) ---&quot;)
+print(json_output)
+
+# Demonstrate that Python can access each field directly.
+print(&quot;\n--- Python can use individual fields ---&quot;)
+print(&quot;Topic:&quot;, plan.topic)
+print(&quot;First search query:&quot;, plan.search_queries[0])
+print(&quot;Start year:&quot;, plan.start_year)
+
+# Save this structured plan so the next lesson can reuse it.
+output_file = Path(&quot;search_plan.json&quot;)
+output_file.write_text(json_output + &quot;\n&quot;, encoding=&quot;utf-8&quot;)
+print(&quot;\nSaved file:&quot;, output_file.resolve())</code></pre></div>
+  <div class="s2-activity"><strong>YOUR TURN</strong><p>Change <code>TOPIC</code> to your own AI for Media survey topic, save the file and run it again. Open the generated <code>search_plan.json</code>. Find <code>search_queries</code> and <code>start_year</code>.</p></div>
+  <div class="s2-note"><strong>Optional:</strong> Add a <code>research_focus: str</code> field to the Pydantic <code>SearchPlan</code> and rerun. What changes in the generated JSON?</div>
+</section>
+
+<section class="s2-section" id="s2-check">
+  <div class="s2-section-head"><div><span class="s2-index">05 / VALIDATION + SAFETY</span><h3>Valid JSON ≠ Valid Research</h3><p>Field types, business rules and factual correctness are different things. Try three sample responses to see the difference.</p></div></div>
+  <div class="s2-lab-panel">
+    <div class="s2-lab-title"><strong>INTERACTIVE · What if the JSON is wrong?</strong><small>Three sample responses</small></div>
+    <div class="s2-lab-body">
+      <label for="s2-validation-sample" class="s2-select-label">Choose a sample response:</label>
+      <select id="s2-validation-sample" class="s2-sample-select">
+        <option value="correct">Correct JSON · three queries</option>
+        <option value="wrong_type">Wrong type · text instead of a list</option>
+        <option value="wrong_count">Correct type · only one query</option>
+      </select>
+      <div class="s2-code"><div class="s2-code-bar"><span>EXAMPLE JSON</span></div><pre><code id="s2-validation-json"></code></pre></div>
+      <button class="button-primary" id="s2-validate" type="button">Validate example →</button>
+      <div class="s2-note" id="s2-validation-result" aria-live="polite"></div>
+      <p class="s2-caption">This classroom interaction illustrates basic checks. The actual Python script uses Pydantic to validate its real API response.</p>
+    </div>
+  </div>
+  <div class="s2-code"><div class="s2-code-bar"><span>PYTHON · ADDITIONAL VALIDATION RULES</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python"># Check the number of queries, not just their data type.
+assert len(plan.search_queries) == 3
+
+# Do not allow a starting year in the future.
+from datetime import date
+assert plan.start_year &lt;= date.today().year</code></pre></div>
+  <div class="s2-three">
+    <div class="s2-concept"><strong>Schema validation</strong><p>Are the correct fields present, with the right types?</p></div>
+    <div class="s2-concept"><strong>Extra rules</strong><p>Exactly three queries? A sensible publication year?</p></div>
+    <div class="s2-concept"><strong>Factual validation</strong><p>Are the queries relevant? Are the eventual paper references real?</p></div>
+  </div>
+  <div class="s2-note"><strong>Remember:</strong> Keep the API Key private and out of GitHub. Each API call uses tokens. If you receive <code>429</code>, stop sending repeated requests and ask for assistance.</div>
+  <div class="s2-bridge"><span class="s2-index">NEXT / SECTION 03</span><h3>From SearchPlan to Function Calling ↗</h3><p>In this section, Python called Gemini to generate a SearchPlan. Next, we will let the LLM request a real <code>search_papers(query)</code> function, while Python executes it using OpenAlex metadata.</p><p>Remember: a JSON search plan is not itself an academic paper list. The real research sources come from OpenAlex in the next section.</p></div>
+</section>
+
 </main></div>
 </body></html>
