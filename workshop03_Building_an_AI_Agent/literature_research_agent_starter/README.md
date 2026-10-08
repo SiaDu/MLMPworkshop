@@ -74,7 +74,7 @@ source ~/.bashrc
 
 **Use only ONE method:** `nano` **or** `echo >>`. Typing the real key directly into the terminal's `echo` command can save it in shell history, so `nano` is recommended.
 
-**On shared lab computers:** If other students use the same Linux login, do **not** store a personal key in `~/.bashrc`. Instead, use `export GEMINI_API_KEY="your_api_key_here"` temporarily in your own terminal session, or follow your instructor's secure setup. The temporary command may also remain in shell history. When finished, run `unset GEMINI_API_KEY` and close the session. Never share the key.
+**Lab setup:** Each student uses their own Linux account and computer, so you can keep your personal `GEMINI_API_KEY` in your own `~/.bashrc` for future classes. You normally need to run `source ~/.bashrc` only after editing it; new Bash terminal sessions load this configuration automatically. Keep your key private and never upload it to GitHub.
 
 ## Part B — Install project dependencies
 
