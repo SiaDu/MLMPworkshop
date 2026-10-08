@@ -1,0 +1,12 @@
+# This file tells uv which Python version and packages this project needs.
+
+[project]
+name = "workshop03-literature-research-agent"
+version = "0.1.0"
+description = "Starter code for Workshop 03: LLM API, structured output and paper search."
+requires-python = ">=3.10"
+dependencies = [
+    "google-genai>=1.0.0",
+    "pydantic>=2.0.0",
+    "requests>=2.31.0",
+]
