@@ -186,6 +186,15 @@
       <p>Expected output: <code>API key is set</code>. If nothing appears, reopen <code>~/.bashrc</code> and check for a spelling mistake.</p>
     </div></div>
   </div></div>
+  <details class="s2-alternative">
+  <summary>Alternative way to add the API Key using one command (do not use both methods)</summary>
+  <p>Only use this if you did <strong>not</strong> already add your key through <code>nano</code>. A real key typed directly into a shell command may remain in terminal history, so the <code>nano</code> method above is preferable.</p>
+  <div class="s2-code"><div class="s2-code-bar"><span>ALTERNATIVE LINUX COMMAND · NOT AN EXTRA STEP</span><button type="button" class="s2-copy" data-s2-copy>Copy code</button></div><pre><code># Append one export line to ~/.bashrc. Replace YOUR_API_KEY first.
+echo 'export GEMINI_API_KEY="YOUR_API_KEY"' &gt;&gt; ~/.bashrc
+
+# Apply the updated Bash settings.
+source ~/.bashrc</code></pre></div>
+</details>
   <div class="s2-lab-panel"><div class="s2-lab-title"><strong>PART B · Open the starter project and install its dependencies</strong><small>No sudo required</small></div><div class="s2-lab-body">
     <p class="s2-caption">Start in the root folder of your cloned <code>MLMPworkshop</code> repository. Your instructor has prepared the project files already.</p>
     <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Go into the prepared starter folder.
