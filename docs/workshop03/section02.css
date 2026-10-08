@@ -99,3 +99,11 @@
 .s2-roadmap:last-of-type{margin-bottom:28px}
 .s2-code pre{tab-size:4}
 @media(max-width:900px){.sidebar .side-nav{gap:5px}}
+
+
+/* Optional setup command is tucked away to keep the classroom slide focused. */
+.s2-alternative{margin:12px 0 20px;padding:13px 16px;border:1px solid #46536c;border-radius:11px;background:#172236}
+.s2-alternative summary{cursor:pointer;color:#c4ccea;font-size:12px;font-weight:750;line-height:1.5}
+.s2-alternative summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.s2-alternative p{font-size:11px;color:var(--muted);line-height:1.6;margin:12px 0 6px}
+.s2-alternative .s2-code{margin-bottom:0}
