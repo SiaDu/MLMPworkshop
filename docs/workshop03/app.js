@@ -6,8 +6,8 @@ const EXAMPLES = {
     goal: "Find five relevant papers for an AI facial animation survey.",
     caption: "Search real academic metadata, inspect findings and export a reading list.",
     conditions: [
-      { value: "sparse", label: "Few papers found" },
-      { value: "sufficient", label: "Enough papers found" }
+      { value: "sufficient", label: "Enough papers found" },
+      { value: "sparse", label: "Few papers found" }
     ],
     tools: [
       { name: "search_papers", desc: "Query OpenAlex by keyword", icon: "⌕", via: "OpenAlex API" },
@@ -43,7 +43,7 @@ const QUIZ = [
 
 const $ = (selector) => document.querySelector(selector);
 const currentCase = "text";
-let condition = "sparse";
+let condition = "sufficient";
 let events = [];
 let stepIndex = -1;
 const responses = Array(QUIZ.length).fill(null);
