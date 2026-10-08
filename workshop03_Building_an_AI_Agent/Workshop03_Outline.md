@@ -65,13 +65,17 @@ By the end of the workshop, students should be able to:
 
 ### 3. Function Calling + OpenAlex Paper Search — Required Hands-on (35 min)
 
-- Create or use a `search_papers(query)` Python tool backed by the OpenAlex API
-- Let the model choose when to invoke that tool
-- Inspect the tool request, Python execution, and returned result
-- Understand the **agent loop**: request → tool call → observation → response
-- Collect titles, authors, years, identifiers, and source URLs
+- Test the pre-written `search_papers(query, limit)` tool against OpenAlex without Gemini
+- Compare direct Python execution with LLM-requested Function Calling
+- Use **Gemini SDK Automatic Function Calling**, with a wrapper that prints the requested arguments and real tool-result count
+- Inspect the tool request → local Python execution → OpenAlex response → final Gemini answer
+- Verify a real paper title, publication year, and DOI/OpenAlex link
 
-**Important distinction:** Function calling is how the model requests an action; an API request is one way the Python tool performs that action. Web scraping and browser automation are different implementations of possible tools, not requirements for OpenAlex paper search.
+**Slides:** [Interactive Workshop 03 website](../docs/workshop03/index.html#s3) (the left sidebar includes all seven sections).
+
+**Student instructions + annotated Python:** [Section 3 — Function Calling + OpenAlex](literature_research_agent_starter/README.md), including `tools.py` and `03_function_calling.py`.
+
+**Scope:** One automatic search-tool call in this section. Repeated searches, checking sufficiency, applying year filters, deduplication, and CSV exports belong to Section 4. The Gemini SDK automatically orchestrates the function calling; no manual dispatcher is required from students.
 
 ### 4. Build & Test — AI Literature Research Agent — Required Hands-on (25 min)
 
