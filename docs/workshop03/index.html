@@ -268,30 +268,61 @@ print(response.text)</code></pre>
 </section>
 
 
+
 <section class="s2-section" id="s2-check">
-  <div class="s2-section-head"><div><span class="s2-index">05 / VALIDATION + SAFETY</span><h3>Valid JSON ≠ Valid Research</h3><p>Check data types first. Then check your rules, such as exactly three queries. Neither check guarantees that the queries are relevant.</p></div></div>
-  <div class="s2-lab-panel">
-    <div class="s2-lab-title"><strong>INTERACTIVE · What if the JSON is wrong?</strong><small>Try all three responses</small></div>
-    <div class="s2-lab-body">
-      <label for="s2-validation-sample" class="s2-select-label">Choose a sample response:</label>
-      <select id="s2-validation-sample" class="s2-sample-select">
-        <option value="correct">Correct JSON · three queries</option>
-        <option value="wrong_type">Wrong type · text instead of a list</option>
-        <option value="wrong_count">Correct type · only one query</option>
-      </select>
-      <div class="s2-code"><div class="s2-code-bar"><span>EXAMPLE JSON</span></div><pre><code id="s2-validation-json"></code></pre></div>
-      <button class="button-primary" id="s2-validate" type="button">Validate example →</button>
-      <div class="s2-note" id="s2-validation-result" aria-live="polite"></div>
-      <p class="s2-caption">This interactive example illustrates the checks. The runnable Python program uses Pydantic.</p>
+  <div class="s2-section-head">
+    <div>
+      <span class="s2-index">05 / UNDERSTANDING DATA VALIDATION</span>
+      <h3>Understanding Data Validation</h3>
+      <p>Structured Outputs help control the response format. They do not guarantee that the generated information is correct, relevant or useful.</p>
     </div>
   </div>
+
   <div class="s2-three">
-    <div class="s2-concept"><strong>Schema</strong><p>Correct fields and Python data types?</p></div>
-    <div class="s2-concept"><strong>Extra rules</strong><p>Three queries? Publication year in range?</p></div>
-    <div class="s2-concept"><strong>Factual accuracy</strong><p>Are the queries relevant and subsequent references real?</p></div>
+    <div class="s2-concept">
+      <strong>1. Schema Validation</strong>
+      <p>Are the required fields present, with the correct data types? For example, is <code>search_queries</code> a list of strings?</p>
+    </div>
+    <div class="s2-concept">
+      <strong>2. Rule Validation</strong>
+      <p>Does the output satisfy our additional requirements? For example, are there exactly three search queries?</p>
+    </div>
+    <div class="s2-concept">
+      <strong>3. Content Validation</strong>
+      <p>Are the queries relevant and useful for the research topic? A valid data structure alone cannot tell us.</p>
+    </div>
   </div>
-  <div class="s2-note"><strong>Safety:</strong> Never share or commit your API Key. API calls use tokens and may hit rate limits. Keep your generated <code>search_plan.json</code> for Section 3.</div>
-  <div class="s2-bridge"><span class="s2-index">NEXT / SECTION 03</span><h3>From SearchPlan to Function Calling ↗</h3><p>Next, the LLM can request <code>search_papers(query)</code>; your Python tool then retrieves real bibliographic metadata from OpenAlex.</p></div>
+
+  <div class="s2-lab-panel">
+    <div class="s2-lab-title">
+      <strong>INTERACTIVE · Which validation check catches the problem?</strong>
+      <small>Try all four examples</small>
+    </div>
+    <div class="s2-lab-body">
+      <label for="s2-validation-sample" class="s2-select-label">Choose an example response:</label>
+      <select id="s2-validation-sample" class="s2-sample-select">
+        <option value="correct">Correct output — all checks pass</option>
+        <option value="wrong_type">Wrong data type — string instead of list</option>
+        <option value="wrong_count">Wrong number of queries — only one</option>
+        <option value="irrelevant">Irrelevant search queries — valid format, wrong topic</option>
+      </select>
+      <div class="s2-code">
+        <div class="s2-code-bar"><span>EXAMPLE JSON · TOPIC: AI FACIAL ANIMATION</span></div>
+        <pre><code id="s2-validation-json"></code></pre>
+      </div>
+      <button class="button-primary" id="s2-validate" type="button">Run validation checks →</button>
+      <div class="s2-validation-results" aria-label="Validation check results" aria-live="polite">
+        <div class="s2-validation-result-row"><span>Schema Validation</span><strong id="s2-schema-status" class="s2-status s2-status-pending">NOT RUN</strong></div>
+        <div class="s2-validation-result-row"><span>Rule Validation</span><strong id="s2-rule-status" class="s2-status s2-status-pending">NOT RUN</strong></div>
+        <div class="s2-validation-result-row"><span>Content Validation</span><strong id="s2-content-status" class="s2-status s2-status-pending">NOT RUN</strong></div>
+      </div>
+      <div class="s2-note" id="s2-validation-result" aria-live="polite">Select an example and run the checks.</div>
+      <p class="s2-caption">Schema and rule checks are demonstrated by code. Content relevance is an <strong>instructor-defined assessment for these examples</strong>, not a feature of Pydantic. Real content validation needs an additional method, such as human review or an evaluation step.</p>
+    </div>
+  </div>
+
+  <div class="s2-note"><strong>Key takeaway:</strong> A JSON response can be perfectly valid and still contain irrelevant search queries. <code>02_structured_output.py</code> implements schema and rule checks; it does not automatically judge research relevance.</div>
+  <div class="s2-bridge"><span class="s2-index">NEXT / SECTION 03</span><h3>From SearchPlan to Function Calling ↗</h3><p>We have a structured SearchPlan, but not verified research papers. Next, the LLM can request <code>search_papers(query)</code> while Python retrieves paper metadata from OpenAlex.</p></div>
 </section>
 
 <section class="s2-section s2-roadmap" id="s3">
