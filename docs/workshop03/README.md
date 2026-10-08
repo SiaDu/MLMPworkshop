@@ -5,9 +5,7 @@ This is the **Section 1 (10 minutes)** teaching page for *What Is an AI Agent?*.
 ## Live content
 
 - **From LLM to Agent** — a comparison of text-only responses and agents with tools.
-- **Workflow vs Agent** — two switchable scenarios:
-  - Text: literature search with scarce or sufficient results.
-  - Image: storyboard frame that is underexposed or poorly framed.
+- **Workflow vs Agent** — one literature-search example with two selectable conditions: scarce or sufficient results.
 - **Inside an Agent** — Model, Instructions, Tools.
 - **The Agent Loop** — step-by-step inspection of five available tools, the illustrative model selection, the structured tool request, simulated execution, tool result, and repeated model choice.
 - **Quick Check** — three scored questions.
@@ -49,7 +47,7 @@ docs/
     └── README.md
 ```
 
-The illustration is inline SVG, so the teaching page has no external image dependency. The JavaScript does not contact LLM providers or academic APIs.
+The page has no external image dependency. The JavaScript does not contact LLM providers or academic APIs.
 
 ## Future sections
 
