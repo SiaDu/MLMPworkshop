@@ -60,7 +60,7 @@ response = client.models.generate_content(
     contents=prompt,
     config=types.GenerateContentConfig(
         response_mime_type="application/json",
-        response_json_schema=SearchPlan.model_json_schema(),
+        response_schema=SearchPlan,
     ),
 )
 
