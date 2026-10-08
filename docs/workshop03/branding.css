@@ -1,0 +1,6 @@
+.brand{display:flex;align-items:center;gap:13px;text-decoration:none;font-size:13px;letter-spacing:.16em}
+.brand-mark{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:49px;height:46px;flex-shrink:0;border:1px solid #3f8994;border-radius:11px;background:#132f3a;color:#c6fbf5}
+.brand-mark strong{font-size:15px;line-height:1;font-weight:800;letter-spacing:.04em}
+.brand-mark span{font-size:8px;line-height:1;font-weight:800;letter-spacing:.075em}
+.brand-text{font-size:13px;font-weight:800;letter-spacing:.17em;color:var(--ink);white-space:nowrap}
+@media(max-width:600px){.brand-mark{width:43px;height:42px}.brand-text{font-size:11px}}
