@@ -80,11 +80,11 @@ source ~/.bashrc
 
 **You do not need to clone the whole MLMPworkshop repository or create a new GitHub repository.** Download only the starter project:
 
-**[Download literature_research_agent_starter.zip](../../docs/workshop03/downloads/literature_research_agent_starter.zip)**
+**Starter Project ZIP — Coming Soon.** The download link will be added after all workshop scripts are finalized. For now, the source files are maintained in this folder on the `dev` branch.
 
-This ZIP contains `pyproject.toml`, both Python examples, `tools.py`, and this README. It is hosted in the existing MLMPworkshop repository.
+The final ZIP will contain `pyproject.toml`, both Python examples, `tools.py`, and this README, hosted in the existing MLMPworkshop repository.
 
-### Step B1. Extract the ZIP
+### Step B1. Extract the ZIP (once published)
 
 1. Open your **Downloads** folder on Linux.
 2. Find `literature_research_agent_starter.zip`.
