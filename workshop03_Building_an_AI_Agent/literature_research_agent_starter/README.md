@@ -372,13 +372,6 @@ Expected **shape** of output (values can differ):
 
 **Remember:** A correctly formatted JSON file does **not** prove that the research keywords, factual claims or paper references are accurate.
 
-## Part E — API safety and rate limits (1 minute)
-
-- **API key:** a private credential; never put it inside `.py` files, Git commits or screenshots.
-- **Tokens:** the model's input/output usage units; see the counts printed by Script 01.
-- **Rate limits:** do not run an endless API-request loop. If you receive HTTP 429, stop and consult the instructor.
-- **No real paper search yet:** Gemini generates *search terms*, not verified citations. Section 3 uses OpenAlex for actual metadata.
-
 ## What comes next?
 
 In **Section 3 — Function Calling**, we will use the pre-written `tools.py` function:
