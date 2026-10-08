@@ -1,0 +1,14 @@
+# A virtual environment belongs to each student's own computer.
+.venv/
+
+# Python creates these temporary files automatically.
+__pycache__/
+*.pyc
+
+# Never commit files that might contain private API keys.
+.env
+.env.*
+
+# Local results from exercises should not be committed by default.
+search_plan.json
+papers.csv
