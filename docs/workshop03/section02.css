@@ -153,3 +153,14 @@
 .s2-exchange small{color:var(--faint);font-size:10px;text-align:center}
 @media(max-width:1100px){.s2-client-cloud{grid-template-columns:minmax(135px,1fr) 108px minmax(240px,1.6fr);gap:8px}.s2-zone{padding:10px}.s2-zone-content{padding:12px 6px}.s2-zone-label{font-size:9px;letter-spacing:.06em}}
 @media(max-width:680px){.s2-client-cloud{grid-template-columns:minmax(0,1fr)}.s2-exchange{min-height:64px;gap:3px}.s2-zone-content{min-height:96px}.s2-exchange span{font-size:11px}.s2-cloud-parts{grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr)}}
+
+
+/* Section 2: explicit three-stage validation outcomes. */
+.s2-validation-results{display:grid;gap:8px;margin:16px 0 14px}
+.s2-validation-result-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 13px;border:1px solid #384b61;border-radius:9px;background:#172335}
+.s2-validation-result-row>span{font-size:12px;color:#dce8f4;font-weight:700}
+.s2-status{font-size:10px;letter-spacing:.055em;text-align:right;white-space:nowrap;font-weight:800}
+.s2-status-pass{color:#8ae5c8}
+.s2-status-fail{color:#f0a0a6}
+.s2-status-skipped,.s2-status-pending{color:#a7b4c6}
+@media(max-width:450px){.s2-validation-result-row{padding:10px 9px}.s2-validation-result-row>span{font-size:11px}.s2-status{font-size:9px}}
