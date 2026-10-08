@@ -1,136 +1,120 @@
 # Workshop 03 — Building an AI Agent
 
-**Theme:** From LLM APIs to an AI Literature Research Agent
+**Theme:** From LLM APIs to an AI Literature Research Agent  
+**Duration:** **2 hours (120 minutes)**  
+**Core demo:** AI Literature Research Agent for the AI for Media survey assignment
 
 ## Overview
 
-In this workshop, we will build an **AI Literature Research Agent** that students can use to support the literature search and preparation for their **AI for Media survey assignment**.
+In this workshop, students will build a small **AI Literature Research Agent** to support their upcoming survey assignment. The agent will use an LLM to formulate search queries, select a paper-search tool, retrieve **real academic metadata**, and export a traceable reading list.
 
-Rather than asking an LLM to invent a reading list or write a survey, the agent will search real academic databases, organise verified paper metadata, retrieve evidence from selected papers, and prepare a research comparison matrix.
+The priority is a **working, understandable agent**, not learning every agent framework in one session. RAG gets a short guided exercise; LangGraph, MCP, and multi-agent systems are introduced through demonstrations or conceptual examples. Students can explore them in the optional challenges.
 
-The workshop focuses on **practical, AI-assisted development**, not training models or implementing low-level algorithms from scratch. Students may use an AI coding assistant, but should understand which decisions are made by the LLM and which operations are carried out by Python tools.
+The agent **does not write the survey**. Students remain responsible for reading papers, evaluating the literature, checking references, and forming their own arguments.
 
 ## Learning Objectives
 
 By the end of the workshop, students should be able to:
 
-- Distinguish an LLM API call, a fixed workflow, and an AI agent.
-- Explain how function calling and the agent loop enable an LLM to select and use tools.
-- Search real papers using an academic search API and validate basic bibliographic information.
-- Extract structured data, deduplicate records, and export usable research outputs.
-- Use retrieval-augmented generation (RAG) to answer questions from provided paper content with evidence.
-- Understand how LangGraph, MCP, and multi-agent systems extend an agent.
-- Identify hallucinations, missing evidence, usage limits, and situations requiring human verification.
+- Explain the difference between an LLM API call, a fixed workflow, and an AI agent.
+- Run an LLM API call and produce structured JSON output.
+- Explain and observe **function calling** and the **agent loop**.
+- Use OpenAlex as an academic search tool to retrieve real paper metadata.
+- Export a small, deduplicated, source-traceable paper list for their survey.
+- Experience evidence retrieval from a provided paper excerpt (RAG).
+- Recognise when LangGraph, MCP, multi-agent systems, and browser automation are useful.
 
 ## Teaching Levels
 
 - **[Required Hands-on]** Every student runs and modifies the exercise.
-- **[Guided Hands-on]** Starter code is provided; students explore or modify a small feature.
-- **[Live Demo]** The instructor demonstrates the concept. No student setup required.
-- **[Advanced Challenge]** Optional extension for students who finish early or want to explore further.
+- **[Guided Hands-on]** Provided starter code; a short, focused exercise.
+- **[Live Demo]** Instructor runs a prepared example; no student setup required.
+- **[Concept Overview]** Brief explanation only.
+- **[Advanced Challenge]** Optional work after core tasks or after the workshop.
 
-## Workshop Outline (Proposed: 3 Hours)
+## Workshop Outline — 2 Hours
 
-| Section | Topic | Level | Approx. time |
-| --- | --- | --- | --- |
-| 1 | Introduction: What Is an AI Agent? | Concept introduction | 10 min |
-| 2 | LLM APIs | **Required Hands-on** | 15 min |
-| 3 | Structured Outputs | **Required Hands-on** | 15 min |
-| 4 | Function Calling and the Agent Loop | **Required Hands-on** | 30 min |
-| 5 | Academic Paper Search with OpenAlex | **Required Hands-on** | 20 min |
-| 6 | Retrieval-Augmented Generation (RAG) | **Guided Hands-on** | 20 min |
-| 7 | Agent Workflows with LangGraph | **Guided Hands-on** | 25 min |
-| 8 | Model Context Protocol (MCP) | **Live Demo** | 10 min |
-| 9 | Multi-Agent Systems | **Live Demo** | 10 min |
-| 10 | Mini Project Integration and Testing | **Required Hands-on** | 25 min |
-| | **Total** | | **180 min** |
+| Time | Topic | Level |
+| --- | --- | --- |
+| 0:00–0:10 (10 min) | 1. What Is an AI Agent? | Concept overview |
+| 0:10–0:30 (20 min) | 2. LLM API + Structured Outputs | **Required Hands-on** |
+| 0:30–1:05 (35 min) | 3. Function Calling + OpenAlex Paper Search | **Required Hands-on** |
+| 1:05–1:30 (25 min) | 4. Build & Test the Literature Research Agent | **Required Hands-on** |
+| 1:30–1:45 (15 min) | 5. RAG: Retrieving Evidence from Papers | **Guided Hands-on** |
+| 1:45–1:55 (10 min) | 6. LangGraph: Stateful Agent Workflows | **Live Demo** |
+| 1:55–2:00 (5 min) | 7. MCP + Multi-Agent Systems | **Concept Overview** |
+| | **Total: 120 min** | |
 
-### 1. What Is an AI Agent? — Concept Introduction
+### 1. What Is an AI Agent? — Concept Overview (10 min)
 
-- Chatbot vs. LLM API vs. workflow vs. agent
-- Models, instructions, tools, state, and agent loops
-- The distinction between model decisions and deterministic Python operations
-- Example use case: supporting literature discovery for a survey
+- Chatbots vs. LLM API calls vs. workflows vs. agents
+- Models, instructions, tools, state, and the agent loop
+- What the LLM decides vs. what Python actually executes
 
-### 2. LLM APIs — Required Hands-on
+### 2. LLM API + Structured Outputs — Required Hands-on (20 min)
 
-- Calling a model from a Python application
-- Prompts, responses, API keys, tokens, and free-tier limits
-- Turning a survey topic into relevant academic search keywords
+- Call a free-tier LLM API from Python
+- Turn a survey topic into research keywords
+- Request and validate structured JSON output
+- Basic API-key safety, token usage, and rate limits
 
-### 3. Structured Outputs — Required Hands-on
+### 3. Function Calling + OpenAlex Paper Search — Required Hands-on (35 min)
 
-- Structured JSON outputs and schema validation
-- Organising search queries and paper metadata into consistent fields
-- Why a validated schema is more reliable than free-form text for automation
+- Create or use a `search_papers(query)` Python tool backed by the OpenAlex API
+- Let the model choose when to invoke that tool
+- Inspect the tool request, Python execution, and returned result
+- Understand the **agent loop**: request → tool call → observation → response
+- Collect titles, authors, years, identifiers, and source URLs
 
-### 4. Function Calling and the Agent Loop — Required Hands-on
+**Important distinction:** Function calling is how the model requests an action; an API request is one way the Python tool performs that action. Web scraping and browser automation are different implementations of possible tools, not requirements for OpenAlex paper search.
 
-- Exposing a Python function as an LLM-accessible tool
-- How the model requests a tool call and Python executes it
-- Repeating the cycle: observe → decide → call tool → inspect result → finish or continue
-- Distinguishing **function calling** from the underlying **API request**, **web scraping**, and **browser automation**
-- Simple safeguards: maximum steps, input validation, and error handling
+### 4. Build & Test — AI Literature Research Agent — Required Hands-on (25 min)
 
-### 5. Academic Paper Search with OpenAlex — Required Hands-on
+**Scenario:** Each student enters a research topic related to their own AI for Media survey.
 
-- Searching real papers by topic using the OpenAlex API
-- Gathering title, authors, year, venue, DOI/identifiers, and source links
-- Deduplicating records and filtering by research relevance
-- Cross-checking identifiers and bibliographic metadata, optionally with Crossref
-- Recognising that metadata search does **not** mean access to full paper content
+**Minimum workflow:**
 
-**Core learning point:** The OpenAlex request is an API operation. It becomes an agent tool when the LLM can decide when and how to call the search function.
+1. Generate one or more relevant search queries.
+2. Call the OpenAlex paper search tool.
+3. Deduplicate and preserve metadata/source links.
+4. Export a short list for manual reading and checking.
 
-### 6. Retrieval-Augmented Generation (RAG) — Guided Hands-on
+**Minimum output:** `papers.csv` with approximately 5–10 real papers, paper titles, years, identifiers/URLs where available, and a basic relevance note. The provided starter project can also export `references.bib`; students must check the bibliography before citing it.
 
-- The difference between *discovering papers* and *retrieving evidence from paper content*
-- A small collection of provided, lawfully accessible paper PDFs or text
-- Retrieval basics: chunks, lexical/semantic search, embeddings (concept only)
-- Answering questions about methods, contributions, or limitations with traceable source evidence
-- Marking missing or unsupported claims instead of inventing findings
+**Check for success:** At least one real tool call is visible in the run log, records correspond to source links, and the exported file can be opened.
 
-### 7. Agent Workflows with LangGraph — Guided Hands-on
+### 5. RAG — Guided Hands-on (15 min)
 
-- Nodes, edges, shared state, and conditional routing
-- Example workflow: search → deduplicate → check coverage → review → export
-- A simple branch: insufficient relevant results → refine query and search again
-- Brief introduction to checkpointing, task resumption, and human-in-the-loop review
+- Distinguish *paper discovery* (OpenAlex) from *evidence retrieval* (RAG).
+- Use a **provided, short, lawfully accessible paper excerpt or pre-extracted text**, not a full PDF-ingestion pipeline.
+- Retrieve a relevant passage and generate an evidence-grounded answer with a source reference.
+- Explain chunks, lexical/semantic search, and embeddings at a high level.
 
-### 8. Model Context Protocol (MCP) — Live Demo
+**Full PDF ingestion and multi-document semantic retrieval are advanced challenges.**
 
-- MCP as a standard for connecting tools and data sources to AI applications
-- Client, server, tools, and resources
-- Demonstration of an existing local or research-related MCP tool
-- MCP vs. direct Python function calling
+### 6. LangGraph — Live Demo (10 min)
 
-### 9. Multi-Agent Systems — Live Demo
+- Show a prepared graph: search → check results → refine query or export.
+- Explain nodes, edges, shared state, and conditional routing.
+- Mention checkpointing, resumable tasks, and human approval as extensions.
 
-- Single-agent vs. multi-agent designs
-- Example: **Research Agent** finds papers; **Verification Agent** checks metadata and supporting evidence
-- Delegation, agent-as-tool, and handoff concepts
-- When multiple agents increase complexity without improving results
+**Students are not required to install or implement LangGraph during this two-hour workshop.**
 
-### 10. Mini Project — AI Literature Research Agent (Required Hands-on)
+### 7. MCP + Multi-Agent Systems — Concept Overview (5 min)
 
-**Scenario:** Each student enters a topic relevant to their AI for Media survey assignment.
+- **MCP:** A standard interface for connecting AI applications to external tools/data; contrast with a direct Python function tool.
+- **Multi-Agent:** A Research Agent can discover papers while a Verification Agent checks metadata/evidence.
+- Explain why these architectures are optional, not prerequisites for building a useful single agent.
 
-**Core workflow:**
+## Preparation Before Class (Not Included in 120 Minutes)
 
-1. Interpret the research topic and generate search queries.
-2. Use a tool to retrieve **real** papers from an academic API.
-3. Filter and deduplicate the results.
-4. Verify basic metadata and preserve sources.
-5. Export a reading list and structured research matrix.
+To keep the practical work feasible:
 
-**Expected core outputs:**
-- `papers.csv` — a list of approximately 10 real, traceable papers, with titles, years, authors, identifiers/URLs, and relevance notes.
-- `references.bib` — BibTeX references based on verified metadata.
-- A short run log or README explaining the agent's tools and decisions.
-
-**Guided extensions:** Investigate approximately five selected papers using supplied full text or verifiable excerpts; record methods, datasets, contributions, and limitations **only when supported by evidence**. Run the provided LangGraph branch and a small RAG exercise.
-
-**Academic integrity:** This agent supports discovery and organisation, not automatic authorship of the survey. Students must read and critically assess their selected papers and confirm citations before using them.
+- Provide a ready-to-clone starter repository with a tested Python/`uv` environment and dependencies.
+- Ask students to set up a free-tier LLM API key in advance; supply a mock mode for access or quota problems.
+- Confirm current OpenAlex API-key/access requirements and test the paper-search function.
+- Prepare a small, fixed paper-text sample for the RAG exercise and cached search results for fallback.
+- Prepare LangGraph screenshots or a runnable instructor demo so students do not need separate setup.
 
 ## Advanced Challenges (Optional)
 
@@ -193,6 +177,6 @@ By the end of the workshop, students should be able to:
 
 ## Expected Outcome
 
-Each student should have a working **AI Literature Research Agent** that searches actual academic metadata, uses model-selected tools, generates structured outputs, and creates a verifiable paper list to support their survey work.
+Students leave with a **small working AI Literature Research Agent** that uses an LLM API, function calling, real OpenAlex records, and structured output to generate a reading list for their survey.
 
-Students should also be able to explain the different purposes of **API calling, function calling, RAG, MCP, LangGraph, multi-agent systems, and browser automation** without assuming that every project needs all of them.
+They experience RAG with supplied evidence and gain a conceptual understanding of LangGraph, MCP, and multi-agent systems. The more complex integrations are **optional extensions**, not required two-hour deliverables.
