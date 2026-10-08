@@ -7,7 +7,7 @@ The website is the **student-facing slide deck and practical instructions**. Stu
 The website is **one continuous page**, with a persistent left sidebar listing all seven course sections.
 
 - **Section 01 — What Is an AI Agent?** LLM vs Agent, Workflow vs Agent, model/instructions/tools, step-by-step agent tool loop and quiz.
-- **Section 02 — LLM API + Structured Outputs.** A two-way API flow diagram, compact example code, one-click starter ZIP download, interactive natural-language vs JSON comparison, and validation examples. The complete annotated scripts, Linux API-key setup and `uv` commands live in the starter project's README.
+- **Section 02 — LLM API + Structured Outputs.** A two-way API flow diagram, compact example code, reserved starter ZIP download position (Coming Soon), interactive natural-language vs JSON comparison, and validation examples. The complete annotated scripts, Linux API-key setup and `uv` commands live in the starter project's README.
 - **Sections 03–07.** Navigation and brief concept previews, ready for later lesson development.
 
 The sidebar deliberately has **no progress bar or teaching-duration labels**.
@@ -15,8 +15,8 @@ The sidebar deliberately has **no progress bar or teaching-duration labels**.
 ## Student workflow
 
 1. Open the website at the classroom's GitHub Pages URL.
-2. Learn the concepts from the slides and download the starter ZIP from Section 2.
-3. Extract the ZIP, open its README and follow the instructions. No full-repository clone or separate repository is necessary.
+2. Learn the concepts from the slides. The Section 2 ZIP download is intentionally disabled until the full project is complete.
+3. Once the ZIP is released, extract it, open its README and follow the instructions. No full-repository clone or separate repository is necessary.
 4. The starter project's `README.md` is the detailed student guide with all commands, complete commented scripts and troubleshooting.
 
 ## Files
