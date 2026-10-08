@@ -93,41 +93,115 @@ document.querySelectorAll("[data-s2-copy]").forEach(button => {
   });
 });
 
-// A tiny deterministic JSON validation demonstration.
-// The real Pydantic validation happens in 02_structured_output.py.
+// Classroom examples: schema and rule checks run in JavaScript.
+// Content relevance is deliberately an instructor-defined judgment for each
+// example. It is NOT calculated by Pydantic or the browser.
 const JSON_SAMPLES = {
-  correct: '{"topic":"AI facial animation","search_queries":["speech-driven facial animation","neural facial motion synthesis","controllable facial performance generation"],"start_year":2022}',
-  wrong_type: '{"topic":"AI facial animation","search_queries":"speech-driven facial animation","start_year":2022}',
-  wrong_count: '{"topic":"AI facial animation","search_queries":["speech-driven facial animation"],"start_year":2022}'
+  correct: {
+    value: {
+      topic: "AI facial animation",
+      search_queries: [
+        "speech-driven facial animation",
+        "neural facial motion synthesis",
+        "controllable facial performance generation"
+      ],
+      start_year: 2022
+    },
+    relevant: true,
+    explanation: "All three searches relate to AI facial animation. The relevance verdict here is a teaching example, not an automated research evaluation."
+  },
+  wrong_type: {
+    value: {
+      topic: "AI facial animation",
+      search_queries: "speech-driven facial animation",
+      start_year: 2022
+    },
+    relevant: null
+  },
+  wrong_count: {
+    value: {
+      topic: "AI facial animation",
+      search_queries: ["speech-driven facial animation"],
+      start_year: 2022
+    },
+    relevant: null
+  },
+  irrelevant: {
+    value: {
+      topic: "AI facial animation",
+      search_queries: [
+        "pizza recipes",
+        "football results",
+        "weather forecast"
+      ],
+      start_year: 2022
+    },
+    relevant: false,
+    explanation: "All the fields and the three-query rule pass, but the keywords have nothing to do with AI facial animation. The relevance verdict is predefined for this teaching example."
+  }
 };
 
+function setValidationStatus(id, label, outcome) {
+  const element = document.querySelector(id);
+  element.textContent = label;
+  element.className = "s2-status s2-status-" + outcome;
+}
+
 function validateExample() {
-  const selected = document.querySelector("#s2-validation-sample").value;
-  const text = JSON_SAMPLES[selected];
-  const code = document.querySelector("#s2-validation-json");
-  const msg = document.querySelector("#s2-validation-result");
-  code.textContent = JSON.stringify(JSON.parse(text), null, 2);
-  msg.textContent = "Select “Validate example” to check the schema and the additional business rules.";
-  msg.style.borderColor = "";
-  msg.style.color = "";
+  const example = JSON_SAMPLES[document.querySelector("#s2-validation-sample").value];
+  document.querySelector("#s2-validation-json").textContent =
+    JSON.stringify(example.value, null, 2);
+
+  const explanation = document.querySelector("#s2-validation-result");
+  explanation.textContent = "Select ‘Run validation checks’ to see which checks pass.";
+  explanation.style.borderColor = "";
+  ["#s2-schema-status", "#s2-rule-status", "#s2-content-status"].forEach((id) => {
+    setValidationStatus(id, "NOT RUN", "pending");
+  });
 
   document.querySelector("#s2-validate").onclick = () => {
-    const data = JSON.parse(text);
+    const data = example.value;
+
+    // 1. Schema Validation: structural fields and their data types.
     const schemaPass = typeof data.topic === "string"
       && Array.isArray(data.search_queries)
-      && data.search_queries.every(q => typeof q === "string")
+      && data.search_queries.every((query) => typeof query === "string")
       && Number.isInteger(data.start_year);
-    const countPass = schemaPass && data.search_queries.length === 3;
+
+    setValidationStatus(
+      "#s2-schema-status",
+      schemaPass ? "✓ PASS" : "✕ FAIL",
+      schemaPass ? "pass" : "fail"
+    );
+
     if (!schemaPass) {
-      msg.textContent = "✕ Schema check failed: search_queries must be a list of strings, not a single string.";
-      msg.style.borderColor = "#c47780";
-    } else if (!countPass) {
-      msg.textContent = "✕ Schema shape passes, but the extra rule fails: exactly 3 search queries are required.";
-      msg.style.borderColor = "#c4a46b";
-    } else {
-      msg.textContent = "✓ Schema and count checks pass. This still does not verify whether the queries are relevant.";
-      msg.style.borderColor = "#66ad9f";
+      setValidationStatus("#s2-rule-status", "— NOT CHECKED", "skipped");
+      setValidationStatus("#s2-content-status", "— NOT CHECKED", "skipped");
+      explanation.textContent = "Schema Validation failed: search_queries should be a list of strings, but the model returned a single string. Later checks are skipped.";
+      return;
     }
+
+    // 2. Additional Rule Validation: exactly three queries.
+    const rulePass = data.search_queries.length === 3;
+    setValidationStatus(
+      "#s2-rule-status",
+      rulePass ? "✓ PASS" : "✕ FAIL",
+      rulePass ? "pass" : "fail"
+    );
+
+    if (!rulePass) {
+      setValidationStatus("#s2-content-status", "— NOT CHECKED", "skipped");
+      explanation.textContent = "Schema Validation passed, but Rule Validation failed: we require exactly three search queries. Content is not checked yet.";
+      return;
+    }
+
+    // 3. Content Validation is an annotated example, not automated judging.
+    setValidationStatus(
+      "#s2-content-status",
+      example.relevant ? "✓ PASS (EXAMPLE)" : "✕ FAIL (EXAMPLE)",
+      example.relevant ? "pass" : "fail"
+    );
+    explanation.textContent = example.explanation;
   };
 }
 
