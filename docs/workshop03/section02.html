@@ -45,6 +45,64 @@
     <a href="#s2-check"><span>05 · 3 MIN</span>Validation</a>
   </div>
 </section>
+
+<section class="s2-section" id="s2-api">
+  <div class="s2-section-head"><div><span class="s2-index">01 / UNDERSTAND</span><h3>What is an LLM API?</h3><p>An API is how a program communicates with another service. With an API, Python can send a prompt and receive a model response that other Python functions can use.</p></div><span class="s2-min">≈ 3 MIN</span></div>
+  <div class="s2-flow" role="img" aria-label="A Python script calls the Gemini API and receives a model response">
+    <div class="s2-flow-cell"><span>⌨</span><b>Your Python Script</b><small>Survey topic + prompt</small></div><div class="s2-flow-arrow">→</div>
+    <div class="s2-flow-cell"><span>⇄</span><b>Gemini API</b><small>Send / receive</small></div><div class="s2-flow-arrow">↔</div>
+    <div class="s2-flow-cell"><span>✳</span><b>LLM Model</b><small>Generate a response</small></div><div class="s2-flow-arrow">→</div>
+    <div class="s2-flow-cell"><span>{ }</span><b>Python Data</b><small>Text or structured JSON</small></div>
+  </div>
+  <div class="s2-three">
+    <div class="s2-concept"><strong>API Key</strong><p>A private credential linked to your account and API usage. Never put it on GitHub.</p></div>
+    <div class="s2-concept"><strong>Tokens</strong><p>Units used to measure model input and output. They affect usage limits and sometimes costs.</p></div>
+    <div class="s2-concept"><strong>Rate Limits</strong><p>Limits on requests or tokens over time. Stop repeated calls if you receive an HTTP 429 error.</p></div>
+  </div>
+  <div class="s2-note"><strong>Model for this exercise:</strong> <code>gemini-3.5-flash-lite</code> through the <code>google-genai</code> SDK. You need a Gemini API Key. Free-tier availability and request quotas may depend on your account.</div>
+</section>
+
+<section class="s2-section" id="s2-setup">
+  <div class="s2-section-head"><div><span class="s2-index">BEFORE CLASS / GET READY</span><h3>Set up your Linux environment</h3><p>Each of you has your own Linux account and computer. Configure your key once, then use it from Python without pasting it into a source file.</p></div><span class="s2-min">PRE-CLASS SETUP</span></div>
+  <div class="s2-lab-panel"><div class="s2-lab-title"><strong>PART A · Configure your Gemini API Key</strong><small>Linux Bash / personal account</small></div><div class="s2-lab-body">
+    <div class="s2-step"><span class="s2-n">1</span><div><h4>Create your API Key</h4><p>Open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">Google AI Studio → API Keys ↗</a>. Sign in, create a key and copy it. <strong>Do not show your key to anyone.</strong></p></div></div>
+    <div class="s2-step"><span class="s2-n">2</span><div><h4>Open your Bash settings</h4><p><code>nano</code> is a terminal text editor. <code>~/.bashrc</code> stores settings for your own Bash account.</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash">nano ~/.bashrc</code></pre></div>
+    </div></div>
+    <div class="s2-step"><span class="s2-n">3</span><div><h4>Go to the bottom and add this line</h4><p>Replace the placeholder with <strong>your own Gemini API Key</strong>. Do not type the key into any Python file.</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>WRITE INSIDE THE NANO EDITOR</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Give Python access to your Gemini API Key.\nexport GEMINI_API_KEY=&quot;your_api_key_here&quot;</code></pre></div>
+      <div class="s2-keys"><span>Save:</span><kbd>Ctrl + O</kbd><span>then</span><kbd>Enter</kbd><span>Exit:</span><kbd>Ctrl + X</kbd></div>
+    </div></div>
+    <div class="s2-step"><span class="s2-n">4</span><div><h4>Reload the file and check the key exists</h4><p>The second command prints a safe status message, <strong>not your real key</strong>.</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Reload your Bash settings in this terminal.\nsource ~/.bashrc\n\n# Print a message only if GEMINI_API_KEY is set.\necho &quot;${GEMINI_API_KEY:+API key is set}&quot;</code></pre></div>
+      <p>Expected output: <code>API key is set</code>. If nothing appears, reopen <code>~/.bashrc</code> and check for a spelling mistake.</p>
+    </div></div>
+  </div></div>
+  <div class="s2-lab-panel"><div class="s2-lab-title"><strong>PART B · Open the starter project and install its dependencies</strong><small>No sudo required</small></div><div class="s2-lab-body">
+    <p class="s2-caption">Start in the root folder of your cloned <code>MLMPworkshop</code> repository. Your instructor has prepared the project files already.</p>
+    <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Go into the prepared starter folder.
+cd workshop03_Building_an_AI_Agent/literature_research_agent_starter
+
+# Install the packages in pyproject.toml.
+# uv creates the .venv environment if it is not there already.
+uv sync
+
+# Activate the project-local Python environment.
+source .venv/bin/activate
+
+# Check which Python you are using.
+which python
+python --version</code></pre></div>
+    <div class="s2-note"><strong>Already provided:</strong> <code>pyproject.toml</code>, <code>01_first_api_call.py</code>, <code>02_structured_output.py</code> and <code>tools.py</code>. <strong>You do not need to write the whole project.</strong> We will use <code>tools.py</code> in Section 3.</div>
+    <div class="s2-step"><span class="s2-n">5</span><div><h4>Optional: open Python to check the SDK</h4><p>In the Linux terminal, enter:</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash">python</code></pre></div>
+      <p>Once you see the Python prompt <code>&gt;&gt;&gt;</code>, type the following lines one at a time:</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>PYTHON INTERACTIVE PROMPT</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python"># Import the official Gemini SDK.\nfrom google import genai\n\n# Create a client using the key from your environment.\nclient = genai.Client()\n\n# Exit Python and return to your Linux terminal.\nexit()</code></pre></div>
+      <p><strong>Important:</strong> creating a client does not prove that your key can access the model. The next step will send a real request.</p>
+    </div></div>
+  </div></div>
+</section>
+
 <!-- CONTENT_APPEND -->
 </main></div>
 </body></html>
