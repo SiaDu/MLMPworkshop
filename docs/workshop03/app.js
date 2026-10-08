@@ -17,22 +17,7 @@ const EXAMPLES = {
       { name: "list_local_files", desc: "Inspect the working directory", icon: "▣", via: "Local Python" }
     ]
   },
-  image: {
-    label: "Storyboard Image Agent",
-    goal: "Make a storyboard frame easier to read.",
-    caption: "Inspect a scene, select image-editing tools and examine the result.",
-    conditions: [
-      { value: "dark", label: "The frame is too dark" },
-      { value: "offcentre", label: "The subject is off-centre" }
-    ],
-    tools: [
-      { name: "inspect_frame", desc: "Measure scene characteristics", icon: "◉", via: "Image analysis code" },
-      { name: "adjust_brightness", desc: "Change image brightness", icon: "☼", via: "Image-processing code" },
-      { name: "adjust_contrast", desc: "Change image contrast", icon: "◐", via: "Image-processing code" },
-      { name: "crop_to_subject", desc: "Adjust composition", icon: "⌗", via: "Image-processing code" },
-      { name: "export_image", desc: "Save the edited frame", icon: "⇩", via: "Local Python" }
-    ]
-  }
+
 };
 
 const QUIZ = [
@@ -57,7 +42,7 @@ const QUIZ = [
 ];
 
 const $ = (selector) => document.querySelector(selector);
-let currentCase = "text";
+const currentCase = "text";
 let condition = "sparse";
 let events = [];
 let stepIndex = -1;
@@ -89,93 +74,45 @@ function outcome(container, title, description, tone) {
 }
 
 function comparisonState() {
-  const work = $("#workflow-steps");
+  const workflow = $("#workflow-steps");
   const agent = $("#agent-steps");
-  clear(work); clear(agent);
-  const source = EXAMPLES[currentCase];
-  $("#scenario-goal").textContent = source.goal;
-  $("#scenario-caption").textContent = source.caption;
+  clear(workflow);
+  clear(agent);
+
+  const example = EXAMPLES.text;
+  $("#scenario-goal").textContent = example.goal;
+  $("#scenario-caption").textContent = example.caption;
+
   const picker = $("#scenario-condition");
   clear(picker);
-  source.conditions.forEach((entry) => {
-    const o = node("option", "", entry.label);
-    o.value = entry.value;
-    picker.append(o);
+  example.conditions.forEach(({value, label}) => {
+    const option = node("option", "", label);
+    option.value = value;
+    picker.append(option);
   });
   picker.value = condition;
 
-  const wfOut = $("#workflow-output"), agOut = $("#agent-output");
-  if (currentCase === "text") {
-    addStep(work, 1, 'Run a fixed query: "facial animation"', "Always uses search_papers()");
-    addStep(work, 2, "Filter by publication year", "Code-defined selection criteria");
-    addStep(work, 3, "Export whatever remains", "No dynamic query revision");
-    if (condition === "sparse") {
-      outcome(wfOut, "2 / 5 papers", "The fixed sequence finishes with too few results.", "warn");
-      addStep(agent, 1, "Choose search_papers()", "Model selects from 5 available tools");
-      addStep(agent, 2, "Evaluate: only 2 relevant papers", "Results do not meet the goal");
-      addStep(agent, 3, "Search again with refined keywords", "Model chooses search_papers() a second time");
-      addStep(agent, 4, "Check and export 5 papers", "Verify metadata and finish");
-      outcome(agOut, "5 / 5 papers", "The illustrated agent adapts the query and reaches the goal.", "good");
-    } else {
-      outcome(wfOut, "5 / 5 papers", "The fixed process works well when one search is enough.", "good");
-      addStep(agent, 1, "Choose search_papers()", "Model selects from 5 available tools");
-      addStep(agent, 2, "Evaluate: 5 relevant papers found", "No need to search again");
-      addStep(agent, 3, "Verify records and export", "Model finishes after the checks");
-      outcome(agOut, "5 / 5 papers", "The illustrated agent skips unnecessary extra searching.", "good");
-    }
-    $("#comparison-visual").hidden = true;
-    $("#compare-takeaway").textContent = condition === "sparse"
-      ? "The workflow follows its fixed sequence. The agent may adapt when the first search is insufficient."
-      : "Both can succeed. An agent is useful when the correct next step cannot be fully predetermined.";
-  } else {
-    addStep(work, 1, "Increase brightness", "Always applies the same multiplier");
-    addStep(work, 2, "Apply a centred crop", "No inspection of subject position");
-    addStep(work, 3, "Export the frame", "Fixed image-processing sequence");
-    addStep(agent, 1, "Choose inspect_frame()", "Model requests an image-analysis tool");
-    if (condition === "dark") {
-      addStep(agent, 2, "Observe: insufficient brightness", "Composition is already acceptable");
-      addStep(agent, 3, "Choose adjust_brightness()", "Target the observed issue only");
-      addStep(agent, 4, "Inspect and export", "Check the adjusted image");
-      outcome(wfOut, "Usable, but unnecessarily cropped", "Fixed edits may introduce unnecessary changes.", "warn");
-      outcome(agOut, "Brightness adjusted", "The illustrated agent targets the detected problem.", "good");
-    } else {
-      addStep(agent, 2, "Observe: subject near frame edge", "Brightness is already acceptable");
-      addStep(agent, 3, "Choose crop_to_subject()", "Adjust composition instead of brightness");
-      addStep(agent, 4, "Inspect and export", "Check the subject framing");
-      outcome(wfOut, "Brighter, but still poorly framed", "The prescribed brightness step does not address the main issue.", "warn");
-      outcome(agOut, "Composition improved", "The illustrated agent targets the detected problem.", "good");
-    }
-    $("#comparison-visual").hidden = false;
-    updateScene();
-    $("#compare-takeaway").textContent = "Both workflows and agents use image tools. Here the agent selects an edit based on inspection.";
-  }
-}
+  addStep(workflow, 1, 'Run fixed query: "facial animation"', "Always calls search_papers()");
+  addStep(workflow, 2, "Filter by publication year", "A code-defined selection criterion");
+  addStep(workflow, 3, "Export available records", "No adaptive search decision");
 
-function updateScene() {
-  const variants = {
-    dark: {
-      original: {filter:"brightness(.47) contrast(1.06)", transform:"none", desc:"Underexposed input frame"},
-      workflow: {filter:"brightness(1.15) contrast(1.04)", transform:"scale(1.17)", desc:"Fixed brightness + central crop"},
-      agent: {filter:"brightness(1.26) contrast(1.04)", transform:"none", desc:"Brightness selected after inspection"}
-    },
-    offcentre: {
-      original: {filter:"brightness(1)", transform:"translateX(-16%) scale(1.04)", desc:"Robot is close to the left edge"},
-      workflow: {filter:"brightness(1.48)", transform:"translateX(-16%) scale(1.19)", desc:"Unneeded brightening; centre crop"},
-      agent: {filter:"brightness(1)", transform:"translateX(8%) scale(1.12)", desc:"Framing adjusted around the robot"}
-    }
-  };
-  const scene = variants[condition] || variants.dark;
-  document.querySelectorAll(".art-holder").forEach((holder) => {
-    clear(holder);
-    const variant = holder.dataset.variant;
-    const art = $("#scene-template").content.firstElementChild.cloneNode(true);
-    art.style.filter = scene[variant].filter;
-    art.style.transform = scene[variant].transform;
-    holder.append(art);
-  });
-  $("#image-original-caption").textContent = scene.original.desc;
-  $("#image-workflow-caption").textContent = scene.workflow.desc;
-  $("#image-agent-caption").textContent = scene.agent.desc;
+  addStep(agent, 1, "Choose search_papers()", "LLM selects from five available tools");
+  if (condition === "sparse") {
+    outcome($("#workflow-output"), "2 / 5 relevant papers", "The fixed sequence ends with an incomplete list.", "warn");
+    addStep(agent, 2, "Observe only two relevant records", "The result does not meet the goal");
+    addStep(agent, 3, "Select search_papers() again", "LLM revises its search keywords");
+    addStep(agent, 4, "Verify records, then export", "The example agent can reach five records");
+    outcome($("#agent-output"), "5 / 5 relevant papers", "The illustrative agent adapts its query after feedback.", "good");
+    $("#compare-takeaway").textContent =
+      "Fixed workflow: predetermined operations. Agent: a model may select new actions based on the results.";
+  } else {
+    outcome($("#workflow-output"), "5 / 5 relevant papers", "The fixed workflow works when a single search is sufficient.", "good");
+    addStep(agent, 2, "Observe five relevant records", "No extra search is necessary");
+    addStep(agent, 3, "Verify records, then export", "LLM finishes without repeating the search");
+    outcome($("#agent-output"), "5 / 5 relevant papers", "The illustrative agent skips unnecessary extra searches.", "good");
+    $("#compare-takeaway").textContent =
+      "Both approaches can succeed. Agent decisions are especially useful when the next step depends on uncertain results.";
+  }
 }
 
 function action(tool, args, why, result, detail) {
@@ -189,45 +126,39 @@ function action(tool, args, why, result, detail) {
 
 function buildTrace() {
   const result = [];
-  if (currentCase === "text") {
-    result.push(...action("search_papers", { query: "facial animation", limit: 5 },
-      "The user needs papers, so search_papers() is the most useful first tool.",
-      condition === "sparse" ? { relevant_found: 2, sample_titles: ["Example result A", "Example result B"] } : { relevant_found: 5, verified: false },
-      condition === "sparse" ? "Only two results meet the example relevance criteria. The goal is not yet met." : "Five relevant records are available. An extra keyword search is not necessary."));
-    if (condition === "sparse") {
-      result.push(...action("search_papers", { query: "speech-driven 3D facial animation", limit: 5 },
-        "After observing too few papers, the model selects the search tool again with revised keywords.",
-        { newly_relevant: 3, total_relevant: 5 }, "Three additional relevant records are found in the illustrative dataset."));
-    }
-    result.push(...action("verify_doi", { paper_count: 5 },
-      "Before finishing, the model requests the metadata-checking tool.",
-      { checked: 5, valid_records: 5, note: "Illustrative metadata check" }, "Basic identifiers are consistent in this sample. Full-paper claims have not been checked."));
-    result.push(...action("export_csv", { filename: "papers.csv", rows: 5 },
-      "The goal has been reached; the agent requests export_csv() to save the reading list.",
-      { filename: "papers.csv", rows: 5, mode: "simulation only" }, "The sample export succeeds in this teaching trace; this page does not write a local CSV."));
-    result.push({ phase: "finish", title: "Agent finishes", text: "The agent has an example set of five paper records. A real student must still verify sources and read the papers.", tool: null, data: { final_status: "done", output: "5 illustrative paper records" } });
-  } else {
-    result.push(...action("inspect_frame", { image_id: "storyboard_03" },
-      "Before editing, the model selects an inspection tool to find the issue.",
-      condition === "dark" ? { brightness: "low", subject_position: "acceptable" } : { brightness: "acceptable", subject_position: "left edge" },
-      condition === "dark" ? "The sample inspection says the frame is too dark, not badly framed." : "The sample inspection says the subject is off-centre, not underexposed."));
-    if (condition === "dark") {
-      result.push(...action("adjust_brightness", { factor: 1.5 },
-        "The model chooses brightness adjustment rather than a crop or contrast operation.",
-        { applied: "brightness", factor: 1.5 }, "The illustrated output is brighter; composition is preserved."));
-    } else {
-      result.push(...action("crop_to_subject", { subject: "robot", preserve_aspect: "16:9" },
-        "The model chooses composition adjustment rather than unnecessary brightening.",
-        { applied: "crop and reframe", subject: "robot" }, "The illustrated output moves the robot away from the frame edge."));
-    }
-    result.push(...action("inspect_frame", { image_id: "edited_storyboard_03" },
-      "The model selects inspect_frame() again to assess the processed frame.",
-      { check: "improved for the given goal", note: "Simulated measurement" }, "The sample verification reports an improvement. In practice, independent checks still matter."));
-    result.push(...action("export_image", { filename: "storyboard_03_edited.png" },
-      "The requested edit appears complete, so the model chooses export_image().",
-      { filename: "storyboard_03_edited.png", mode: "simulation only" }, "The teaching trace reports an export; no PNG is written by this site."));
-    result.push({ phase: "finish", title: "Agent finishes", text: "The agent completes the illustrative image-editing loop after inspection, editing and checking.", tool: null, data: { final_status: "done", output: "edited storyboard frame (illustration)" } });
+  result.push(...action("search_papers", { query: "facial animation", limit: 5 },
+    "The task requires academic research, so the illustrative LLM selects search_papers() from the entire tool menu.",
+    condition === "sparse"
+      ? { relevant_found: 2, sample_titles: ["Illustrative paper A", "Illustrative paper B"] }
+      : { relevant_found: 5, metadata_verified: false },
+    condition === "sparse"
+      ? "Only two results meet the example relevance criteria. The goal is not yet met."
+      : "Five relevant records are available. Another keyword search is unnecessary."));
+
+  if (condition === "sparse") {
+    result.push(...action("search_papers", { query: "speech-driven 3D facial animation", limit: 5 },
+      "The example LLM observes insufficient results and independently selects search_papers() again with refined keywords.",
+      { newly_relevant: 3, total_relevant: 5 },
+      "The illustrative search returns three additional relevant records."));
   }
+
+  result.push(...action("verify_doi", { paper_count: 5 },
+    "The example LLM requests a metadata-checking tool before completing the task.",
+    { checked: 5, valid_records: 5, note: "Illustrative metadata verification" },
+    "The sample metadata check succeeds. The article contents have not been verified."));
+
+  result.push(...action("export_csv", { filename: "papers.csv", rows: 5 },
+    "The goal is met, so the illustrative LLM selects export_csv().",
+    { filename: "papers.csv", rows: 5, mode: "simulation only" },
+    "The teaching trace reports an export. This page does not write an actual CSV."));
+
+  result.push({
+    phase: "finish",
+    title: "Agent finishes",
+    text: "The example agent has five paper records. A real student must still check sources and read the papers.",
+    tool: null,
+    data: { final_status: "done", output: "5 illustrative research records" }
+  });
   return result;
 }
 
@@ -275,18 +206,6 @@ function resetTrace() {
   events = buildTrace();
   stepIndex = -1;
   renderTrace();
-}
-
-function setCase(which) {
-  currentCase = which;
-  condition = EXAMPLES[which].conditions[0].value;
-  document.querySelectorAll("[data-case]").forEach(btn=>{
-    const selected = btn.dataset.case === which;
-    btn.classList.toggle("is-selected", selected);
-    btn.setAttribute("aria-pressed", String(selected));
-  });
-  comparisonState();
-  resetTrace();
 }
 
 function setupQuiz() {
@@ -344,13 +263,30 @@ function setupNavigation() {
   sections.forEach(id=>observer.observe(document.getElementById(id)));
 }
 
-document.querySelectorAll("[data-case]").forEach(btn=>btn.addEventListener("click",()=>setCase(btn.dataset.case)));
-$("#scenario-condition").addEventListener("change",(ev)=>{condition=ev.target.value;comparisonState();resetTrace();});
-$("#try-other").addEventListener("click",()=>setCase(currentCase==="text"?"image":"text"));
-$("#loop-next").addEventListener("click",()=>{if(stepIndex<events.length-1){stepIndex++;renderTrace();}});
-$("#loop-back").addEventListener("click",()=>{if(stepIndex>=0){stepIndex--;renderTrace();}});
-$("#loop-reset").addEventListener("click",resetTrace);
-$("#quiz-retry").addEventListener("click",()=>{responses.fill(null);drawQuiz();});
-setCase("text");
+$("#scenario-condition").addEventListener("change", (event) => {
+  condition = event.target.value;
+  comparisonState();
+  resetTrace();
+});
+$("#loop-next").addEventListener("click", () => {
+  if (stepIndex < events.length - 1) {
+    stepIndex++;
+    renderTrace();
+  }
+});
+$("#loop-back").addEventListener("click", () => {
+  if (stepIndex >= 0) {
+    stepIndex--;
+    renderTrace();
+  }
+});
+$("#loop-reset").addEventListener("click", resetTrace);
+$("#quiz-retry").addEventListener("click", () => {
+  responses.fill(null);
+  drawQuiz();
+});
+
+comparisonState();
+resetTrace();
 setupQuiz();
 setupNavigation();
