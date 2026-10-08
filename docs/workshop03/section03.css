@@ -1,0 +1,91 @@
+
+/* Section 03 — Function Calling / OpenAlex: self-contained teaching slides */
+.s3-section{border-top:1px solid var(--line);padding:41px 0 29px;scroll-margin-top:94px}
+.s3-intro{border-top:1px solid var(--line);padding-top:65px}
+.s3-kicker{font-size:10px;font-weight:850;letter-spacing:.16em;color:var(--accent);display:flex;gap:10px;align-items:center}
+.s3-kicker:before{content:"";height:1px;width:25px;background:var(--accent)}
+.s3-intro h2{margin:16px 0 12px;font-size:clamp(34px,5vw,59px);line-height:1.08;letter-spacing:-.06em}
+.s3-intro h2 em{font-style:normal;color:var(--accent)}
+.s3-lede{font-size:15px;color:var(--muted);line-height:1.7;max-width:820px}
+.s3-objective{padding:19px 22px;border-radius:13px;background:linear-gradient(110deg,#162d37,#24243f);border:1px solid #497780;margin:23px 0 27px}
+.s3-objective strong{font-size:12px;color:#aef5df;letter-spacing:.06em}
+.s3-objective p{font-size:13px;color:#d0dceb;margin:5px 0 0}
+.s3-jump{display:flex;flex-wrap:wrap;gap:8px;margin-top:19px}
+.s3-jump a{font-size:11px;font-weight:750;border:1px solid #3b4d68;border-radius:999px;padding:7px 11px;color:#cbd8e9;background:#151e2f}
+.s3-jump a:hover{border-color:#7cebd4;color:#adf6e4}
+.s3-section-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:23px}
+.s3-tag{color:var(--accent);font-size:10px;letter-spacing:.14em;font-weight:850}
+.s3-section-top h3{margin:7px 0 9px;font-size:clamp(27px,3.3vw,39px);line-height:1.15;letter-spacing:-.045em}
+.s3-section-top p{max-width:790px;font-size:13px;color:var(--muted);line-height:1.7;margin:0}
+.s3-split{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.s3-side{border:1px solid #3e526d;border-radius:13px;background:#142034;padding:19px;min-width:0}
+.s3-side.focus{background:linear-gradient(135deg,#27233e,#17263c);border-color:#72649b}
+.s3-side>span{font-weight:850;letter-spacing:.10em;font-size:10px;color:#adbcd5}
+.s3-side.focus>span{color:#cab9ff}
+.s3-side h4{font-size:18px;letter-spacing:-.02em;margin:9px 0}
+.s3-side>p{font-size:12px;color:var(--muted);margin:0 0 15px}
+.s3-sequence{display:flex;flex-direction:column;gap:7px}
+.s3-sequence div{padding:10px 12px;border:1px solid #3a5067;border-radius:8px;background:#1d2b3f;font-size:12px;color:#e4edf9}
+.s3-sequence .key{border-color:#7276a2;background:#2a2946;color:#e5dfff}
+.s3-sequence .arrow{text-align:center;padding:0;border:0;background:transparent;font-weight:800;color:#8bdccf;font-size:13px}
+.s3-banner{border:1px solid #4b637a;background:#182738;border-radius:10px;padding:14px 18px;font-size:12px;color:#c8dceb;margin-top:15px;line-height:1.65}
+.s3-banner b{color:#fff}
+.s3-source-flow{display:grid;grid-template-columns:1fr 45px 1fr 45px 1fr;gap:6px;align-items:center;margin:22px 0}
+.s3-flow-card{min-height:137px;border-radius:12px;border:1px solid #426278;background:#1a293c;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:15px 8px}
+.s3-flow-card span{font-size:23px;color:#a6f3e3}
+.s3-flow-card b{font-size:13px}
+.s3-flow-card small{font-size:11px;color:var(--muted);line-height:1.5}
+.s3-flow-arrow{text-align:center;color:#a89ef3;font-weight:850;font-size:21px}
+.s3-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.s3-fact{border-radius:11px;background:#151e30;border:1px solid #334860;padding:15px}
+.s3-fact b{font-size:12px;color:#f0f7ff;display:block;margin-bottom:5px}
+.s3-fact p{margin:0;font-size:11px;color:var(--muted);line-height:1.55}
+.s3-a{color:#86eedc;text-decoration:underline;text-underline-offset:3px}
+.s3-tool-signature{padding:19px 18px;background:#0c1525;border:1px solid #3b5671;border-radius:12px;overflow:auto}
+.s3-tool-signature code{font:13px/1.8 ui-monospace,Consolas,monospace;color:#c4efda;white-space:pre}
+.s3-args{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:15px 0}
+.s3-arg{padding:13px;border-radius:10px;background:#171f33;border:1px solid #3d516e}
+.s3-arg b{font:12px ui-monospace,Consolas,monospace;color:#b7f0de}
+.s3-arg p{color:var(--muted);font-size:11px;line-height:1.5;margin:7px 0 0}
+.s3-demo-code{border:1px solid #3c5570;background:#0a1423;border-radius:12px;overflow:hidden;margin:18px 0}
+.s3-demo-code>span{display:block;background:#1c2b40;padding:10px 15px;color:#b9cbe0;font-size:10px;letter-spacing:.11em;font-weight:850}
+.s3-demo-code pre{margin:0;padding:17px;font:12px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre;overflow:auto;color:#c4edda}
+.s3-checkpoint{display:flex;gap:11px;align-items:flex-start;border-radius:11px;border:1px solid #50786d;background:#19322d;padding:14px 16px;margin:16px 0;color:#ddf1e5;font-size:12px;line-height:1.6}
+.s3-checkpoint strong{color:#96edcd}
+.s3-checkpoint .mark{font-size:20px;color:#8af0c8;line-height:1}
+.s3-trace{border:1px solid #465b79;border-radius:16px;overflow:hidden;background:#101a2b;margin:20px 0}
+.s3-trace-top{padding:17px 19px;background:#1a283d;border-bottom:1px solid #3c4e65;display:flex;gap:15px;align-items:center;justify-content:space-between}
+.s3-trace-top b{font-size:12px;letter-spacing:.07em}
+.s3-trace-counter{font:12px ui-monospace,Consolas,monospace;color:#c6bbfb}
+.s3-trace-track{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:14px 18px}
+.s3-trace-stage{height:6px;background:#2b3d52;border-radius:999px}
+.s3-trace-stage.active{background:#9b90df}
+.s3-trace-stage.complete{background:#78cabc}
+.s3-trace-body{padding:18px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:15px}
+.s3-trace-pane{border:1px solid #3c4c65;border-radius:11px;background:#0c1524;min-width:0;padding:19px}
+.s3-trace-label{font-size:10px;letter-spacing:.13em;font-weight:850;color:#b3acf8}
+.s3-trace-pane h4{font-size:22px;letter-spacing:-.025em;margin:11px 0 5px}
+.s3-trace-pane p{color:var(--muted);font-size:12px;line-height:1.65;margin:0 0 13px}
+.s3-trace-code{margin:0;padding:12px;border-radius:9px;border:1px solid #2f445b;background:#080e19;color:#bce9d1;font:11px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;min-height:160px}
+.s3-trace-insight{display:flex;flex-direction:column;gap:10px;justify-content:center;padding:20px;border:1px solid #514f7c;border-radius:11px;background:#24243d}
+.s3-trace-insight>span{letter-spacing:.10em;color:#bdb7fc;font-size:10px;font-weight:850}
+.s3-trace-insight h4{font-size:15px;margin:0}
+.s3-trace-insight p{font-size:12px;color:#c4d0e1;line-height:1.7;margin:0}
+.s3-trace-actions{border-top:1px solid #3b506a;background:#172338;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px}
+.s3-trace-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.s3-trace-buttons button{padding:9px 13px;border-radius:8px;border:1px solid #506782;background:#253952;color:#f1f7ff;font-size:11px;font-weight:750;cursor:pointer}
+.s3-trace-buttons button.primary{background:#9deedf;border-color:#9deedf;color:#142b35}
+.s3-trace-buttons button:disabled{cursor:default;opacity:.38}
+.s3-trace-footnote{font-size:10px;color:var(--faint);max-width:300px;line-height:1.5}
+.s3-task-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.s3-task{padding:17px;border:1px solid #3c5875;background:#172239;border-radius:12px}
+.s3-task small{font-size:10px;font-weight:850;color:#b2a7f5;letter-spacing:.11em}
+.s3-task h4{font-size:14px;margin:8px 0}
+.s3-task p{font-size:11px;color:var(--muted);line-height:1.6;margin:0}
+.s3-ready{padding:22px;background:linear-gradient(120deg,#163534,#25253f);border:1px solid #527b80;border-radius:13px;margin:18px 0}
+.s3-ready h4{font-size:20px;margin:2px 0 9px}
+.s3-ready p{font-size:12px;color:#ccdae7;margin:0 0 15px}
+.s3-ready a{display:inline-block;border-radius:8px;padding:11px 15px;background:#98f0e1;color:#14303b;font-size:12px;font-weight:800}
+.s3-ready a:hover{background:#d1fff6}
+@media(max-width:1000px){.s3-source-flow{grid-template-columns:1fr 24px 1fr 24px 1fr}.s3-args{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.s3-split,.s3-trace-body,.s3-message-paths{grid-template-columns:1fr}.s3-source-flow{grid-template-columns:1fr;gap:6px}.s3-flow-arrow{transform:rotate(90deg)}.s3-facts,.s3-task-grid{grid-template-columns:1fr}.s3-trace-actions{flex-direction:column;align-items:stretch}.s3-trace-footnote{max-width:none}.s3-args{grid-template-columns:1fr}.s3-trace-buttons{justify-content:space-between}.s3-trace-buttons button{flex:1}}
