@@ -103,6 +103,89 @@ python --version</code></pre></div>
   </div></div>
 </section>
 
+
+<section class="s2-section" id="s2-call">
+  <div class="s2-section-head"><div><span class="s2-index">02 / FIRST API CALL</span><h3>Your first Gemini API request</h3><p>Run one prepared Python file, observe the model's response and change the research topic. The code below is already in your starter folder, with comments for every important step.</p></div><span class="s2-min">≈ 4 MIN</span></div>
+  <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL · RUN THE FIRST PROGRAM</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># The project's .venv should already be active.
+python 01_first_api_call.py</code></pre></div>
+  <p class="s2-caption">Read the full file below. No need to type the whole script — edit the supplied file in VS Code.</p>
+  <div class="s2-code"><div class="s2-code-bar"><span>01_first_api_call.py · FULL ANNOTATED PYTHON</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python">&quot;&quot;&quot;
+Workshop 03 — Section 2A: Your first Gemini API call.
+
+Student task:
+1. Run this file once.
+2. Change TOPIC to your own AI for Media survey topic.
+3. Run it again and compare the answers.
+&quot;&quot;&quot;
+
+import os  # Lets Python read environment variables, including the API key.
+
+from google import genai  # Imports the Google Gemini Python library.
+
+
+# Change this topic to something relevant to your own survey.
+TOPIC = &quot;AI facial animation&quot;
+
+# The model name identifies which Gemini model should answer our request.
+MODEL = &quot;gemini-3.5-flash-lite&quot;
+
+
+# Check that the API key exists WITHOUT showing the secret in the terminal.
+if not os.getenv(&quot;GEMINI_API_KEY&quot;):
+    raise SystemExit(
+        &quot;GEMINI_API_KEY is missing. Follow the README to configure it.&quot;
+    )
+
+# Make a client. It reads GEMINI_API_KEY from the environment automatically.
+# Important: this line alone DOES NOT test whether the key is valid.
+client = genai.Client()
+
+# This is the text we send to the model (the prompt).
+prompt = (
+    f&quot;Suggest exactly three different academic search queries about {TOPIC}. &quot;
+    &quot;Write a short numbered list. Do not invent paper titles or references.&quot;
+)
+
+print(&quot;Topic:&quot;, TOPIC)
+print(&quot;Sending the first request to Gemini...&quot;)
+
+# This call sends the prompt over the internet to the selected Gemini model.
+# An actual API request is needed to confirm that the key/model works.
+response = client.models.generate_content(
+    model=MODEL,
+    contents=prompt,
+)
+
+# Print the natural-language response returned by Gemini.
+print(&quot;\n--- Model response ---&quot;)
+print(response.text)
+
+# Token counts let us see how much text was processed.
+# These values are usage information, not monetary cost.
+if response.usage_metadata:
+    usage = response.usage_metadata
+    print(&quot;\n--- Token usage ---&quot;)
+    print(&quot;Input tokens:&quot;, usage.prompt_token_count)
+    print(&quot;Output tokens:&quot;, usage.candidates_token_count)</code></pre></div>
+  <div class="s2-activity"><strong>YOUR TURN · 2 MINUTES</strong><p>Run the file once. Find <code>TOPIC = "AI facial animation"</code> in VS Code. Change it to your own survey topic, save the file and run it again. What changed? Find the reported input/output token counts.</p></div>
+  <div class="s2-note"><strong>Notice:</strong> <code>response.text</code> contains the model's natural-language answer. The response might be a list, a paragraph or differently worded text. How can Python reliably extract exactly three queries?</div>
+</section>
+
+<section class="s2-section" id="s2-format">
+  <div class="s2-section-head"><div><span class="s2-index">03 / INTERACTIVE COMPARISON</span><h3>Natural Language vs Structured JSON</h3><p>Give the same survey topic to the model. Switch between two examples of the output and think about which is easier for Python to process.</p></div><span class="s2-min">≈ 3 MIN</span></div>
+  <div class="s2-demo">
+    <div class="s2-demo-top"><strong>SAME GOAL · TWO OUTPUT FORMATS</strong><div class="s2-tabs" role="group" aria-label="Choose response format"><button type="button" class="active" data-s2-preview="natural" aria-pressed="true">Natural Language</button><button type="button" data-s2-preview="json" aria-pressed="false">Structured JSON</button></div></div>
+    <div class="s2-demo-body"><pre class="s2-response" id="s2-example-response" aria-live="polite"></pre><div class="s2-demo-explain"><b id="s2-example-title"></b><p id="s2-example-detail"></p><code id="s2-example-field"></code></div></div>
+    <div class="s2-demo-footnote">These are illustrative responses; the actual model output will vary.</div>
+  </div>
+  <div class="s2-three">
+    <div class="s2-concept"><strong>JSON</strong><p>A data format with named keys and values, including strings, numbers and lists.</p></div>
+    <div class="s2-concept"><strong>JSON Schema</strong><p>A formal description of the fields and types the model must provide.</p></div>
+    <div class="s2-concept"><strong>Pydantic</strong><p>A Python library for describing, reading and validating structured data.</p></div>
+  </div>
+  <div class="s2-note"><strong>Key distinction:</strong> writing “please return JSON” in a prompt is not the same as providing an actual schema in the API request. In the next example we will supply the schema through <code>GenerateContentConfig</code>.</div>
+</section>
+
 <!-- CONTENT_APPEND -->
 </main></div>
 </body></html>
