@@ -17,7 +17,6 @@ The agent **does not write the survey**. Students remain responsible for reading
 By the end of the workshop, students should be able to:
 
 - Explain the difference between an LLM API call, a fixed workflow, and an AI agent.
-- Describe the role of an **agent harness** in running tool calls, maintaining context, and controlling the agent loop.
 - Run an LLM API call and produce structured JSON output.
 - Explain and observe **function calling** and the **agent loop**.
 - Use OpenAlex as an academic search tool to retrieve real paper metadata.
@@ -37,7 +36,7 @@ By the end of the workshop, students should be able to:
 
 | Time | Topic | Level |
 | --- | --- | --- |
-| 0:00–0:10 (10 min) | 1. What Is an AI Agent? (including Agent Harness) | Concept overview |
+| 0:00–0:10 (10 min) | 1. What Is an AI Agent? | Concept overview |
 | 0:10–0:30 (20 min) | 2. LLM API + Structured Outputs | **Required Hands-on** |
 | 0:30–1:05 (35 min) | 3. Function Calling + OpenAlex Paper Search | **Required Hands-on** |
 | 1:05–1:30 (25 min) | 4. Build & Test the Literature Research Agent | **Required Hands-on** |
@@ -48,13 +47,12 @@ By the end of the workshop, students should be able to:
 
 ### 1. What Is an AI Agent? — Concept Overview (10 min)
 
-- Chatbots vs. LLM API calls vs. workflows vs. agents
-- Models, instructions, tools, state, and the agent loop
-- **Agent Harness:** the runtime around the model that manages the agent loop, tool execution, context/state, permissions, and stopping conditions
-- How the harness connects the LLM to real Python tools (e.g., OpenAlex paper search)
-- What the LLM decides vs. what Python actually executes
+- **LLM vs. AI Agent (2 min):** A model response vs. an application that uses an LLM to select actions and tools.
+- **Workflow vs. Agent (3 min):** Predetermined steps vs. model-directed choices; workflows can execute code and can include agents.
+- **Anatomy of an Agent (2 min):** Model, instructions, and tools, using OpenAlex paper search as the example.
+- **Agent Loop (3 min):** Decide → request a tool → execute Python/API tool → observe the result → repeat or finish.
 
-**Key distinction:** The LLM proposes decisions and tool calls; the harness executes approved tools and returns results. An agent framework or SDK can provide harness capabilities, but a minimal harness can also be written in ordinary Python.
+**Key distinction:** The LLM chooses or requests actions within its permitted scope; application code performs tool execution and enforces boundaries. **Agentic workflows** combine program-defined steps with agent-directed decisions.
 
 ### 2. LLM API + Structured Outputs — Required Hands-on (20 min)
 
