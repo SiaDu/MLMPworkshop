@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Hands-on Gemini API and structured outputs lesson for Workshop 03.">
+  <title>LLM API + Structured Outputs · Workshop 03</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./section02.css">
+  <script src="./section02.js" defer></script>
+</head>
+<body>
+<div class="ambient ambient-one" aria-hidden="true"></div>
+<div class="ambient ambient-two" aria-hidden="true"></div>
+<header class="topbar">
+  <a href="./" class="brand"><span class="brand-mark">W<span>03</span></span><span class="brand-text">AI FOR MEDIA <span class="brand-separator">/</span> WORKSHOP 03</span></a>
+  <div class="header-right"><span class="live-dot"></span><span>Section 02 · Hands-on</span><a class="outline-link" href="./">← Section 01</a></div>
+</header>
+<div class="shell" id="top">
+<aside class="sidebar" aria-label="Section 2 navigation">
+  <div class="sidebar-title">SECTION 02 <span>· 20 MIN</span></div>
+  <nav class="side-nav">
+    <a href="#s2-api" class="nav-item active"><span class="nav-num">01</span>What is an API?</a>
+    <a href="#s2-setup" class="nav-item"><span class="nav-num">02</span>Environment Setup</a>
+    <a href="#s2-call" class="nav-item"><span class="nav-num">03</span>First API Call</a>
+    <a href="#s2-format" class="nav-item"><span class="nav-num">04</span>Text vs JSON</a>
+    <a href="#s2-schema" class="nav-item"><span class="nav-num">05</span>Pydantic Schema</a>
+    <a href="#s2-check" class="nav-item"><span class="nav-num">06</span>Validate & Finish</a>
+  </nav>
+  <div class="sidebar-bottom"><div class="side-progress"><span>Today's goal</span><strong>SearchPlan</strong></div><p>Call an LLM, produce valid JSON, and save a search plan for Section 3.</p><div style="margin-top:10px"><a href="./" style="font-size:11px;color:var(--accent)">← Back to Agent Concepts</a></div></div>
+</aside>
+<main class="main">
+<section class="s2-intro" id="s2-start">
+  <div class="s2-eyebrow">SECTION 02 / REQUIRED HANDS-ON · 20 MINUTES</div>
+  <h2>LLM API <em>+ Structured Outputs</em></h2>
+  <p>Last section: how an agent selects actions. This section: how Python calls a real LLM and turns a survey topic into data that other tools can use.</p>
+  <div class="s2-objective"><div><strong>YOUR GOAL</strong><p>Generate 3 academic search queries → validate a structured SearchPlan → save search_plan.json.</p></div><span class="time">20 MIN · PRACTICAL</span></div>
+  <div class="s2-route" aria-label="Lesson overview">
+    <a href="#s2-api"><span>01 · 3 MIN</span>LLM API</a>
+    <a href="#s2-setup"><span>PRE-CLASS</span>Get ready</a>
+    <a href="#s2-call"><span>02 · 4 MIN</span>First call</a>
+    <a href="#s2-format"><span>03 · 3 MIN</span>Why JSON?</a>
+    <a href="#s2-schema"><span>04 · 7 MIN</span>Structured output</a>
+    <a href="#s2-check"><span>05 · 3 MIN</span>Validation</a>
+  </div>
+</section>
+<!-- CONTENT_APPEND -->
+</main></div>
+</body></html>
