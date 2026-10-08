@@ -4,10 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="description" content="An interactive ten-minute lesson comparing workflows and AI agents using one interactive academic research example.">
-  <title>What Is an AI Agent? · Workshop 03</title>
+  <meta name="description" content="AI Agent concepts, Gemini API, Python examples and structured JSON with Pydantic.">
+  <title>Building an AI Agent · Workshop 03</title>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./section02.css">
   <script src="./app.js" defer></script>
+  <script src="./section02.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -17,29 +19,31 @@
       <span class="brand-mark">W<span>03</span></span>
       <span class="brand-text">AI FOR MEDIA <span class="brand-separator">/</span> WORKSHOP 03</span>
     </a>
-    <div class="header-right"><span class="live-dot"></span><span>Interactive concept lab</span><a class="outline-link" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/Workshop03_Outline.md" target="_blank" rel="noopener">Course outline ↗</a></div>
+    <div class="header-right"><span class="live-dot"></span><span>Interactive Workshop</span><a class="outline-link" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/Workshop03_Outline.md" target="_blank" rel="noopener">Course outline ↗</a></div>
   </header>
 
   <div class="shell" id="top">
-    <aside class="sidebar" aria-label="Section navigation">
-      <div class="sidebar-title">SECTION 01 <span>· 10 MIN</span></div>
+    <aside class="sidebar" aria-label="Workshop 03 sections">
+      <div class="sidebar-title">WORKSHOP 03 <span> / COURSE CONTENTS</span></div>
       <nav class="side-nav">
-        <a href="#intro" class="nav-item active"><span class="nav-num">01</span>From LLM to Agent</a>
-        <a href="#comparison" class="nav-item"><span class="nav-num">02</span>Workflow vs Agent</a>
-        <a href="#anatomy" class="nav-item"><span class="nav-num">03</span>Inside an Agent</a>
-        <a href="#loop" class="nav-item"><span class="nav-num">04</span>The Agent Loop</a>
-        <a href="#quiz" class="nav-item"><span class="nav-num">05</span>Quick Check</a>
+        <a href="#intro" class="nav-item active"><span class="nav-num">01</span>What Is an AI Agent?</a>
+        <a href="#s2-start" class="nav-item"><span class="nav-num">02</span>LLM API + Structured Outputs</a>
+        <a href="#s3" class="nav-item"><span class="nav-num">03</span>Function Calling + OpenAlex</a>
+        <a href="#s4" class="nav-item"><span class="nav-num">04</span>Build &amp; Test an Agent</a>
+        <a href="#s5" class="nav-item"><span class="nav-num">05</span>RAG: Evidence Retrieval</a>
+        <a href="#s6" class="nav-item"><span class="nav-num">06</span>LangGraph</a>
+        <a href="#s7" class="nav-item"><span class="nav-num">07</span>MCP + Multi-Agent</a>
       </nav>
       <div class="sidebar-bottom">
-        <div class="side-progress"><span>Lesson progress</span><strong id="progress-number">0%</strong></div>
-        <div class="meter"><span id="progress-bar"></span></div>
-        <p>One research task. The same tools. Different decision makers.</p>
+        <span class="sidebar-card-eyebrow">TODAY'S PROJECT</span>
+        <strong>Literature Research Agent</strong>
+        <p>Survey topic → search queries → OpenAlex papers → research list.</p>
       </div>
     </aside>
 
     <main class="main">
       <section class="hero" id="intro">
-        <div class="eyebrow"><span class="eyebrow-line"></span> SECTION 01 / THE FUNDAMENTALS <span class="eyebrow-time">10 MINUTES</span></div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> SECTION 01 / THE FUNDAMENTALS </div>
         <h1>What is an <em>AI Agent?</em></h1>
         <p class="lede">An LLM generates responses. An agent can <strong>choose actions</strong>, use tools, observe what happens, and decide what to do next.</p>
         <div class="hero-pills"><span>LLM vs Agent</span><span>Workflow</span><span>Tool selection</span><span>Agent loop</span></div>
@@ -58,7 +62,7 @@
       </section>
 
       <section class="lesson-section" id="comparison">
-        <div class="section-top"><div><span class="section-index">01 — COMPARE</span><h2>Workflow <span>vs.</span> Agent</h2><p>Both can use Python, APIs and software. The difference is <strong>who decides the next action</strong>.</p></div><div class="time-pill">≈ 3 MIN</div></div>
+        <div class="section-top"><div><span class="section-index">01 — COMPARE</span><h2>Workflow <span>vs.</span> Agent</h2><p>Both can use Python, APIs and software. The difference is <strong>who decides the next action</strong>.</p></div></div>
         <div class="playground">
           <div class="playground-header">
             <div class="header-heading"><span class="window-dots"><i></i><i></i><i></i></span><strong>Literature Research · Compare two approaches</strong></div>
@@ -86,7 +90,7 @@
       </section>
 
       <section class="lesson-section" id="anatomy">
-        <div class="section-top"><div><span class="section-index">02 — COMPONENTS</span><h2>Inside an Agent</h2><p>Three essentials, plus the code that connects them.</p></div><div class="time-pill">≈ 2 MIN</div></div>
+        <div class="section-top"><div><span class="section-index">02 — COMPONENTS</span><h2>Inside an Agent</h2><p>Three essentials, plus the code that connects them.</p></div></div>
         <div class="anatomy-grid">
           <article class="anatomy-card"><span class="anatomy-no">01</span><div class="anatomy-icon">◉</div><h3>Model</h3><p>The LLM interprets the goal and chooses what to request next.</p><small>e.g. Gemini / GPT</small></article>
           <article class="anatomy-card"><span class="anatomy-no">02</span><div class="anatomy-icon">≡</div><h3>Instructions</h3><p>Define the task, constraints, available scope and stopping conditions.</p><small>e.g. “Find 5 real papers”</small></article>
@@ -96,7 +100,7 @@
       </section>
 
       <section class="lesson-section" id="loop">
-        <div class="section-top"><div><span class="section-index">03 — INTERACTIVE EXPLORER</span><h2>The Agent Loop</h2><p>See the available tools <em>before</em> the model makes a choice. Step through selection, execution, observation and the next decision.</p></div><div class="time-pill">≈ 3 MIN</div></div>
+        <div class="section-top"><div><span class="section-index">03 — INTERACTIVE EXPLORER</span><h2>The Agent Loop</h2><p>See the available tools <em>before</em> the model makes a choice. Step through selection, execution, observation and the next decision.</p></div></div>
         <div class="loop-lab">
           <div class="lab-topline">
             <div><span class="lab-overline">SIMULATED AGENT EXECUTION</span><h3 id="loop-task-title">Literature Research Agent</h3></div>
@@ -130,16 +134,337 @@
       </section>
 
       <section class="lesson-section quiz-section" id="quiz">
-        <div class="section-top"><div><span class="section-index">04 — CHECK YOUR UNDERSTANDING</span><h2>Three quick questions.</h2><p>Can you distinguish the model's decisions from the program's execution?</p></div><div class="time-pill">≈ 1 MIN</div></div>
+        <div class="section-top"><div><span class="section-index">04 — CHECK YOUR UNDERSTANDING</span><h2>Three quick questions.</h2><p>Can you distinguish the model's decisions from the program's execution?</p></div></div>
         <div class="quiz-grid" id="quiz-grid"></div>
         <div class="quiz-footer"><div id="quiz-score" aria-live="polite">Answer all three to see your score.</div><button type="button" id="quiz-retry" class="secondary-action">Reset answers ↺</button></div>
       </section>
 
-      <section class="next-section">
-        <div><span class="section-index">NEXT UP · REQUIRED HANDS-ON</span><h2>LLM API & Structured Outputs <span>↗</span></h2><p>In Section 2, you will call a real model. Section 3 will connect that model to the OpenAlex paper-search tool.</p></div>
-        <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/Workshop03_Outline.md" class="next-link" target="_blank" rel="noopener">View workshop outline ↗</a>
+      <section class="s2-intro" id="s2-start">
+  <div class="s2-eyebrow">SECTION 02 / REQUIRED HANDS-ON</div>
+  <h2>LLM API <em>+ Structured Outputs</em></h2>
+  <p>Last section: how an agent selects actions. This section: how Python calls a real LLM and turns a survey topic into data that other tools can use.</p>
+  <div class="s2-objective"><div><strong>YOUR GOAL</strong><p>Generate 3 academic search queries → validate a structured SearchPlan → save search_plan.json.</p></div></div>
+  <div class="s2-route" aria-label="Lesson overview">
+    <a href="#s2-api"><span>01 / CONCEPT</span>LLM API</a>
+    <a href="#s2-setup"><span>PRE-CLASS</span>Get ready</a>
+    <a href="#s2-call"><span>02 / HANDS-ON</span>First call</a>
+    <a href="#s2-format"><span>03 / COMPARE</span>Why JSON?</a>
+    <a href="#s2-schema"><span>04 / HANDS-ON</span>Structured output</a>
+    <a href="#s2-check"><span>05 / VALIDATE</span>Validation</a>
+  </div>
+</section>
+
+<section class="s2-section" id="s2-api">
+  <div class="s2-section-head"><div><span class="s2-index">01 / UNDERSTAND</span><h3>What is an LLM API?</h3><p>An API is how a program communicates with another service. With an API, Python can send a prompt and receive a model response that other Python functions can use.</p></div></div>
+  <div class="s2-flow" role="img" aria-label="A Python script calls the Gemini API and receives a model response">
+    <div class="s2-flow-cell"><span>⌨</span><b>Your Python Script</b><small>Survey topic + prompt</small></div><div class="s2-flow-arrow">→</div>
+    <div class="s2-flow-cell"><span>⇄</span><b>Gemini API</b><small>Send / receive</small></div><div class="s2-flow-arrow">↔</div>
+    <div class="s2-flow-cell"><span>✳</span><b>LLM Model</b><small>Generate a response</small></div><div class="s2-flow-arrow">→</div>
+    <div class="s2-flow-cell"><span>{ }</span><b>Python Data</b><small>Text or structured JSON</small></div>
+  </div>
+  <div class="s2-three">
+    <div class="s2-concept"><strong>API Key</strong><p>A private credential linked to your account and API usage. Never put it on GitHub.</p></div>
+    <div class="s2-concept"><strong>Tokens</strong><p>Units used to measure model input and output. They affect usage limits and sometimes costs.</p></div>
+    <div class="s2-concept"><strong>Rate Limits</strong><p>Limits on requests or tokens over time. Stop repeated calls if you receive an HTTP 429 error.</p></div>
+  </div>
+  <div class="s2-note"><strong>Model for this exercise:</strong> <code>gemini-3.5-flash-lite</code> through the <code>google-genai</code> SDK. You need a Gemini API Key. Free-tier availability and request quotas may depend on your account.</div>
+</section>
+
+<section class="s2-section" id="s2-setup">
+  <div class="s2-section-head"><div><span class="s2-index">BEFORE CLASS / GET READY</span><h3>Set up your Linux environment</h3><p>Each of you has your own Linux account and computer. Configure your key once, then use it from Python without pasting it into a source file.</p></div></div>
+  <div class="s2-lab-panel"><div class="s2-lab-title"><strong>PART A · Configure your Gemini API Key</strong><small>Linux Bash / personal account</small></div><div class="s2-lab-body">
+    <div class="s2-step"><span class="s2-n">1</span><div><h4>Create your API Key</h4><p>Open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">Google AI Studio → API Keys ↗</a>. Sign in, create a key and copy it. <strong>Do not show your key to anyone.</strong></p></div></div>
+    <div class="s2-step"><span class="s2-n">2</span><div><h4>Open your Bash settings</h4><p><code>nano</code> is a terminal text editor. <code>~/.bashrc</code> stores settings for your own Bash account.</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash">nano ~/.bashrc</code></pre></div>
+    </div></div>
+    <div class="s2-step"><span class="s2-n">3</span><div><h4>Go to the bottom and add this line</h4><p>Replace the placeholder with <strong>your own Gemini API Key</strong>. Do not type the key into any Python file.</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>WRITE INSIDE THE NANO EDITOR</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Give Python access to your Gemini API Key.\nexport GEMINI_API_KEY=&quot;your_api_key_here&quot;</code></pre></div>
+      <div class="s2-keys"><span>Save:</span><kbd>Ctrl + O</kbd><span>then</span><kbd>Enter</kbd><span>Exit:</span><kbd>Ctrl + X</kbd></div>
+    </div></div>
+    <div class="s2-step"><span class="s2-n">4</span><div><h4>Reload the file and check the key exists</h4><p>The second command prints a safe status message, <strong>not your real key</strong>.</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Reload your Bash settings in this terminal.\nsource ~/.bashrc\n\n# Print a message only if GEMINI_API_KEY is set.\necho &quot;${GEMINI_API_KEY:+API key is set}&quot;</code></pre></div>
+      <p>Expected output: <code>API key is set</code>. If nothing appears, reopen <code>~/.bashrc</code> and check for a spelling mistake.</p>
+    </div></div>
+  </div></div>
+  <div class="s2-lab-panel"><div class="s2-lab-title"><strong>PART B · Open the starter project and install its dependencies</strong><small>No sudo required</small></div><div class="s2-lab-body">
+    <p class="s2-caption">Start in the root folder of your cloned <code>MLMPworkshop</code> repository. Your instructor has prepared the project files already.</p>
+    <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Go into the prepared starter folder.
+cd workshop03_Building_an_AI_Agent/literature_research_agent_starter
+
+# Install the packages in pyproject.toml.
+# uv creates the .venv environment if it is not there already.
+uv sync
+
+# Activate the project-local Python environment.
+source .venv/bin/activate
+
+# Check which Python you are using.
+which python
+python --version</code></pre></div>
+    <div class="s2-note"><strong>Already provided:</strong> <code>pyproject.toml</code>, <code>01_first_api_call.py</code>, <code>02_structured_output.py</code> and <code>tools.py</code>. <strong>You do not need to write the whole project.</strong> We will use <code>tools.py</code> in Section 3.</div>
+    <div class="s2-step"><span class="s2-n">5</span><div><h4>Optional: open Python to check the SDK</h4><p>In the Linux terminal, enter:</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash">python</code></pre></div>
+      <p>Once you see the Python prompt <code>&gt;&gt;&gt;</code>, type the following lines one at a time:</p>
+      <div class="s2-code"><div class="s2-code-bar"><span>PYTHON INTERACTIVE PROMPT</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python"># Import the official Gemini SDK.\nfrom google import genai\n\n# Create a client using the key from your environment.\nclient = genai.Client()\n\n# Exit Python and return to your Linux terminal.\nexit()</code></pre></div>
+      <p><strong>Important:</strong> creating a client does not prove that your key can access the model. The next step will send a real request.</p>
+    </div></div>
+  </div></div>
+</section>
+
+
+<section class="s2-section" id="s2-call">
+  <div class="s2-section-head"><div><span class="s2-index">02 / FIRST API CALL</span><h3>Your first Gemini API request</h3><p>Run one prepared Python file, observe the model's response and change the research topic. The code below is already in your starter folder, with comments for every important step.</p></div></div>
+  <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL · RUN THE FIRST PROGRAM</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># The project's .venv should already be active.
+python 01_first_api_call.py</code></pre></div>
+  <p class="s2-caption">Read the full file below. No need to type the whole script — edit the supplied file in VS Code.</p>
+  <div class="s2-code"><div class="s2-code-bar"><span>01_first_api_call.py · FULL ANNOTATED PYTHON</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python">&quot;&quot;&quot;
+Workshop 03 — Section 2A: Your first Gemini API call.
+
+Student task:
+1. Run this file once.
+2. Change TOPIC to your own AI for Media survey topic.
+3. Run it again and compare the answers.
+&quot;&quot;&quot;
+
+import os  # Lets Python read environment variables, including the API key.
+
+from google import genai  # Imports the Google Gemini Python library.
+
+
+# Change this topic to something relevant to your own survey.
+TOPIC = &quot;AI facial animation&quot;
+
+# The model name identifies which Gemini model should answer our request.
+MODEL = &quot;gemini-3.5-flash-lite&quot;
+
+
+# Check that the API key exists WITHOUT showing the secret in the terminal.
+if not os.getenv(&quot;GEMINI_API_KEY&quot;):
+    raise SystemExit(
+        &quot;GEMINI_API_KEY is missing. Follow the README to configure it.&quot;
+    )
+
+# Make a client. It reads GEMINI_API_KEY from the environment automatically.
+# Important: this line alone DOES NOT test whether the key is valid.
+client = genai.Client()
+
+# This is the text we send to the model (the prompt).
+prompt = (
+    f&quot;Suggest exactly three different academic search queries about {TOPIC}. &quot;
+    &quot;Write a short numbered list. Do not invent paper titles or references.&quot;
+)
+
+print(&quot;Topic:&quot;, TOPIC)
+print(&quot;Sending the first request to Gemini...&quot;)
+
+# This call sends the prompt over the internet to the selected Gemini model.
+# An actual API request is needed to confirm that the key/model works.
+response = client.models.generate_content(
+    model=MODEL,
+    contents=prompt,
+)
+
+# Print the natural-language response returned by Gemini.
+print(&quot;\n--- Model response ---&quot;)
+print(response.text)
+
+# Token counts let us see how much text was processed.
+# These values are usage information, not monetary cost.
+if response.usage_metadata:
+    usage = response.usage_metadata
+    print(&quot;\n--- Token usage ---&quot;)
+    print(&quot;Input tokens:&quot;, usage.prompt_token_count)
+    print(&quot;Output tokens:&quot;, usage.candidates_token_count)</code></pre></div>
+  <div class="s2-activity"><strong>YOUR TURN · 2 MINUTES</strong><p>Run the file once. Find <code>TOPIC = "AI facial animation"</code> in VS Code. Change it to your own survey topic, save the file and run it again. What changed? Find the reported input/output token counts.</p></div>
+  <div class="s2-note"><strong>Notice:</strong> <code>response.text</code> contains the model's natural-language answer. The response might be a list, a paragraph or differently worded text. How can Python reliably extract exactly three queries?</div>
+</section>
+
+<section class="s2-section" id="s2-format">
+  <div class="s2-section-head"><div><span class="s2-index">03 / INTERACTIVE COMPARISON</span><h3>Natural Language vs Structured JSON</h3><p>Give the same survey topic to the model. Switch between two examples of the output and think about which is easier for Python to process.</p></div></div>
+  <div class="s2-demo">
+    <div class="s2-demo-top"><strong>SAME GOAL · TWO OUTPUT FORMATS</strong><div class="s2-tabs" role="group" aria-label="Choose response format"><button type="button" class="active" data-s2-preview="natural" aria-pressed="true">Natural Language</button><button type="button" data-s2-preview="json" aria-pressed="false">Structured JSON</button></div></div>
+    <div class="s2-demo-body"><pre class="s2-response" id="s2-example-response" aria-live="polite"></pre><div class="s2-demo-explain"><b id="s2-example-title"></b><p id="s2-example-detail"></p><code id="s2-example-field"></code></div></div>
+    <div class="s2-demo-footnote">These are illustrative responses; the actual model output will vary.</div>
+  </div>
+  <div class="s2-three">
+    <div class="s2-concept"><strong>JSON</strong><p>A data format with named keys and values, including strings, numbers and lists.</p></div>
+    <div class="s2-concept"><strong>JSON Schema</strong><p>A formal description of the fields and types the model must provide.</p></div>
+    <div class="s2-concept"><strong>Pydantic</strong><p>A Python library for describing, reading and validating structured data.</p></div>
+  </div>
+  <div class="s2-note"><strong>Key distinction:</strong> writing “please return JSON” in a prompt is not the same as providing an actual schema in the API request. In the next example we will supply the schema through <code>GenerateContentConfig</code>.</div>
+</section>
+
+
+<section class="s2-section" id="s2-schema">
+  <div class="s2-section-head"><div><span class="s2-index">04 / HANDS-ON</span><h3>Structured Outputs with Pydantic</h3><p>Describe the fields Python expects, request matching JSON from Gemini, check the returned values, and save them.</p></div></div>
+  <div class="s2-three">
+    <div class="s2-concept"><strong>topic: str</strong><p>A string (text) describing your survey topic.</p></div>
+    <div class="s2-concept"><strong>search_queries: list[str]</strong><p>A list in which every item is a string.</p></div>
+    <div class="s2-concept"><strong>start_year: int</strong><p>An integer (whole number) for the publication year.</p></div>
+  </div>
+  <div class="s2-code"><div class="s2-code-bar"><span>PYTHON · OUR EXPECTED DATA MODEL</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python"># Import the Pydantic base class used to define a data structure.
+from pydantic import BaseModel
+
+# Each attribute specifies the type we expect in the JSON.
+class SearchPlan(BaseModel):
+    topic: str                # A text string.
+    search_queries: list[str] # A list of search-query strings.
+    start_year: int           # An integer.</code></pre></div>
+  <div class="s2-note"><strong>Key API settings:</strong> <code>response_mime_type="application/json"</code> requests JSON, and <code>response_schema=SearchPlan</code> tells Gemini which fields/types to return. Afterwards, <code>SearchPlan.model_validate_json(response.text)</code> validates the JSON as a Python object.</div>
+  <div class="s2-code"><div class="s2-code-bar"><span>LINUX TERMINAL · RUN SECOND SCRIPT</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-bash"># Generate structured JSON and save a local research plan.
+python 02_structured_output.py</code></pre></div>
+  <p class="s2-caption">This is the complete provided Python file. Read the comments — you do not need to type the entire program.</p>
+  <div class="s2-code"><div class="s2-code-bar"><span>02_structured_output.py · FULL ANNOTATED PYTHON</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python">&quot;&quot;&quot;
+Workshop 03 — Section 2B: Ask Gemini for a structured JSON SearchPlan.
+
+Student task:
+1. Run this file.
+2. Change TOPIC to your survey topic and run it again.
+3. Find search_plan.json. This file will help with the next section.
+Optional: add a 'research_focus: str' field to SearchPlan.
+&quot;&quot;&quot;
+
+import os  # Reads the GEMINI_API_KEY environment variable.
+from datetime import date  # Gets the current year for a simple check.
+from pathlib import Path  # Helps save our JSON output to a file.
+
+from google import genai  # The official Google Gemini Python SDK.
+from google.genai import types  # Configuration options for Gemini.
+from pydantic import BaseModel, Field  # Define and describe a data schema.
+
+
+# EDIT THIS: use your own survey topic.
+TOPIC = &quot;AI facial animation&quot;
+MODEL = &quot;gemini-3.5-flash-lite&quot;
+
+
+# A Pydantic class defines the exact fields that Python expects.
+# This is NOT an LLM agent or a paper-search function.
+class SearchPlan(BaseModel):
+    # str = a piece of text, such as &quot;AI facial animation&quot;.
+    topic: str = Field(description=&quot;The student's academic survey topic&quot;)
+
+    # list[str] = a list of text strings (search queries).
+    search_queries: list[str] = Field(
+        description=&quot;Three distinct queries suitable for academic paper search&quot;
+    )
+
+    # int = an integer, such as 2022.
+    start_year: int = Field(
+        description=&quot;Earliest publication year to search from&quot;
+    )
+
+
+# Stop with a useful message if the student's key is not configured.
+if not os.getenv(&quot;GEMINI_API_KEY&quot;):
+    raise SystemExit(&quot;Missing GEMINI_API_KEY. See the README.&quot;)
+
+# Set up our API client; the key comes from the environment.
+client = genai.Client()
+
+# Tell Gemini what we need. The schema below enforces the data FORMAT.
+prompt = (
+    f&quot;Create a literature search plan for the topic: {TOPIC}. &quot;
+    &quot;Give exactly three different academic search queries. &quot;
+    &quot;Focus on publications from 2022 onwards. &quot;
+    &quot;Do not invent specific paper titles or citations.&quot;
+)
+
+# Request JSON whose fields follow our Pydantic model.
+response = client.models.generate_content(
+    model=MODEL,
+    contents=prompt,
+    config=types.GenerateContentConfig(
+        response_mime_type=&quot;application/json&quot;,
+        response_schema=SearchPlan,
+    ),
+)
+
+# A successful response should contain JSON text, not an empty response.
+if not response.text:
+    raise SystemExit(&quot;The model did not return any JSON text.&quot;)
+
+# This checks the returned JSON against our expected Python field types.
+# If a field is missing or the wrong type, Pydantic reports an error.
+plan = SearchPlan.model_validate_json(response.text)
+
+# Extra RULES for the lesson: correct JSON types are not enough.
+# We also want EXACTLY three queries and a sensible publication year.
+if len(plan.search_queries) != 3:
+    raise ValueError(&quot;Expected exactly three search queries.&quot;)
+
+if not (2000 &lt;= plan.start_year &lt;= date.today().year):
+    raise ValueError(&quot;The start_year is outside the allowed range.&quot;)
+
+# Convert the validated Python model back into neatly formatted JSON.
+json_output = plan.model_dump_json(indent=2)
+
+print(&quot;\n--- Validated SearchPlan (JSON) ---&quot;)
+print(json_output)
+
+# Demonstrate that Python can access each field directly.
+print(&quot;\n--- Python can use individual fields ---&quot;)
+print(&quot;Topic:&quot;, plan.topic)
+print(&quot;First search query:&quot;, plan.search_queries[0])
+print(&quot;Start year:&quot;, plan.start_year)
+
+# Save this structured plan so the next lesson can reuse it.
+output_file = Path(&quot;search_plan.json&quot;)
+output_file.write_text(json_output + &quot;\n&quot;, encoding=&quot;utf-8&quot;)
+print(&quot;\nSaved file:&quot;, output_file.resolve())</code></pre></div>
+  <div class="s2-activity"><strong>YOUR TURN</strong><p>Change <code>TOPIC</code> to your own AI for Media survey topic, save the file and run it again. Open the generated <code>search_plan.json</code>. Find <code>search_queries</code> and <code>start_year</code>.</p></div>
+  <div class="s2-note"><strong>Optional:</strong> Add a <code>research_focus: str</code> field to the Pydantic <code>SearchPlan</code> and rerun. What changes in the generated JSON?</div>
+</section>
+
+<section class="s2-section" id="s2-check">
+  <div class="s2-section-head"><div><span class="s2-index">05 / VALIDATION + SAFETY</span><h3>Valid JSON ≠ Valid Research</h3><p>Field types, business rules and factual correctness are different things. Try three sample responses to see the difference.</p></div></div>
+  <div class="s2-lab-panel">
+    <div class="s2-lab-title"><strong>INTERACTIVE · What if the JSON is wrong?</strong><small>Three sample responses</small></div>
+    <div class="s2-lab-body">
+      <label for="s2-validation-sample" class="s2-select-label">Choose a sample response:</label>
+      <select id="s2-validation-sample" class="s2-sample-select">
+        <option value="correct">Correct JSON · three queries</option>
+        <option value="wrong_type">Wrong type · text instead of a list</option>
+        <option value="wrong_count">Correct type · only one query</option>
+      </select>
+      <div class="s2-code"><div class="s2-code-bar"><span>EXAMPLE JSON</span></div><pre><code id="s2-validation-json"></code></pre></div>
+      <button class="button-primary" id="s2-validate" type="button">Validate example →</button>
+      <div class="s2-note" id="s2-validation-result" aria-live="polite"></div>
+      <p class="s2-caption">This classroom interaction illustrates basic checks. The actual Python script uses Pydantic to validate its real API response.</p>
+    </div>
+  </div>
+  <div class="s2-code"><div class="s2-code-bar"><span>PYTHON · ADDITIONAL VALIDATION RULES</span><button class="s2-copy" type="button" data-s2-copy>Copy code</button></div><pre><code class="language-python"># Check the number of queries, not just their data type.
+assert len(plan.search_queries) == 3
+
+# Do not allow a starting year in the future.
+from datetime import date
+assert plan.start_year &lt;= date.today().year</code></pre></div>
+  <div class="s2-three">
+    <div class="s2-concept"><strong>Schema validation</strong><p>Are the correct fields present, with the right types?</p></div>
+    <div class="s2-concept"><strong>Extra rules</strong><p>Exactly three queries? A sensible publication year?</p></div>
+    <div class="s2-concept"><strong>Factual validation</strong><p>Are the queries relevant? Are the eventual paper references real?</p></div>
+  </div>
+  <div class="s2-note"><strong>Remember:</strong> Keep the API Key private and out of GitHub. Each API call uses tokens. If you receive <code>429</code>, stop sending repeated requests and ask for assistance.</div>
+  <div class="s2-bridge"><span class="s2-index">NEXT / SECTION 03</span><h3>From SearchPlan to Function Calling ↗</h3><p>In this section, Python called Gemini to generate a SearchPlan. Next, we will let the LLM request a real <code>search_papers(query)</code> function, while Python executes it using OpenAlex metadata.</p><p>Remember: a JSON search plan is not itself an academic paper list. The real research sources come from OpenAlex in the next section.</p></div>
+</section>
+
+
+      <section class="s2-section s2-roadmap" id="s3">
+        <div class="s2-section-head"><div><span class="s2-index">SECTION 03 / FUNCTION CALLING</span><h3>Function Calling + OpenAlex</h3><p>The LLM requests <code>search_papers()</code>; your Python tool calls the OpenAlex API and returns real paper metadata.</p></div></div>
       </section>
-      <footer class="footer"><span>AI for Media · Workshop 03</span><span>All decisions and sample results on this page are illustrative.</span></footer>
+      <section class="s2-section s2-roadmap" id="s4">
+        <div class="s2-section-head"><div><span class="s2-index">SECTION 04 / BUILD &amp; TEST</span><h3>Build Your Literature Research Agent</h3><p>Connect a model, tool execution, result checks and a CSV export into one working project.</p></div></div>
+      </section>
+      <section class="s2-section s2-roadmap" id="s5">
+        <div class="s2-section-head"><div><span class="s2-index">SECTION 05 / RAG</span><h3>Retrieve Evidence from Papers</h3><p>Retrieve relevant passages from provided paper excerpts before the model generates an answer.</p></div></div>
+      </section>
+      <section class="s2-section s2-roadmap" id="s6">
+        <div class="s2-section-head"><div><span class="s2-index">SECTION 06 / LANGGRAPH</span><h3>Stateful Agent Workflows</h3><p>Explore nodes, state and conditional routing in a guided instructor demonstration.</p></div></div>
+      </section>
+      <section class="s2-section s2-roadmap" id="s7">
+        <div class="s2-section-head"><div><span class="s2-index">SECTION 07 / MCP + MULTI-AGENT</span><h3>Connecting Tools and Specialized Agents</h3><p>An introduction to standard tool interfaces and when multiple agents may be useful.</p></div></div>
+      </section>
+      <footer class="footer"><span>AI for Media · Workshop 03</span><span>Python starter scripts are supplied in the course repository.</span></footer>
     </main>
   </div>
 
