@@ -392,7 +392,7 @@ print(response.text)</code></pre>
 </section>
 
 <section class="s3-section" id="s3-tool">
-  <div class="s3-section-top"><div><span class="s3-tag">03 / PREPARED TOOL</span><h3>Your first Python Tool</h3><p>The instructor has already written <code>tools.py</code>. This is a normal Python function, not an LLM by itself. You will <strong>run and inspect</strong> it, not recreate it.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">03 / PREPARED TOOL</span><h3>Your first Python Tool</h3><p>There are <strong>two separate Python files</strong> in the starter folder: <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/tools.py" target="_blank" rel="noopener"><code>tools.py</code> ↗</a> contains the OpenAlex search function; <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/03_function_calling.py" target="_blank" rel="noopener"><code>03_function_calling.py</code> ↗</a> lets Gemini request that function. They are provided for you — inspect and run them, not recreate them.</p></div></div>
   <div class="s3-tool-signature"><code>def search_papers(query: str, limit: int = 5) -&gt; list[dict]:</code></div>
   <div class="s3-args">
     <div class="s3-arg"><b>query: str</b><p>Academic search keywords chosen by the program or requested by Gemini.</p></div>
