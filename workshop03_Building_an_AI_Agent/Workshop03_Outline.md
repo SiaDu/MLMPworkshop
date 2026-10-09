@@ -79,18 +79,24 @@ By the end of the workshop, students should be able to:
 
 ### 4. Build & Test — AI Literature Research Agent — Required Hands-on (25 min)
 
-**Scenario:** Each student enters a research topic related to their own AI for Media survey.
+**Website:** One interactive pipeline, with two sample outcomes (target reached / too few records). The interactive example is predefined, not a live search.
 
-**Minimum workflow:**
+**Student workflow:**
 
-1. Generate one or more relevant search queries.
-2. Call the OpenAlex paper search tool.
-3. Deduplicate and preserve metadata/source links.
-4. Export a short list for manual reading and checking.
+1. Load the existing `search_plan.json` from Section 2, or generate a new structured plan with Gemini.
+2. Ask Gemini to call `search_papers(query, limit)` with the Section 3 automatic-calling mechanism.
+3. Apply the SearchPlan's `start_year` at OpenAlex using `from_publication_date`.
+4. Check year and required metadata, deduplicate by DOI/OpenAlex ID, and count unique usable records.
+5. If short, let Gemini revise the search query; stop when `TARGET_PAPERS` or `MAX_SEARCH_ROUNDS` is reached.
+6. Export `papers.csv` (title, year, authors, DOI, OpenAlex URL, query) and `search_log.json`.
 
-**Minimum output:** `papers.csv` with approximately 5–10 real papers, paper titles, years, identifiers/URLs where available, and a basic relevance note. The provided starter project can also export `references.bib`; students must check the bibliography before citing it.
+**Provided code:** [04_research_agent.py](literature_research_agent_starter/04_research_agent.py) and extended [tools.py](literature_research_agent_starter/tools.py).
 
-**Check for success:** At least one real tool call is visible in the run log, records correspond to source links, and the exported file can be opened.
+**Student tutorial:** [Section 4 of the Starter Project README](literature_research_agent_starter/README.md#section-4--build--test-your-literature-research-agent).
+
+**Success criteria:** At least one real OpenAlex tool request is visible in terminal output, `papers.csv` and `search_log.json` are produced, and the student verifies a paper URL and its topical relevance manually.
+
+**Key limitation:** Record-count sufficiency is not research relevance. This lesson applies metadata, year and duplicate checks, not automated semantic relevance validation. It does not generate a verified bibliography or download full paper texts.
 
 ### 5. RAG — Guided Hands-on (15 min)
 
