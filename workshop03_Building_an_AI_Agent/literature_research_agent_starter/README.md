@@ -691,6 +691,544 @@ The aim is to **observe the automatic tool-calling mechanism**, not to collect a
 
 Section 3 demonstrates **one search tool**. Section 4 will connect the previous `search_plan.json` to a repeatable research process: multiple search queries, checking whether the results are sufficient, handling duplicates, and exporting paper metadata into a CSV reading list.
 
-**Important current limitation:** `SearchPlan` includes `start_year`, but the current `search_papers(query, limit)` tool has **no year-filter argument**. The publication-year rule is not applied by this Section 3 script. We can add this when building the Section 4 workflow.
+**About years:** Section 3's Function Calling script does **not** pass a year filter. For Section 4, we extended `tools.py` with an optional `start_year` argument; the new agent now uses the SearchPlan year to filter the OpenAlex request.
 
 References: [Google Gen AI SDK — Automatic Python function calling](https://googleapis.github.io/python-genai/#function-calling) · [Gemini Function Calling](https://ai.google.dev/gemini-api/docs/function-calling) · [OpenAlex API](https://help.openalex.org/api/)
+
+
+---
+
+## Section 4 — Build & Test Your Literature Research Agent
+
+**Goal:** Combine what you learned in Section 2 (**Structured Outputs**) and Section 3 (**Function Calling**) into a small research agent that searches real academic metadata, checks and deduplicates the results, retries when necessary, and exports a CSV reading list.
+
+The workshop website has **one interactive pipeline** showing both outcomes: **Enough Papers** and **Not Enough Papers**. Here you will run the **real Python script**.
+
+### Part A — Understand the complete pipeline
+
+```text
+Research TOPIC
+      |
+      v
+Load Section 2 SearchPlan (or generate it with Gemini + Pydantic)
+      |
+      v
+Gemini requests search_papers(query, limit)
+      |
+      v
+Local Python calls OpenAlex with start_year filter
+      |
+      v
+Check year + basic metadata; deduplicate by DOI / OpenAlex ID
+      |
+      v
+Enough unique records?
+  | YES                     | NO (rounds remain)
+  v                         v
+Export papers.csv       Ask Gemini to revise keywords
++ search_log.json            |
+                             └──> search_papers again
+  |
+  NO but max rounds reached -> Export available partial results
+```
+
+**A bounded agent workflow:** Gemini proposes/refines search queries and requests a Python tool. The **Python program**, not the LLM, enforces data checks, stopping conditions and export rules. We use `MAX_SEARCH_ROUNDS` to avoid endless requests.
+
+| Earlier section | Reused in Section 4 |
+| --- | --- |
+| Section 2 — Structured Outputs | `SearchPlan` with `topic`, three `search_queries` and `start_year`. |
+| Section 3 — Function Calling | Gemini SDK makes local `search_papers()` calls and receives actual OpenAlex data. |
+| Section 4 — New | Search-result checks, deduplication, query revisions, stopping rules, CSV export and search log. |
+
+**Do not confuse record count with relevance.** We count records that pass basic *metadata and year* checks. No automatic semantic relevance evaluation is implemented. A paper may be real, recent and still not suitable for your survey.
+
+### Part B — Run the prepared agent
+
+Make sure the starter folder contains:
+
+```text
+literature_research_agent_starter/
+├── README.md
+├── pyproject.toml
+├── 01_first_api_call.py
+├── 02_structured_output.py
+├── 03_function_calling.py
+├── 04_research_agent.py       <-- NEW
+└── tools.py                   <-- Extended to support start_year
+```
+
+Open a terminal **in the starter folder**:
+
+```bash
+pwd
+ls
+source .venv/bin/activate
+echo "${GEMINI_API_KEY:+API key is set}"
+```
+
+If you have not created the environment yet, complete Section 2 Part B first. Do **not** paste your API key directly into the Python files.
+
+Then run:
+
+```bash
+python 04_research_agent.py
+```
+
+The script will:
+
+1. Read `search_plan.json` from Section 2 **if the topic matches** and the plan passes validation. Otherwise, request a new structured plan from Gemini.
+2. Use the first SearchPlan query to ask Gemini for a Function Call to `search_papers()`.
+3. Pass the plan's **`start_year`** to OpenAlex's **`from_publication_date`** filter (e.g., `2022-01-01`). This is an actual API-side filter, not just a prompt instruction.
+4. Check the returned records for a nonempty title, a publication year in range, and a DOI or OpenAlex URL. Remove duplicates using DOI/OpenAlex identifiers.
+5. If there are not enough records, ask Gemini to **revise its next query** using previous search history and another SearchPlan suggestion.
+6. Stop after the target is reached **or** the maximum number of search rounds. Export the collected records even if the target is not reached.
+
+For Section 4 we extended the existing tool without breaking Section 3:
+
+```python
+# The new start_year parameter is optional.
+def search_papers(query: str, limit: int = 5,
+                  start_year: int | None = None) -> list[dict]:
+    ...
+
+# Example: OpenAlex will search only publications from 2022 onwards.
+search_papers("facial animation", limit=5, start_year=2022)
+```
+
+**Only the OpenAlex paper metadata is used for the CSV.** The agent does not ask Gemini to invent paper titles or references.
+
+### Part C — Change the settings
+
+In `04_research_agent.py`, find this block:
+
+```python
+TOPIC = "AI facial animation"
+TARGET_PAPERS = 10
+MAX_SEARCH_ROUNDS = 3
+PAPERS_PER_SEARCH = 5
+DEFAULT_START_YEAR = 2022
+```
+
+| Setting | What it controls |
+| --- | --- |
+| `TOPIC` | Your AI for Media survey topic. Changing this causes the agent to regenerate the SearchPlan if the saved plan is for another topic. |
+| `TARGET_PAPERS` | The number of unique records required to finish early. |
+| `MAX_SEARCH_ROUNDS` | The maximum number of search attempts (1–5). A higher number uses more API calls. |
+| `PAPERS_PER_SEARCH` | Maximum records returned per OpenAlex tool call (1–10). |
+| `DEFAULT_START_YEAR` | Requested year for a newly generated plan. If a valid matching `search_plan.json` already exists, its own `start_year` takes precedence. |
+
+**Recommended student tasks:**
+
+1. **Use your topic.** Change `TOPIC` to your survey topic. Run the script. Check `[PLAN]` to see whether it reused or generated `search_plan.json`.
+2. **Force an early stop.** Set `TARGET_PAPERS = 3` and `PAPERS_PER_SEARCH = 5`. Did the run stop before three rounds?
+3. **Test the retry limit.** Set `TARGET_PAPERS = 10`, `PAPERS_PER_SEARCH = 3` and `MAX_SEARCH_ROUNDS = 2`. With at most six retrieved records, the script cannot reach ten in this run. Does it export a partial CSV?
+
+You do not need to write a dispatcher or implement a loop from scratch. Observe the ready-made code; focus on what each stage is responsible for.
+
+### Part D — Inspect the outputs
+
+The script writes these files in the **same starter folder**:
+
+| File | Meaning |
+| --- | --- |
+| `search_plan.json` | Topic, three academic queries, and `start_year`; reused from Section 2 or regenerated as needed. |
+| `papers.csv` | Collected, deduplicated OpenAlex records. |
+| `search_log.json` | Query history, retrieved count, added valid records, rounds, and reason for completion (target met or not). |
+
+`papers.csv` contains these columns:
+
+```text
+title,year,authors,doi,openalex_url,search_query
+```
+
+Open `papers.csv` in a spreadsheet program or VS Code. Choose a real paper and open its `doi` or `openalex_url` in your browser. Check **title, year, and whether the work is actually relevant** to your survey.
+
+**Why a separate search log?** It reveals what the agent did: which keywords were tried, which rounds returned duplicates, and whether it stopped because it found enough records or hit the iteration limit. This makes the workflow easier to inspect and debug.
+
+#### Example terminal output (illustrative, not real results)
+
+```text
+[PLAN] Reusing search_plan.json from Section 2.
+[TOPIC] AI facial animation
+[YEAR FILTER] Publications from 2022 onwards
+[TARGET] 10 unique records; at most 3 rounds
+
+[ROUND 1/3] Proposed query: 'speech-driven facial animation'
+[GEMINI → PYTHON] search_papers(query='...', limit=5)
+[PYTHON] OpenAlex year filter: >= 2022
+[TOOL RESULT] 5 record(s) retrieved.
+[CHECK] +4 new valid, non-duplicate records. Total: 4/10.
+[DECISION] Not enough papers: try a revised query if rounds remain.
+
+...
+[STOP] Maximum search rounds reached; exporting partial results.
+[EXPORT] .../papers.csv (9 records)
+[EXPORT] .../search_log.json
+[REVIEW] Open source links and check each paper's relevance yourself.
+```
+
+### Complete annotated code — `04_research_agent.py`
+
+The Python file is **provided**; you are not expected to type it. The complete code is included here so that you can inspect the pipeline and understand individual functions.
+
+<details>
+<summary>Show full commented code — 04_research_agent.py</summary>
+
+```python
+"""
+Workshop 03 — Section 4: Build & Test the Literature Research Agent.
+
+This is a ready-to-run classroom example. Students change the four settings
+below, then run: python 04_research_agent.py
+
+Pipeline:
+    Load or generate a Pydantic SearchPlan (Section 2)
+    -> Gemini requests a Python search tool (Section 3)
+    -> OpenAlex returns real paper metadata with a year filter
+    -> Python checks metadata and removes duplicates
+    -> If short, Gemini revises the query (up to MAX_SEARCH_ROUNDS)
+    -> Export papers.csv and search_log.json
+
+IMPORTANT: The automatic checks below verify metadata, publication year, and
+duplicate IDs. They do NOT verify semantic research relevance. Students must
+read the paper records before using them in an academic survey.
+"""
+
+import csv  # Write a spreadsheet-readable paper list.
+import json  # Save an audit log of the search.
+import os  # Read the GEMINI_API_KEY environment variable.
+from datetime import date
+from pathlib import Path
+
+from google import genai
+from google.genai import types
+from pydantic import BaseModel, Field
+
+from tools import search_papers as openalex_search_papers
+
+
+# ===== STUDENT SETTINGS: change these, not the tool execution code. =====
+TOPIC = "AI facial animation"
+TARGET_PAPERS = 10
+MAX_SEARCH_ROUNDS = 3
+PAPERS_PER_SEARCH = 5  # Each OpenAlex request returns at most 5 records.
+DEFAULT_START_YEAR = 2022
+
+MODEL = "gemini-3.5-flash-lite"
+
+PLAN_FILE = Path("search_plan.json")  # Reuse Section 2's output if it matches.
+PAPERS_FILE = Path("papers.csv")
+LOG_FILE = Path("search_log.json")
+
+
+# Section 2 — a schema constrains the structure of Gemini's plan.
+class SearchPlan(BaseModel):
+    topic: str = Field(description="The student's research topic")
+    search_queries: list[str] = Field(
+        description="Exactly three distinct academic paper-search queries"
+    )
+    start_year: int = Field(description="Earliest publication year (inclusive)")
+
+
+# When we need another round, ask Gemini for ONE revised search query.
+class RevisedQuery(BaseModel):
+    query: str = Field(description="One new academic paper-search query")
+
+
+def check_plan(plan: SearchPlan) -> None:
+    """Extra rule checks (Section 2). They supplement Pydantic's schema."""
+    if len(plan.search_queries) != 3:
+        raise ValueError("SearchPlan must contain exactly three queries.")
+    if any(not query.strip() for query in plan.search_queries):
+        raise ValueError("Search queries cannot be empty.")
+    if len({q.casefold().strip() for q in plan.search_queries}) != 3:
+        raise ValueError("Search queries must be distinct.")
+    if not 2000 <= plan.start_year <= date.today().year:
+        raise ValueError("SearchPlan start_year is outside the valid range.")
+
+
+def load_or_generate_plan(client: genai.Client) -> SearchPlan:
+    """Reuse a matching Section 2 plan; otherwise generate a fresh plan."""
+    if PLAN_FILE.exists():
+        try:
+            previous = SearchPlan.model_validate_json(
+                PLAN_FILE.read_text(encoding="utf-8")
+            )
+            check_plan(previous)
+            if previous.topic.strip().casefold() == TOPIC.strip().casefold():
+                print("[PLAN] Reusing search_plan.json from Section 2.")
+                return previous
+            print("[PLAN] Topic changed; generating a new SearchPlan.")
+        except (ValueError, OSError) as error:
+            print(f"[PLAN] Previous SearchPlan is invalid: {error}")
+
+    print("[GEMINI] Generating a structured SearchPlan...")
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=(
+            f"Generate a literature search plan for: {TOPIC}. "
+            "Provide exactly three distinct, useful academic search queries. "
+            f"Use start_year={DEFAULT_START_YEAR}. "
+            "Do not invent paper titles or citations."
+        ),
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=SearchPlan,
+        ),
+    )
+    if not response.text:
+        raise ValueError("Gemini did not return a SearchPlan.")
+    plan = SearchPlan.model_validate_json(response.text)
+    check_plan(plan)
+    if plan.topic.strip().casefold() != TOPIC.strip().casefold():
+        # Keep the user-supplied topic as our authoritative research goal.
+        plan = plan.model_copy(update={"topic": TOPIC.strip()})
+    PLAN_FILE.write_text(plan.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    print("[PLAN] Saved search_plan.json.")
+    return plan
+
+
+def revise_query(
+    client: genai.Client, plan: SearchPlan, previous: list[str],
+    found: int, suggested: str,
+) -> str:
+    """Use Gemini to reformulate keywords when more papers are needed."""
+    print(f"[GEMINI] Only {found}/{TARGET_PAPERS} papers so far; revising query...")
+    reply = client.models.generate_content(
+        model=MODEL,
+        contents=(
+            f"Research topic: {plan.topic}. Year >= {plan.start_year}. "
+            f"Previously searched: {previous}. "
+            f"Found {found} unique records; need {TARGET_PAPERS}. "
+            f"Consider this alternative search direction: {suggested}. "
+            "Suggest ONE different, focused academic search query that is "
+            "not identical to previous queries. Do not give paper titles."
+        ),
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=RevisedQuery,
+        ),
+    )
+    if not reply.text:
+        raise ValueError("Gemini did not return a revised query.")
+    proposed = RevisedQuery.model_validate_json(reply.text).query.strip()
+    if proposed and proposed.casefold() not in {q.casefold() for q in previous}:
+        return proposed
+    if suggested.casefold() not in {q.casefold() for q in previous}:
+        print("[PLAN] Reusing an unused SearchPlan alternative.")
+        return suggested
+    raise ValueError("No distinct search query could be generated.")
+
+
+def paper_ids(paper: dict) -> set[str]:
+    """Stable deduplication keys: DOI and OpenAlex work ID when present."""
+    keys = set()
+    if paper.get("doi"):
+        keys.add("doi:" + str(paper["doi"]).strip().lower())
+    if paper.get("openalex_url"):
+        keys.add("openalex:" + str(paper["openalex_url"]).strip().lower())
+    # If no identifiers exist, title + year is a best-effort fallback.
+    if not keys:
+        keys.add(
+            "title:" + str(paper.get("title", "")).strip().casefold()
+            + ":" + str(paper.get("year", ""))
+        )
+    return keys
+
+
+def main() -> None:
+    # These limits prevent an unbounded, expensive agent loop.
+    if not os.getenv("GEMINI_API_KEY"):
+        raise SystemExit("GEMINI_API_KEY is missing. Follow Section 2 README.")
+    if not TOPIC.strip():
+        raise SystemExit("TOPIC cannot be empty.")
+    if not 1 <= TARGET_PAPERS <= 30:
+        raise SystemExit("TARGET_PAPERS must be between 1 and 30.")
+    if not 1 <= MAX_SEARCH_ROUNDS <= 5:
+        raise SystemExit("MAX_SEARCH_ROUNDS must be between 1 and 5.")
+    if not 1 <= PAPERS_PER_SEARCH <= 10:
+        raise SystemExit("PAPERS_PER_SEARCH must be between 1 and 10.")
+
+    client = genai.Client()
+    plan = load_or_generate_plan(client)
+    print(f"\n[TOPIC] {plan.topic}")
+    print(f"[YEAR FILTER] Publications from {plan.start_year} onwards")
+    print(f"[TARGET] {TARGET_PAPERS} unique records; at most {MAX_SEARCH_ROUNDS} rounds")
+
+    papers: list[dict] = []
+    seen: set[str] = set()
+    used_queries: list[str] = []
+    search_log: list[dict] = []
+
+    for round_number in range(1, MAX_SEARCH_ROUNDS + 1):
+        # First round uses Section 2's first query. Subsequent queries are
+        # actively revised by Gemini using unused plan suggestions as seeds.
+        if round_number == 1:
+            query = plan.search_queries[0]
+        else:
+            suggestion = plan.search_queries[min(round_number - 1, 2)]
+            query = revise_query(
+                client, plan, used_queries, len(papers), suggestion
+            )
+
+        print(f"\n[ROUND {round_number}/{MAX_SEARCH_ROUNDS}] Proposed query: {query!r}")
+
+        # The wrapper lets students SEE automatic function execution.
+        # It is intentionally defined here to capture the chosen year filter.
+        called: list[dict] = []
+
+        def search_papers(query: str, limit: int = 5) -> list[dict]:
+            """Search OpenAlex for academic papers using keyword arguments.
+
+            Args:
+                query: Keywords for academic paper discovery.
+                limit: Maximum records to retrieve, from 1 to 10.
+            """
+            # Enforce our own maximum even if Gemini suggests a larger value.
+            safe_limit = max(1, min(int(limit), PAPERS_PER_SEARCH, 10))
+            print(f"[GEMINI → PYTHON] search_papers(query={query!r}, limit={safe_limit})")
+            print(f"[PYTHON] OpenAlex year filter: >= {plan.start_year}")
+            records = openalex_search_papers(
+                query=query, limit=safe_limit, start_year=plan.start_year
+            )
+            called.append({"query": query, "limit": safe_limit, "records": records})
+            print(f"[TOOL RESULT] {len(records)} record(s) retrieved.")
+            return records
+
+        # Gemini chooses a tool call; the SDK executes the local function.
+        # ANY asks for a tool call. The low call limit prevents extra tool
+        # executions in this simple one-search-per-round example.
+        client.models.generate_content(
+            model=MODEL,
+            contents=(
+                f"Call search_papers ONCE for this research topic: {plan.topic}. "
+                f"Use the search direction '{query}' and limit={PAPERS_PER_SEARCH}. "
+                "We need genuine OpenAlex metadata, not invented citations."
+            ),
+            config=types.GenerateContentConfig(
+                tools=[search_papers],
+                automatic_function_calling=types.AutomaticFunctionCallingConfig(
+                    maximum_remote_calls=2
+                ),
+                tool_config=types.ToolConfig(
+                    function_calling_config=types.FunctionCallingConfig(mode="ANY")
+                ),
+            ),
+        )
+        if not called:
+            # If no local tool executed, there is no evidence to export.
+            raise RuntimeError("Gemini did not execute the search_papers tool.")
+
+        # Inspect only ACTUAL OpenAlex results captured inside the tool.
+        added = 0
+        returned = 0
+        for call in called:
+            actual_query = call["query"]
+            used_queries.append(actual_query)
+            returned += len(call["records"])
+            for paper in call["records"]:
+                title = paper.get("title")
+                year = paper.get("year")
+                # Rule checks: year and metadata, NOT semantic relevance.
+                if not isinstance(title, str) or not title.strip():
+                    continue
+                if type(year) is not int or not plan.start_year <= year <= date.today().year:
+                    continue
+                if not (paper.get("doi") or paper.get("openalex_url")):
+                    continue
+                keys = paper_ids(paper)
+                if keys & seen:
+                    continue
+                seen.update(keys)
+                papers.append({
+                    "title": title.strip(),
+                    "year": year,
+                    "authors": "; ".join(paper.get("authors") or []),
+                    "doi": paper.get("doi") or "",
+                    "openalex_url": paper.get("openalex_url") or "",
+                    "search_query": actual_query,
+                })
+                added += 1
+                if len(papers) >= TARGET_PAPERS:
+                    break
+            if len(papers) >= TARGET_PAPERS:
+                break
+
+        search_log.append({
+            "round": round_number,
+            "planned_query": query,
+            "tool_queries": [entry["query"] for entry in called],
+            "retrieved": returned,
+            "new_unique_valid_records": added,
+            "total_unique_valid_records": len(papers),
+        })
+        print(
+            f"[CHECK] +{added} new valid, non-duplicate records. "
+            f"Total: {len(papers)}/{TARGET_PAPERS}."
+        )
+        if len(papers) >= TARGET_PAPERS:
+            print("[STOP] Target reached.")
+            break
+        print("[DECISION] Not enough papers: try a revised query if rounds remain.")
+    else:
+        print("[STOP] Maximum search rounds reached; exporting partial results.")
+
+    # Save REAL returned paper metadata, not generated bibliography entries.
+    with PAPERS_FILE.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "title", "year", "authors", "doi", "openalex_url", "search_query"
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(papers)
+
+    LOG_FILE.write_text(
+        json.dumps({
+            "topic": plan.topic,
+            "start_year": plan.start_year,
+            "target_papers": TARGET_PAPERS,
+            "max_search_rounds": MAX_SEARCH_ROUNDS,
+            "finished_with_target": len(papers) >= TARGET_PAPERS,
+            "total_unique_valid_records": len(papers),
+            "searches": search_log,
+            "note": "No automatic semantic relevance check; verify papers manually.",
+        }, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+    print(f"\n[EXPORT] {PAPERS_FILE.resolve()} ({len(papers)} records)")
+    print(f"[EXPORT] {LOG_FILE.resolve()}")
+    print("[REVIEW] Open source links and check each paper's relevance yourself.")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as error:
+        raise SystemExit(
+            f"Research run failed: {error}\n"
+            "Check API keys, quotas, network access, and the SearchPlan."
+        ) from error
+```
+
+</details>
+
+### Part E — Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| `GEMINI_API_KEY is missing` | Repeat Section 2's API key setup and `source ~/.bashrc`. |
+| `No module named google` / `requests` | Run `uv sync` in the starter folder and activate `.venv`. |
+| `403`, `404` or unavailable model | Your Gemini account may not have access to the selected model. Ask your instructor. |
+| `429` or quota error | Gemini and OpenAlex have separate limits. Stop repeated requests and ask your instructor. |
+| No results | Try a broader topic or earlier `start_year`. Confirm OpenAlex connectivity with `python tools.py`. |
+| Only a partial CSV | The agent reached `MAX_SEARCH_ROUNDS` before `TARGET_PAPERS`; this is expected behavior, not necessarily an error. |
+| Fewer papers after deduplication | Multiple searches returned the same records, or records lacked valid metadata. |
+| `search_plan.json` not reused | Its saved topic differs from `TOPIC`, or it failed the schema/rule checks. |
+| CSV contains irrelevant papers | This script does not perform semantic relevance evaluation; manually review titles and sources. |
+
+**Before citing:** Inspect the actual paper, confirm the DOI and bibliographic metadata, and assess its relevance yourself. OpenAlex metadata is for discovery, not a substitute for reading or verifying the paper.
+
+References: [OpenAlex filtering documentation](https://help.openalex.org/api/filtering/) · [Gemini Python SDK function calling](https://googleapis.github.io/python-genai/#function-calling)
