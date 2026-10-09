@@ -12,3 +12,6 @@ __pycache__/
 # Local results from exercises should not be committed by default.
 search_plan.json
 papers.csv
+
+# Section 4: locally generated research outputs.
+search_log.json
