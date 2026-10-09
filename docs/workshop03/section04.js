@@ -5,10 +5,14 @@ const S4_CASES = {
   enough: [
     ["topic", "User Input", "Topic: AI facial animation. Target: 10 records. Maximum: 3 search rounds."],
     ["plan", "Structured SearchPlan", "Use Section 2's SearchPlan (or ask Gemini to generate one). Keep three queries and start_year."],
-    ["search", "Gemini Function Calling → OpenAlex", "The SDK executes a local search_papers() tool. OpenAlex applies start_year and returns actual metadata."],
-    ["check", "Check and Deduplicate", "Illustrative outcome: 10 unique records pass the year and basic metadata checks."],
-    ["decision", "Enough papers? YES", "10 / 10 unique records are available. Stop additional tool calls to save time and API quota."],
-    ["export", "Export papers.csv + search_log.json", "Write real returned records and a search log. The student still reviews every paper for research relevance."]
+    ["search", "Round 1 — Function Calling", "The SDK executes the local search_papers() tool; at most 5 records are requested per round."],
+    ["check", "Check and Deduplicate", "Illustrative outcome: 5 unique records pass the year and basic metadata checks."],
+    ["decision", "Enough papers? NO", "5 / 10 unique records. Another search round is allowed."],
+    ["revise", "Gemini revises the query", "Use the SearchPlan's alternatives to formulate a distinct academic search query."],
+    ["search", "Round 2 — Search again", "The SDK calls search_papers() again and OpenAlex returns up to 5 more records."],
+    ["check", "Check and Deduplicate", "Illustrative outcome: 10 / 10 unique records after two search rounds."],
+    ["decision", "Enough papers? YES", "Target reached before the three-round limit. Stop further tool calls."],
+    ["export", "Export papers.csv + search_log.json", "Save returned metadata and a search log. The student still reviews research relevance manually."]
   ],
   few: [
     ["topic", "User Input", "Topic: AI facial animation. Target: 10 records. Maximum: 3 search rounds."],
