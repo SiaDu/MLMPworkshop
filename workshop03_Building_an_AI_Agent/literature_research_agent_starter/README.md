@@ -732,7 +732,7 @@ Export papers.csv       Ask Gemini to revise keywords
   NO but max rounds reached -> Export available partial results
 ```
 
-**A bounded agent workflow:** Gemini proposes/refines search queries and requests a Python tool. The **Python program**, not the LLM, enforces data checks, stopping conditions and export rules. We use `MAX_SEARCH_ROUNDS` to avoid endless requests.
+**A bounded agent workflow:** Gemini proposes/refines search queries and requests a Python tool. The **Python program**, not the LLM, enforces data checks, stopping conditions and export rules. We use `MAX_SEARCH_ROUNDS` to avoid endless requests. **A search round is one attempted OpenAlex tool search, not one Gemini API call**; the SDK may make additional Gemini requests internally to handle Function Calling.
 
 | Earlier section | Reused in Section 4 |
 | --- | --- |
