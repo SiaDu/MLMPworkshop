@@ -387,17 +387,7 @@ A normal Python script can call `search_papers()`, but an **AI agent** lets the 
 
 OpenAlex currently permits small anonymous searches; a free OpenAlex API key can increase the request budget. The tool automatically uses `OPENALEX_API_KEY` if one is configured.
 
-## Instructor's 20-minute pacing
-
-| Time | Activity |
-| --- | --- |
-| 0–3 min | Explain LLM API and API-key environment variables (students set keys up before class). |
-| 3–7 min | Run `01_first_api_call.py`, change `TOPIC`. |
-| 7–10 min | Compare natural language vs JSON and explain schema fields. |
-| 10–17 min | Run `02_structured_output.py`, inspect `search_plan.json`, change topic. |
-| 17–20 min | Explain validation vs correctness, tokens, rate limits and Section 3 hand-off. |
-
-### Quick troubleshooting
+## Section 2 — Quick troubleshooting
 
 | Symptom | Check |
 | --- | --- |
@@ -442,6 +432,8 @@ SDK returns the results to Gemini -> Gemini writes an answer
 **Two APIs, different purposes:** Gemini decides how to use a tool and interprets its output. OpenAlex searches academic bibliographic metadata. An OpenAlex record is evidence of a database record, **not** proof that the paper is relevant, correctly indexed, or actually read by the model.
 
 ### Part A — Try OpenAlex without Gemini
+
+**Two different files:** `tools.py` implements the actual OpenAlex search function; `03_function_calling.py` uses Gemini Automatic Function Calling to request that function. You need **both files in the same extracted starter folder**. View them on GitHub: [tools.py](tools.py) · [03_function_calling.py](03_function_calling.py).
 
 The instructor already provided `tools.py`. Open it in VS Code and find:
 
