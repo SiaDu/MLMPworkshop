@@ -9,10 +9,12 @@
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./section02.css">
   <link rel="stylesheet" href="./section03.css">
+  <link rel="stylesheet" href="./section04.css">
   <link rel="stylesheet" href="./branding.css">
   <script src="./app.js" defer></script>
   <script src="./section02.js" defer></script>
   <script src="./section03.js" defer></script>
+  <script src="./section04.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -477,10 +479,78 @@ python 03_function_calling.py</code></pre></div>
   <div class="s3-banner"><b>Next — Section 4:</b> Turn one tool call into a multi-step research workflow. Combine the SearchPlan, repeated queries, result checks, deduplication, and CSV export. The current Section 3 tool does not yet apply <code>start_year</code>.</div>
 </section>
 
-<section class="s2-section s2-roadmap" id="s4">
-        <div class="s2-section-head"><div><span class="s2-index">SECTION 04 / BUILD &amp; TEST</span><h3>Build Your Literature Research Agent</h3><p>Connect a model, tool execution, result checks and a CSV export into one working project.</p></div></div>
-      </section>
-      <section class="s2-section s2-roadmap" id="s5">
+
+<section class="s4-section" id="s4">
+  <div class="s4-eyebrow">SECTION 04 / BUILD &amp; TEST</div>
+  <h2>Your Literature <em>Research Agent</em></h2>
+  <p class="s4-lead">Now connect the skills from Sections 2 and 3 into one working pipeline. The agent starts with a structured <code>SearchPlan</code>, asks Gemini to search OpenAlex, checks the returned metadata, revises its query if needed, and exports a reading list.</p>
+
+  <div class="s4-pipeline">
+    <div class="s4-pipeline-head">
+      <span class="s4-label">INTERACTIVE / ONE COMPLETE AGENT PIPELINE</span>
+      <span class="s4-badge" id="s4-outcome">ENOUGH PAPERS → EXPORT</span>
+    </div>
+    <div class="s4-controls" aria-label="Choose a search result scenario">
+      <button type="button" class="s4-choice" data-s4-case="enough" aria-pressed="true">Enough Papers</button>
+      <button type="button" class="s4-choice" data-s4-case="few" aria-pressed="false">Not Enough Papers</button>
+    </div>
+
+    <div class="s4-stage-layout">
+      <div class="s4-main-lane">
+        <div class="s4-node" data-s4-node="topic"><b>01 / Research Topic</b><small>Student selects topic · target 10 papers · max 3 rounds</small></div>
+        <div class="s4-arrow">↓</div>
+        <div class="s4-node" data-s4-node="plan"><b>02 / Load or Generate SearchPlan</b><small>Section 2 · Gemini + Pydantic · 3 queries + start_year</small></div>
+        <div class="s4-arrow">↓</div>
+        <div class="s4-node" data-s4-node="search"><b>03 / Gemini Function Calling → OpenAlex</b><small>Section 3 · Python executes search_papers() with year filter</small></div>
+        <div class="s4-arrow">↓</div>
+        <div class="s4-node" data-s4-node="check"><b>04 / Check and Deduplicate</b><small>Metadata + publication year + unique identifiers</small></div>
+        <div class="s4-arrow">↓</div>
+        <div class="s4-decision-box s4-node" data-s4-node="decision">
+          <span class="s4-diamond">◇</span>
+          <span><b>Enough unique records?</b><small>Target reached OR maximum rounds reached?</small></span>
+        </div>
+        <div class="s4-arrow">↓ YES / STOP</div>
+        <div class="s4-node" data-s4-node="export"><b>05 / Export CSV + Search Log</b><small>papers.csv · search_log.json · human relevance review</small></div>
+      </div>
+
+      <div class="s4-loop-marker" aria-hidden="true"><span>↖</span><small>RETRY LOOP</small><span>↙</span></div>
+      <div class="s4-loop-lane">
+        <div class="s4-loop-title">NO / NEED MORE PAPERS</div>
+        <div class="s4-loop-line">
+          <div class="s4-node" data-s4-node="revise"><b>Gemini Revises Query</b><small>Use previous results and SearchPlan alternatives</small></div>
+          <small>↺ Call search_papers() again. Repeat only while another round is allowed.</small>
+        </div>
+        <div class="s4-banner s4-loop-line">
+          <b>Safety stop: MAX_SEARCH_ROUNDS = 3</b>
+          <small>If still short, export the partial list. Never loop indefinitely.</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="s4-current" aria-live="polite">
+      <span id="s4-step" class="s4-progress">STEP 1 / 6</span>
+      <div><b id="s4-step-title">User Input</b><p id="s4-step-desc">Select a scenario, then click Next step to follow each stage.</p></div>
+    </div>
+    <div class="s4-actions">
+      <div>
+        <button type="button" id="s4-prev" disabled>← Previous</button>
+        <button type="button" id="s4-next" class="s4-next">Next step →</button>
+      </div>
+      <span class="s4-mini">Illustrative counts, not live search results. The real search happens in the Python starter project.</span>
+    </div>
+  </div>
+
+  <div class="s4-exercise">
+    <span>HANDS-ON / RUN YOUR AGENT</span>
+    <h3>One script, one complete pipeline.</h3>
+    <p>Run the prepared Python file in your activated starter project. Change <code>TOPIC</code>, <code>TARGET_PAPERS</code> and <code>MAX_SEARCH_ROUNDS</code>; inspect the exported paper list and the search log.</p>
+    <code class="s4-command">python 04_research_agent.py</code>
+    <a href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open the complete Section 4 README tutorial ↗</a>
+  </div>
+  <p class="s4-tiny"><strong>Remember:</strong> The automatic checks verify basic metadata, publication year and duplicates. They do not measure semantic research relevance. Verify each paper before citing it. A SearchPlan created in Section 2 is reused only when its topic matches the current task.</p>
+</section>
+
+<section class="s2-section s2-roadmap" id="s5">
         <div class="s2-section-head"><div><span class="s2-index">SECTION 05 / RAG</span><h3>Retrieve Evidence from Papers</h3><p>Retrieve relevant passages from provided paper excerpts before the model generates an answer.</p></div></div>
       </section>
       <section class="s2-section s2-roadmap" id="s6">
