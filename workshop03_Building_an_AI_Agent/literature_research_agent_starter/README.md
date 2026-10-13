@@ -139,6 +139,7 @@ client = genai.Client()
 exit()
 ```
 ![Example](images/4.png)
+
 Should looks like this.
 
 **Important:** Creating a client checks local setup, **not** whether the API key is valid. The next step sends a real request.
