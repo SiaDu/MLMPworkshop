@@ -373,6 +373,8 @@ Export papers.csv       Ask Gemini to revise keywords
   NO but max rounds reached -> Export available partial results
 ```
 
+**Reliability:** Temporary Gemini HTTP 429/500/502/503/504 errors are retried with waits of 2s, 4s, and 8s. If a later round still fails, the agent exports papers already found and records the failure in `search_log.json` (`stop_reason`, `error`, `rounds_completed`). If OpenAlex already returned records before Gemini's final response failed, the script avoids repeating the same search.
+
 **A bounded agent workflow:** Gemini proposes/refines search queries and requests a Python tool. The **Python program**, not the LLM, enforces data checks, stopping conditions and export rules. We use `MAX_SEARCH_ROUNDS` to avoid endless requests. **A search round is one attempted OpenAlex tool search, not one Gemini API call**; the SDK may make additional Gemini requests internally to handle Function Calling.
 
 | Earlier section | Reused in Section 4 |
@@ -422,7 +424,7 @@ The script will:
 3. Pass the plan's **`start_year`** to OpenAlex's **`from_publication_date`** filter (e.g., `2022-01-01`). This is an actual API-side filter, not just a prompt instruction.
 4. Check the returned records for a nonempty title, a publication year in range, and a DOI or OpenAlex URL. Remove duplicates using DOI/OpenAlex identifiers.
 5. If there are not enough records, ask Gemini to **revise its next query** using previous search history and another SearchPlan suggestion.
-6. Stop after the target is reached **or** the maximum number of search rounds. Export the collected records even if the target is not reached.
+6. Stop after reaching the target or the maximum number of search rounds. Retry temporary Gemini errors up to three times; if they persist in a later round, export any successfully collected records instead of discarding them.
 
 For Section 4 we extended the existing tool without breaking Section 3:
 
@@ -474,7 +476,7 @@ The script writes these files in the **same starter folder**:
 | --- | --- |
 | `search_plan.json` | Topic, three academic queries, and `start_year`; reused from Section 2 or regenerated as needed. |
 | `papers.csv` | Collected, deduplicated OpenAlex records. |
-| `search_log.json` | Query history, retrieved count, added valid records, rounds, and reason for completion (target met or not). |
+| `search_log.json` | Query history, retrieved counts, valid records, and stop reason (`target_reached`, `max_rounds_reached` or `error`), plus any error and number of completed rounds. |
 
 `papers.csv` contains these columns:
 
@@ -515,7 +517,8 @@ Open `papers.csv` in a spreadsheet program or VS Code. Choose a real paper and o
 | `GEMINI_API_KEY is missing` | Repeat Section 2's API key setup and `source ~/.bashrc`. |
 | `No module named google` / `requests` | Run `uv sync` in the starter folder and activate `.venv`. |
 | `403`, `404` or unavailable model | Your Gemini account may not have access to the selected model. Ask your instructor. |
-| `429` or quota error | Gemini and OpenAlex have separate limits. Stop repeated requests and ask your instructor. |
+| `429` or quota error | Gemini and OpenAlex have separate limits. The script retries temporary Gemini errors up to three times; for a persistent quota error, check with your instructor. |
+| `503 UNAVAILABLE` | Gemini is temporarily busy. The script waits 2s, 4s and 8s before retrying. If still unavailable, inspect the exported partial CSV and `search_log.json`. |
 | No results | Try a broader topic or earlier `start_year`. Confirm OpenAlex connectivity with `python tools.py`. |
 | Only a partial CSV | The agent reached `MAX_SEARCH_ROUNDS` before `TARGET_PAPERS`; this is expected behavior, not necessarily an error. |
 | Fewer papers after deduplication | Multiple searches returned the same records, or records lacked valid metadata. |
