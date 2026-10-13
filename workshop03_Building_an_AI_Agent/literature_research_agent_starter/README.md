@@ -488,27 +488,11 @@ Open `papers.csv` in a spreadsheet program or VS Code. Choose a real paper and o
 
 **Why a separate search log?** It reveals what the agent did: which keywords were tried, which rounds returned duplicates, and whether it stopped because it found enough records or hit the iteration limit. This makes the workflow easier to inspect and debug.
 
-#### Example terminal output (illustrative, not real results)
+#### Example terminal output
 
-```text
-[PLAN] Reusing search_plan.json from Section 2.
-[TOPIC] AI facial animation
-[YEAR FILTER] Publications from 2022 onwards
-[TARGET] 10 unique records; at most 3 rounds
-
-[ROUND 1/3] Proposed query: 'speech-driven facial animation'
-[GEMINI → PYTHON] search_papers(query='...', limit=5)
-[PYTHON] OpenAlex year filter: >= 2022
-[TOOL RESULT] 5 record(s) retrieved.
-[CHECK] +4 new valid, non-duplicate records. Total: 4/10.
-[DECISION] Not enough papers: try a revised query if rounds remain.
-
-...
-[STOP] Maximum search rounds reached; exporting partial results.
-[EXPORT] .../papers.csv (9 records)
-[EXPORT] .../search_log.json
-[REVIEW] Open source links and check each paper's relevance yourself.
-```
+![Example](images/8.png)
+![Example](images/9.png)
+![Example](images/10.png)
 
 ### Part E — Troubleshooting
 
