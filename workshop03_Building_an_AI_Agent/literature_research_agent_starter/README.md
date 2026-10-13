@@ -78,7 +78,7 @@ If nothing is printed, recheck the line you added to `~/.bashrc` or `~/.zshrc`.
 
 **Starter Project ZIP — Coming Soon.**
 
-### Step B1. Extract the ZIP (once published)
+### Step B1. Extract the ZIP 
 
 1. Open your **Downloads** folder on Linux.
 2. Find `literature_research_agent_starter.zip`.
