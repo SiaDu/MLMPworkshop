@@ -177,7 +177,6 @@ The script:
 Expected **shape** of output (values can differ):
 
 ![Example](images/6.png)
-```
 
 **Your task:** Change `TOPIC` in `02_structured_output.py`. Run it again, open `search_plan.json` and inspect the three search queries.
 
