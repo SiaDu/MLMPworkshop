@@ -205,8 +205,8 @@
 <section class="s2-section" id="s2-setup">
   <div class="s2-section-head"><div><span class="s2-index">GET READY / STARTER PROJECT</span><h3>Download &amp; set up</h3><p>The complete instructions, terminal commands and commented Python examples are in the supplied <code>README.md</code>. You do not need to clone the full MLMPworkshop repository.</p></div></div>
   <div class="s2-download-card">
-    <div><span class="s2-index">START HERE</span><h4>Literature Research Agent — Starter Project</h4><p>A ZIP will be available here after the complete project is finalized. It will contain <code>pyproject.toml</code>, the Python examples, <code>tools.py</code> and the README.</p></div>
-    <button class="s2-download-btn" type="button" disabled aria-label="Starter ZIP download coming soon" title="Available after the complete starter project is finalized">↓ Download starter ZIP · Coming Soon</button>
+    <div><span class="s2-index">START HERE</span><h4>Literature Research Agent — Starter Project</h4><p>Download the complete starter ZIP, including <code>pyproject.toml</code>, the Python examples, <code>tools.py</code> and the student README.</p></div>
+    <a class="s2-download-btn" href="https://github.com/SiaDu/MLMPworkshop/raw/refs/heads/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter.zip" aria-label="Download Literature Research Agent starter ZIP">↓ Download starter ZIP</a>
   </div>
   <div class="s2-three">
     <div class="s2-concept"><strong>01 · API Key</strong><p>Create a Gemini Key in <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio ↗</a>. Add it to your own <code>~/.bashrc</code>.</p></div>
@@ -214,7 +214,7 @@
     <div class="s2-concept"><strong>03 · Install</strong><p>From that folder, run <code>uv sync</code> and activate <code>.venv</code>.</p></div>
   </div>
   <div class="s2-note"><strong>Follow the README step-by-step:</strong> <code>nano ~/.bashrc</code>, save with Ctrl+O / Enter / Ctrl+X, <code>source ~/.bashrc</code>, download and extract, then <code>uv sync</code>. All commands are explained there.</div>
-  <a class="s2-text-link" href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open the full setup and code guide (README) ↗</a>
+  <a class="s2-text-link" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open the full setup and code guide (README) ↗</a>
 </section>
 
 
@@ -232,7 +232,7 @@ response = client.models.generate_content(
 print(response.text)</code></pre>
   </div>
   <div class="s2-activity"><strong>YOUR TURN</strong><p>Run <code>python 01_first_api_call.py</code> from the extracted folder. Change <code>TOPIC</code> to your own survey topic and run it again. Compare the answers and token usage.</p></div>
-  <p class="s2-caption">The complete annotated code and troubleshooting steps are in <a href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">README.md ↗</a>. The displayed snippet is for explanation; run the provided file in VS Code.</p>
+  <p class="s2-caption">The complete annotated code and troubleshooting steps are in <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">README.md ↗</a>. The displayed snippet is for explanation; run the provided file in VS Code.</p>
 </section>
 
 <section class="s2-section" id="s2-format">
@@ -268,7 +268,7 @@ print(response.text)</code></pre>
   </div>
   <div class="s2-note"><strong>Structured output:</strong> pass <code>response_schema=SearchPlan</code> with JSON response mode. Use <code>SearchPlan.model_validate_json(...)</code> to check the returned data.</div>
   <div class="s2-activity"><strong>YOUR TURN</strong><p>Run <code>python 02_structured_output.py</code>. Change <code>TOPIC</code> and inspect the resulting <code>search_plan.json</code> in VS Code.</p></div>
-  <p class="s2-caption"><strong>Optional:</strong> add <code>research_focus: str</code> to the Pydantic class. The full example is in <a href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">README.md ↗</a>.</p>
+  <p class="s2-caption"><strong>Optional:</strong> add <code>research_focus: str</code> to the Pydantic class. The full example is in <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">README.md ↗</a>.</p>
 </section>
 
 
@@ -394,7 +394,7 @@ print(response.text)</code></pre>
 </section>
 
 <section class="s3-section" id="s3-tool">
-  <div class="s3-section-top"><div><span class="s3-tag">03 / PREPARED TOOL</span><h3>Your first Python Tool</h3><p>There are <strong>two separate Python files</strong> in the starter folder: <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/tools.py" target="_blank" rel="noopener"><code>tools.py</code> ↗</a> contains the OpenAlex search function; <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/03_function_calling.py" target="_blank" rel="noopener"><code>03_function_calling.py</code> ↗</a> lets Gemini request that function. They are provided for you — inspect and run them, not recreate them.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">03 / PREPARED TOOL</span><h3>Your first Python Tool</h3><p>There are <strong>two separate Python files</strong> in the starter folder: <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/tools.py" target="_blank" rel="noopener"><code>tools.py</code> ↗</a> contains the OpenAlex search function; <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/03_function_calling.py" target="_blank" rel="noopener"><code>03_function_calling.py</code> ↗</a> lets Gemini request that function. They are provided for you — inspect and run them, not recreate them.</p></div></div>
   <div class="s3-tool-signature"><code>def search_papers(query: str, limit: int = 5) -&gt; list[dict]:</code></div>
   <div class="s3-args">
     <div class="s3-arg"><b>query: str</b><p>Academic search keywords chosen by the program or requested by Gemini.</p></div>
@@ -473,8 +473,8 @@ python 03_function_calling.py</code></pre></div>
   </div>
   <div class="s3-ready">
     <h4>Need the complete tutorial?</h4>
-    <p>The detailed instructions, ready-to-run Python file, trace explanations and troubleshooting are in the <strong>Starter Project README</strong>. The ZIP download remains unavailable until the entire workshop is finalized.</p>
-    <a href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open Section 3 README ↗</a>
+    <p>The detailed instructions, ready-to-run Python file, trace explanations and troubleshooting are in the <strong>Starter Project README</strong>. Download the starter ZIP above, then follow its README for the hands-on exercises.</p>
+    <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open Section 3 README ↗</a>
   </div>
   <div class="s3-banner"><b>Next — Section 4:</b> Turn one tool call into a multi-step research workflow. Combine the SearchPlan, repeated queries, result checks, deduplication, and CSV export. The Section 3 script does not pass <code>start_year</code>; Section 4 uses the tool’s optional year filter.</div>
 </section>
@@ -545,7 +545,7 @@ python 03_function_calling.py</code></pre></div>
     <h3>One script, one complete pipeline.</h3>
     <p>Run the prepared Python file in your activated starter project. Change <code>TOPIC</code>, <code>TARGET_PAPERS</code> and <code>MAX_SEARCH_ROUNDS</code>; inspect the exported paper list and the search log.</p>
     <code class="s4-command">python 04_research_agent.py</code>
-    <a href="https://github.com/SiaDu/MLMPworkshop/blob/dev/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open the complete Section 4 README tutorial ↗</a>
+    <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open the complete Section 4 README tutorial ↗</a>
   </div>
   <p class="s4-tiny"><strong>Remember:</strong> The automatic checks verify basic metadata, publication year and duplicates. They do not measure semantic research relevance. Verify each paper before citing it. A SearchPlan created in Section 2 is reused only when its topic matches the current task. Temporary Gemini API errors trigger bounded retries; if a later round still fails, the script saves the papers already found.</p>
 </section>
