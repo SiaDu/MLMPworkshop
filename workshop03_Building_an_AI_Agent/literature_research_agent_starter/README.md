@@ -518,7 +518,7 @@ Open `papers.csv` in a spreadsheet program or VS Code. Choose a real paper and o
 | `No module named google` / `requests` | Run `uv sync` in the starter folder and activate `.venv`. |
 | `403`, `404` or unavailable model | Your Gemini account may not have access to the selected model. Ask your instructor. |
 | `429` or quota error | Gemini and OpenAlex have separate limits. The script retries temporary Gemini errors up to three times; for a persistent quota error, check with your instructor. |
-| `503 UNAVAILABLE` | Gemini is temporarily busy. The script waits 2s, 4s and 8s before retrying. If still unavailable, inspect the exported partial CSV and `search_log.json`. |
+| `503 UNAVAILABLE` | Gemini is temporarily busy. The script waits 2s, 4s and 8s before retrying. If still unavailable, inspect the exported partial CSV and `search_log.json`. Or try chance `MODEL = "gemini-3.5-flash-lite"` to `gemini-3.1-flash-lite`, `gemini-3.5-flash` or `gemini-3.6-flash`|
 | No results | Try a broader topic or earlier `start_year`. Confirm OpenAlex connectivity with `python tools.py`. |
 | Only a partial CSV | The agent reached `MAX_SEARCH_ROUNDS` before `TARGET_PAPERS`; this is expected behavior, not necessarily an error. |
 | Fewer papers after deduplication | Multiple searches returned the same records, or records lacked valid metadata. |
