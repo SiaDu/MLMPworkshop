@@ -732,6 +732,8 @@ Export papers.csv       Ask Gemini to revise keywords
   NO but max rounds reached -> Export available partial results
 ```
 
+**Reliability:** Temporary Gemini HTTP 429/500/502/503/504 errors are retried with 2s, 4s, then 8s waits. If a later round still fails, the agent exports the papers already found and records the failure in `search_log.json` (`stop_reason`, `error`, `rounds_completed`). If OpenAlex already returned records before the model's final response failed, the script avoids making the same OpenAlex request again.
+
 **A bounded agent workflow:** Gemini proposes/refines search queries and requests a Python tool. The **Python program**, not the LLM, enforces data checks, stopping conditions and export rules. We use `MAX_SEARCH_ROUNDS` to avoid endless requests. **A search round is one attempted OpenAlex tool search, not one Gemini API call**; the SDK may make additional Gemini requests internally to handle Function Calling.
 
 | Earlier section | Reused in Section 4 |
@@ -781,7 +783,7 @@ The script will:
 3. Pass the plan's **`start_year`** to OpenAlex's **`from_publication_date`** filter (e.g., `2022-01-01`). This is an actual API-side filter, not just a prompt instruction.
 4. Check the returned records for a nonempty title, a publication year in range, and a DOI or OpenAlex URL. Remove duplicates using DOI/OpenAlex identifiers.
 5. If there are not enough records, ask Gemini to **revise its next query** using previous search history and another SearchPlan suggestion.
-6. Stop after the target is reached **or** the maximum number of search rounds. Export the collected records even if the target is not reached.
+6. Stop after the target is reached **or** the maximum number of search rounds. Temporary Gemini errors are retried up to three times; if they persist during a later round, export the collected records instead of discarding them.
 
 For Section 4 we extended the existing tool without breaking Section 3:
 
@@ -833,7 +835,7 @@ The script writes these files in the **same starter folder**:
 | --- | --- |
 | `search_plan.json` | Topic, three academic queries, and `start_year`; reused from Section 2 or regenerated as needed. |
 | `papers.csv` | Collected, deduplicated OpenAlex records. |
-| `search_log.json` | Query history, retrieved count, added valid records, rounds, and reason for completion (target met or not). |
+| `search_log.json` | Query history, retrieved count, valid records, and stop reason (`target_reached`, `max_rounds_reached`, or `error`). Any error message and completed-round count are recorded. |
 
 `papers.csv` contains these columns:
 
@@ -897,6 +899,7 @@ read the paper records before using them in an academic survey.
 import csv  # Write a spreadsheet-readable paper list.
 import json  # Save an audit log of the search.
 import os  # Read the GEMINI_API_KEY environment variable.
+import time  # Wait before retrying a temporarily busy Gemini API.
 from datetime import date
 from pathlib import Path
 
@@ -916,6 +919,10 @@ DEFAULT_START_YEAR = 2022
 
 MODEL = "gemini-3.5-flash-lite"
 
+# Retry *transient* Gemini errors at most three times (four attempts total).
+GEMINI_RETRY_DELAYS = (2, 4, 8)  # Seconds between retries.
+TRANSIENT_GEMINI_CODES = {429, 500, 502, 503, 504}
+
 PLAN_FILE = Path("search_plan.json")  # Reuse Section 2's output if it matches.
 PAPERS_FILE = Path("papers.csv")
 LOG_FILE = Path("search_log.json")
@@ -933,6 +940,47 @@ class SearchPlan(BaseModel):
 # When we need another round, ask Gemini for ONE revised search query.
 class RevisedQuery(BaseModel):
     query: str = Field(description="One new academic paper-search query")
+
+def is_transient_gemini_error(error: Exception) -> bool:
+    """Only retry temporary HTTP status codes from Gemini."""
+    try:
+        code = int(getattr(error, "code", 0))
+    except (TypeError, ValueError):
+        return False
+    return code in TRANSIENT_GEMINI_CODES
+
+
+def gemini_with_retry(label: str, request, tool_completed=None):
+    """Retry a Gemini API request after 2, 4, then 8 seconds.
+
+    `tool_completed` protects a successful OpenAlex search: if the SDK
+    reports a 503 while preparing the *final* model answer, do not rerun
+    the tool and waste an additional paper-search request.
+    """
+    for attempt in range(len(GEMINI_RETRY_DELAYS) + 1):
+        try:
+            return request()
+        except Exception as error:
+            # Function Calling can execute the local tool *before* Gemini
+            # fails to provide a final answer. The real records matter more.
+            if tool_completed is not None and tool_completed():
+                print(
+                    "[NOTICE] OpenAlex already returned results. "
+                    "Continuing without another Gemini final response."
+                )
+                return None
+            if not is_transient_gemini_error(error):
+                raise  # Invalid API keys, programming errors, etc. are not retried.
+            if attempt == len(GEMINI_RETRY_DELAYS):
+                print(f"[RETRY] {label}: temporary error persists; giving up.")
+                raise
+            wait = GEMINI_RETRY_DELAYS[attempt]
+            print(
+                f"[RETRY] {label}: Gemini returned HTTP {error.code}. "
+                f"Waiting {wait}s before retry {attempt + 1}/3...",
+                flush=True,
+            )
+            time.sleep(wait)
 
 
 def check_plan(plan: SearchPlan) -> None:
@@ -963,17 +1011,20 @@ def load_or_generate_plan(client: genai.Client) -> SearchPlan:
             print(f"[PLAN] Previous SearchPlan is invalid: {error}")
 
     print("[GEMINI] Generating a structured SearchPlan...")
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=(
-            f"Generate a literature search plan for: {TOPIC}. "
-            "Provide exactly three distinct, useful academic search queries. "
-            f"Use start_year={DEFAULT_START_YEAR}. "
-            "Do not invent paper titles or citations."
-        ),
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=SearchPlan,
+    response = gemini_with_retry(
+        "SearchPlan generation",
+        lambda: client.models.generate_content(
+            model=MODEL,
+            contents=(
+                f"Generate a literature search plan for: {TOPIC}. "
+                "Provide exactly three distinct, useful academic search queries. "
+                f"Use start_year={DEFAULT_START_YEAR}. "
+                "Do not invent paper titles or citations."
+            ),
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=SearchPlan,
+            ),
         ),
     )
     if not response.text:
@@ -994,19 +1045,22 @@ def revise_query(
 ) -> str:
     """Use Gemini to reformulate keywords when more papers are needed."""
     print(f"[GEMINI] Only {found}/{TARGET_PAPERS} papers so far; revising query...")
-    reply = client.models.generate_content(
-        model=MODEL,
-        contents=(
-            f"Research topic: {plan.topic}. Year >= {plan.start_year}. "
-            f"Previously searched: {previous}. "
-            f"Found {found} unique records; need {TARGET_PAPERS}. "
-            f"Consider this alternative search direction: {suggested}. "
-            "Suggest ONE different, focused academic search query that is "
-            "not identical to previous queries. Do not give paper titles."
-        ),
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=RevisedQuery,
+    reply = gemini_with_retry(
+        "Query revision",
+        lambda: client.models.generate_content(
+            model=MODEL,
+            contents=(
+                f"Research topic: {plan.topic}. Year >= {plan.start_year}. "
+                f"Previously searched: {previous}. "
+                f"Found {found} unique records; need {TARGET_PAPERS}. "
+                f"Consider this alternative search direction: {suggested}. "
+                "Suggest ONE different, focused academic search query that is "
+                "not identical to previous queries. Do not give paper titles."
+            ),
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=RevisedQuery,
+            ),
         ),
     )
     if not reply.text:
@@ -1060,116 +1114,131 @@ def main() -> None:
     used_queries: list[str] = []
     search_log: list[dict] = []
 
+    stop_reason = "max_rounds_reached"
+    stop_error = None
     for round_number in range(1, MAX_SEARCH_ROUNDS + 1):
-        # First round uses Section 2's first query. Subsequent queries are
-        # actively revised by Gemini using unused plan suggestions as seeds.
-        if round_number == 1:
-            query = plan.search_queries[0]
-        else:
-            suggestion = plan.search_queries[min(round_number - 1, 2)]
-            query = revise_query(
-                client, plan, used_queries, len(papers), suggestion
-            )
+        try:
+            # First round uses Section 2's first query. Subsequent queries are
+            # actively revised by Gemini using unused plan suggestions as seeds.
+            if round_number == 1:
+                query = plan.search_queries[0]
+            else:
+                suggestion = plan.search_queries[min(round_number - 1, 2)]
+                query = revise_query(
+                    client, plan, used_queries, len(papers), suggestion
+                )
 
-        print(f"\n[ROUND {round_number}/{MAX_SEARCH_ROUNDS}] Proposed query: {query!r}")
+            print(f"\n[ROUND {round_number}/{MAX_SEARCH_ROUNDS}] Proposed query: {query!r}")
 
-        # The wrapper lets students SEE automatic function execution.
-        # It is intentionally defined here to capture the chosen year filter.
-        called: list[dict] = []
+            # The wrapper lets students SEE automatic function execution.
+            # It is intentionally defined here to capture the chosen year filter.
+            called: list[dict] = []
 
-        def search_papers(query: str, limit: int = 5) -> list[dict]:
-            """Search OpenAlex for academic papers using keyword arguments.
+            def search_papers(query: str, limit: int = 5) -> list[dict]:
+                """Search OpenAlex for academic papers using keyword arguments.
 
-            Args:
-                query: Keywords for academic paper discovery.
-                limit: Maximum records to retrieve, from 1 to 10.
-            """
-            # Enforce our own maximum even if Gemini suggests a larger value.
-            safe_limit = max(1, min(int(limit), PAPERS_PER_SEARCH, 10))
-            print(f"[GEMINI → PYTHON] search_papers(query={query!r}, limit={safe_limit})")
-            print(f"[PYTHON] OpenAlex year filter: >= {plan.start_year}")
-            records = openalex_search_papers(
-                query=query, limit=safe_limit, start_year=plan.start_year
-            )
-            called.append({"query": query, "limit": safe_limit, "records": records})
-            print(f"[TOOL RESULT] {len(records)} record(s) retrieved.")
-            return records
+                Args:
+                    query: Keywords for academic paper discovery.
+                    limit: Maximum records to retrieve, from 1 to 10.
+                """
+                # Enforce our own maximum even if Gemini suggests a larger value.
+                safe_limit = max(1, min(int(limit), PAPERS_PER_SEARCH, 10))
+                print(f"[GEMINI → PYTHON] search_papers(query={query!r}, limit={safe_limit})")
+                print(f"[PYTHON] OpenAlex year filter: >= {plan.start_year}")
+                records = openalex_search_papers(
+                    query=query, limit=safe_limit, start_year=plan.start_year
+                )
+                called.append({"query": query, "limit": safe_limit, "records": records})
+                print(f"[TOOL RESULT] {len(records)} record(s) retrieved.")
+                return records
 
-        # Gemini chooses a tool call; the SDK executes the local function.
-        # ANY asks for a tool call. The low call limit prevents extra tool
-        # executions in this simple one-search-per-round example.
-        client.models.generate_content(
-            model=MODEL,
-            contents=(
-                f"Call search_papers ONCE for this research topic: {plan.topic}. "
-                f"Use the search direction '{query}' and limit={PAPERS_PER_SEARCH}. "
-                "We need genuine OpenAlex metadata, not invented citations."
-            ),
-            config=types.GenerateContentConfig(
-                tools=[search_papers],
-                automatic_function_calling=types.AutomaticFunctionCallingConfig(
-                    maximum_remote_calls=2
+            # Gemini chooses a tool call; the SDK executes the local function.
+            # ANY asks for a tool call. The low call limit prevents extra tool
+            # executions in this simple one-search-per-round example.
+            gemini_with_retry(
+                f"Round {round_number} tool request",
+                lambda: client.models.generate_content(
+                    model=MODEL,
+                    contents=(
+                        f"Call search_papers ONCE for this research topic: {plan.topic}. "
+                        f"Use the search direction '{query}' and limit={PAPERS_PER_SEARCH}. "
+                        "We need genuine OpenAlex metadata, not invented citations."
+                    ),
+                    config=types.GenerateContentConfig(
+                        tools=[search_papers],
+                        automatic_function_calling=types.AutomaticFunctionCallingConfig(
+                            maximum_remote_calls=2
+                        ),
+                        tool_config=types.ToolConfig(
+                            function_calling_config=types.FunctionCallingConfig(mode="ANY")
+                        ),
+                    ),
                 ),
-                tool_config=types.ToolConfig(
-                    function_calling_config=types.FunctionCallingConfig(mode="ANY")
-                ),
-            ),
-        )
-        if not called:
-            # If no local tool executed, there is no evidence to export.
-            raise RuntimeError("Gemini did not execute the search_papers tool.")
+                tool_completed=lambda: bool(called),
+            )
+            if not called:
+                # If no local tool executed, there is no evidence to export.
+                raise RuntimeError("Gemini did not execute the search_papers tool.")
 
-        # Inspect only ACTUAL OpenAlex results captured inside the tool.
-        added = 0
-        returned = 0
-        for call in called:
-            actual_query = call["query"]
-            used_queries.append(actual_query)
-            returned += len(call["records"])
-            for paper in call["records"]:
-                title = paper.get("title")
-                year = paper.get("year")
-                # Rule checks: year and metadata, NOT semantic relevance.
-                if not isinstance(title, str) or not title.strip():
-                    continue
-                if type(year) is not int or not plan.start_year <= year <= date.today().year:
-                    continue
-                if not (paper.get("doi") or paper.get("openalex_url")):
-                    continue
-                keys = paper_ids(paper)
-                if keys & seen:
-                    continue
-                seen.update(keys)
-                papers.append({
-                    "title": title.strip(),
-                    "year": year,
-                    "authors": "; ".join(paper.get("authors") or []),
-                    "doi": paper.get("doi") or "",
-                    "openalex_url": paper.get("openalex_url") or "",
-                    "search_query": actual_query,
-                })
-                added += 1
+            # Inspect only ACTUAL OpenAlex results captured inside the tool.
+            added = 0
+            returned = 0
+            for call in called:
+                actual_query = call["query"]
+                used_queries.append(actual_query)
+                returned += len(call["records"])
+                for paper in call["records"]:
+                    title = paper.get("title")
+                    year = paper.get("year")
+                    # Rule checks: year and metadata, NOT semantic relevance.
+                    if not isinstance(title, str) or not title.strip():
+                        continue
+                    if type(year) is not int or not plan.start_year <= year <= date.today().year:
+                        continue
+                    if not (paper.get("doi") or paper.get("openalex_url")):
+                        continue
+                    keys = paper_ids(paper)
+                    if keys & seen:
+                        continue
+                    seen.update(keys)
+                    papers.append({
+                        "title": title.strip(),
+                        "year": year,
+                        "authors": "; ".join(paper.get("authors") or []),
+                        "doi": paper.get("doi") or "",
+                        "openalex_url": paper.get("openalex_url") or "",
+                        "search_query": actual_query,
+                    })
+                    added += 1
+                    if len(papers) >= TARGET_PAPERS:
+                        break
                 if len(papers) >= TARGET_PAPERS:
                     break
-            if len(papers) >= TARGET_PAPERS:
-                break
 
-        search_log.append({
-            "round": round_number,
-            "planned_query": query,
-            "tool_queries": [entry["query"] for entry in called],
-            "retrieved": returned,
-            "new_unique_valid_records": added,
-            "total_unique_valid_records": len(papers),
-        })
-        print(
-            f"[CHECK] +{added} new valid, non-duplicate records. "
-            f"Total: {len(papers)}/{TARGET_PAPERS}."
-        )
-        if len(papers) >= TARGET_PAPERS:
-            print("[STOP] Target reached.")
+            search_log.append({
+                "round": round_number,
+                "planned_query": query,
+                "tool_queries": [entry["query"] for entry in called],
+                "retrieved": returned,
+                "new_unique_valid_records": added,
+                "total_unique_valid_records": len(papers),
+            })
+            print(
+                f"[CHECK] +{added} new valid, non-duplicate records. "
+                f"Total: {len(papers)}/{TARGET_PAPERS}."
+            )
+            if len(papers) >= TARGET_PAPERS:
+                stop_reason = "target_reached"
+                print("[STOP] Target reached.")
+                break
+            print("[DECISION] Not enough papers: try a revised query if rounds remain.")
+        except Exception as error:
+            # A later-round failure must not discard previous successful records.
+            stop_reason = "error"
+            stop_error = f"{type(error).__name__}: {error}"
+            print(f"[STOP] Round {round_number} failed: {stop_error}")
+            print("[STOP] Saving the records already retrieved.")
             break
-        print("[DECISION] Not enough papers: try a revised query if rounds remain.")
     else:
         print("[STOP] Maximum search rounds reached; exporting partial results.")
 
@@ -1191,6 +1260,9 @@ def main() -> None:
             "target_papers": TARGET_PAPERS,
             "max_search_rounds": MAX_SEARCH_ROUNDS,
             "finished_with_target": len(papers) >= TARGET_PAPERS,
+            "stop_reason": stop_reason,
+            "error": stop_error,
+            "rounds_completed": len(search_log),
             "total_unique_valid_records": len(papers),
             "searches": search_log,
             "note": "No automatic semantic relevance check; verify papers manually.",
@@ -1200,6 +1272,8 @@ def main() -> None:
 
     print(f"\n[EXPORT] {PAPERS_FILE.resolve()} ({len(papers)} records)")
     print(f"[EXPORT] {LOG_FILE.resolve()}")
+    if stop_error:
+        print("[INCOMPLETE] The run stopped due to an error; partial results were saved.")
     print("[REVIEW] Open source links and check each paper's relevance yourself.")
 
 
@@ -1222,7 +1296,8 @@ if __name__ == "__main__":
 | `GEMINI_API_KEY is missing` | Repeat Section 2's API key setup and `source ~/.bashrc`. |
 | `No module named google` / `requests` | Run `uv sync` in the starter folder and activate `.venv`. |
 | `403`, `404` or unavailable model | Your Gemini account may not have access to the selected model. Ask your instructor. |
-| `429` or quota error | Gemini and OpenAlex have separate limits. Stop repeated requests and ask your instructor. |
+| `429` or quota error | Gemini and OpenAlex have separate limits. The script retries temporary Gemini responses up to three times; if the issue persists, check quotas with the instructor. |
+| `503 UNAVAILABLE` | Gemini is temporarily busy. The agent waits 2s, 4s, then 8s and retries. If still unavailable, inspect the exported partial CSV and `search_log.json`. |
 | No results | Try a broader topic or earlier `start_year`. Confirm OpenAlex connectivity with `python tools.py`. |
 | Only a partial CSV | The agent reached `MAX_SEARCH_ROUNDS` before `TARGET_PAPERS`; this is expected behavior, not necessarily an error. |
 | Fewer papers after deduplication | Multiple searches returned the same records, or records lacked valid metadata. |
