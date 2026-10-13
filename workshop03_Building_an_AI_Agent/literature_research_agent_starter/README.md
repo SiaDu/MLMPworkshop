@@ -76,7 +76,7 @@ If nothing is printed, recheck the line you added to `~/.bashrc` or `~/.zshrc`.
 
 **You do not need to clone the whole MLMPworkshop repository or create a new GitHub repository.** Download only the starter project:
 
-**Starter Project ZIP — Coming Soon.**
+**[⬇ Download the Literature Research Agent Starter ZIP](https://github.com/SiaDu/MLMPworkshop/raw/refs/heads/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter.zip)**
 
 ### Step B1. Extract the ZIP 
 
