@@ -54,7 +54,7 @@
 .s2-dual .s2-code{margin:0}
 .s2-mini-heading{font-size:12px;font-weight:800;letter-spacing:.03em;margin:25px 0 10px}
 .s2-demo{border:1px solid #594f82;background:#16192e;border-radius:15px;overflow:hidden;margin:16px 0}
-.s2-demo-top{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px 16px;background:#25223f}
+.s2-demo-top{display:flex;justify-content:flex-end;gap:12px;align-items:center;padding:13px 16px;background:#25223f}
 .s2-demo-top strong{font-size:12px}
 .s2-tabs{border:1px solid #555073;border-radius:8px;padding:3px;display:flex;gap:3px;background:#171a31}
 .s2-tabs button{font-size:11px;color:#bdb5d1;padding:7px 11px;border:0;background:transparent;border-radius:6px;font-weight:800}
