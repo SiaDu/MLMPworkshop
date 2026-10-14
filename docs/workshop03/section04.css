@@ -7,7 +7,7 @@
 .s4-section h2 em{font-style:normal;color:#9fcbfb}
 .s4-lead{max-width:820px;font-size:14px;line-height:1.75;color:var(--muted);margin:0 0 25px}
 .s4-pipeline{border:1px solid #425b7a;border-radius:17px;overflow:hidden;background:linear-gradient(135deg,#111c2e,#171c33)}
-.s4-pipeline-head{display:flex;justify-content:space-between;align-items:center;gap:15px;background:#202b42;border-bottom:1px solid #3d5170;padding:17px 21px}
+.s4-pipeline-head{display:flex;justify-content:flex-end;align-items:center;gap:15px;background:#202b42;border-bottom:1px solid #3d5170;padding:17px 21px}
 .s4-label{font-size:10px;letter-spacing:.12em;font-weight:850;color:#b4c7e5}
 .s4-badge{font-size:10px;color:#a6b8ce}
 .s4-controls{display:flex;gap:9px;flex-wrap:wrap;padding:17px 20px 6px}
