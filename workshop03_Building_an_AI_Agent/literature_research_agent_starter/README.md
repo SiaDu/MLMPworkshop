@@ -4,9 +4,9 @@
 
 ## What you will build
 
-Turn your **AI for Media survey topic** into a structured research `SearchPlan`.
+Turn your **AI for Media survey topic** into three sets of academic search keywords and save them in a structured `SearchPlan`. A search query is a set of keywords or a short phrase used to find papers in a database.
 
-- **Script 01:** Ask the Gemini API for three research queries (ordinary text).
+- **Script 01:** Ask the Gemini API for three sets of search keywords (ordinary text).
 - **Script 02:** Ask for structured JSON, validate it with Pydantic and save `search_plan.json`.
 - **`tools.py`:** An instructor-prepared OpenAlex paper-search tool for **Section 3**. You do **not** need to write or edit it in Section 2.
 
@@ -168,7 +168,7 @@ It is already included in the ZIP.
 
 The script:
 
-1. Defines a **Pydantic `SearchPlan`** with `topic`, `search_queries` and `start_year`.
+1. Defines a **Pydantic `SearchPlan`** with `topic`, `search_queries` and `start_year`. A SearchPlan stores our research topic, three keyword searches, and the earliest publication year.
 2. Supplies the model's **JSON Schema** to Gemini.
 3. Uses `SearchPlan.model_validate_json(...)` to parse/check the response.
 4. Checks two additional requirements: exactly three queries, and a valid publication year.
@@ -202,14 +202,12 @@ References: [Gemini API documentation](https://ai.google.dev/gemini-api/docs/get
 
 ## Section 3 — Function Calling + OpenAlex Paper Search
 
-**Student guide · Read the explanations, run the supplied Python files, and change only the indicated values.** The workshop website presents the concepts; this README contains the complete commands and annotated example.
-
 ### What you will learn
 
 In Section 2 you asked Gemini to create a structured **SearchPlan**. In Section 3, you will use a **real academic search tool** and let Gemini decide how to call it:
 
 ```text
-User asks for papers
+User: "Find up to 5 academic papers about AI facial animation."
         |
         v
 Gemini requests search_papers(query, limit)
@@ -224,7 +222,9 @@ Python requests paper metadata from OpenAlex API
 SDK returns the results to Gemini -> Gemini writes an answer
 ```
 
-**Remember:** Gemini selects a function and its arguments, but **Python on your computer executes that function**. With *Automatic Function Calling*, the Google Gen AI SDK handles the repeated Gemini API requests and tool-result messages for you. The student provides the initial input **once**.
+**Remember:** Gemini selects a function and its arguments, but **Python on your computer executes that function**. With *Automatic Function Calling*, you enter the instruction once. The SDK may call Gemini more than once to complete the tool-calling process. This is different from running multiple OpenAlex searches.
+
+**Function vs. Tool:** A Python function is code that Python can run. A tool is an ability offered to an LLM. Tools may use local functions, external APIs, libraries, software or other AI models. Here, `search_papers()` is a Python function provided to Gemini as a tool.
 
 **Two APIs, different purposes:** Gemini decides how to use a tool and interprets its output. OpenAlex searches academic bibliographic metadata. An OpenAlex record is evidence of a database record, **not** proof that the paper is relevant, correctly indexed, or actually read by the model.
 
@@ -242,7 +242,7 @@ def search_papers(query: str, limit: int = 5) -> list[dict]:
 | --- | --- |
 | `search_papers` | The name of the Python function (tool). |
 | `query: str` | Search keywords as text, e.g. `"speech-driven facial animation"`. |
-| `limit: int = 5` | Number of paper records to request; default is 5. This tool allows 1–10. |
+| `limit: int = 5` | Number of paper records to request; default is 5. **Our workshop tool** allows 1–10, while OpenAlex supports up to 100 per page. |
 | `list[dict]` | The result is a list of Python dictionaries, one per paper. |
 
 From the extracted **`literature_research_agent_starter`** folder, with your environment activated:
@@ -258,7 +258,7 @@ python tools.py
 
 The existing test at the bottom of `tools.py` searches OpenAlex for **two** sample records. Output changes as the database changes. Each record can include `title`, `year`, `authors`, `doi`, and `openalex_url`; values can be missing.
 
-**OpenAlex account:** Small anonymous searches are supported; an `OPENALEX_API_KEY` is optional for this exercise. A free account raises the daily API allowance. Do not repeatedly run queries if you receive HTTP 429. Official information: [OpenAlex API](https://help.openalex.org/api/) and [Authentication](https://help.openalex.org/api/authentication/).
+**OpenAlex Free Access:** Small searches work without an API key (about 100 keyword searches per day). A free API key provides a $1 daily allowance (about 1,000 keyword searches); no payment card is required. The limits depend on the type of API call. Our workshop limits each search to 10 papers, although OpenAlex supports up to 100 results per page. If you receive HTTP 429, stop repeated requests. Official information: [OpenAlex API](https://help.openalex.org/api/) · [Authentication](https://help.openalex.org/api/authentication/) · [Example costs](https://help.openalex.org/access/example-costs/).
 
 ### Part B — Let Gemini request the Python tool
 
@@ -305,7 +305,7 @@ Part of them are **illustrative log messages**, not actual paper titles.
 
 Your own model may choose a different query, a different number of records may be returned, and the final response will vary. Look for the **`[ARGS]`**, **`[PYTHON]`**, and **`[TOOL RESULT]`** lines: these are printed by the local Python wrapper **only when the SDK executes the tool**.
 
-### Part C — Three student exercises
+### Part C — Three exercises
 
 **Task 1 — Change the topic:** Edit only `TOPIC` in `03_function_calling.py`, for example `"AI-driven character animation"`. Save and run the file. Inspect the new `[ARGS]` query requested by Gemini.
 
@@ -375,7 +375,7 @@ Export papers.csv       Ask Gemini to revise keywords
 
 **Reliability:** Temporary Gemini HTTP 429/500/502/503/504 errors are retried with waits of 2s, 4s, and 8s. If a later round still fails, the agent exports papers already found and records the failure in `search_log.json` (`stop_reason`, `error`, `rounds_completed`). If OpenAlex already returned records before Gemini's final response failed, the script avoids repeating the same search.
 
-**A bounded agent workflow:** Gemini proposes/refines search queries and requests a Python tool. The **Python program**, not the LLM, enforces data checks, stopping conditions and export rules. We use `MAX_SEARCH_ROUNDS` to avoid endless requests. **A search round is one attempted OpenAlex tool search, not one Gemini API call**; the SDK may make additional Gemini requests internally to handle Function Calling.
+**A bounded agent workflow:** Gemini proposes/refines search queries and requests a Python tool. The **Python program**, not the LLM, enforces data checks, stopping conditions and export rules. We use `MAX_SEARCH_ROUNDS` to avoid endless requests. **One search round means one attempted paper search through OpenAlex, not one Gemini API call**; the SDK may call Gemini more than once to complete Function Calling.
 
 | Earlier section | Reused in Section 4 |
 | --- | --- |

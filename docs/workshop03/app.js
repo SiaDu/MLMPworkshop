@@ -4,17 +4,17 @@ const EXAMPLES = {
   text: {
     label: "Literature Research Agent",
     goal: "Find five relevant papers for an AI facial animation survey.",
-    caption: "Search real academic metadata, inspect findings and export a reading list.",
+    caption: "Choose a paper-search source, check results and save a reading list.",
     conditions: [
       { value: "sufficient", label: "Enough papers found" },
       { value: "sparse", label: "Few papers found" }
     ],
     tools: [
-      { name: "search_papers", desc: "Query OpenAlex by keyword", icon: "⌕", via: "OpenAlex API" },
-      { name: "get_paper_details", desc: "Fetch a specific record", icon: "▤", via: "OpenAlex API" },
-      { name: "verify_doi", desc: "Cross-check identifiers", icon: "✓", via: "Metadata service" },
-      { name: "export_csv", desc: "Write a paper table", icon: "⇩", via: "Local Python" },
-      { name: "list_local_files", desc: "Inspect the working directory", icon: "▣", via: "Local Python" }
+      { name: "search_openalex", desc: "Find papers with OpenAlex", icon: "⌕", via: "OpenAlex API" },
+      { name: "search_semantic_scholar", desc: "Find papers with Semantic Scholar", icon: "⌕", via: "Semantic Scholar API" },
+      { name: "search_arxiv", desc: "Find preprints with arXiv", icon: "⌕", via: "arXiv API" },
+      { name: "check_paper_details", desc: "Check title, year and DOI", icon: "✓", via: "Metadata lookup" },
+      { name: "export_csv", desc: "Save a paper list", icon: "⇩", via: "Local Python" }
     ]
   },
 
@@ -92,63 +92,63 @@ function comparisonState() {
   });
   picker.value = condition;
 
-  addStep(workflow, 1, 'Run fixed query: "facial animation"', "Always calls search_papers()");
+  addStep(workflow, 1, 'Run fixed query: "facial animation"', "Uses a predefined OpenAlex search");
   addStep(workflow, 2, "Filter by publication year", "A code-defined selection criterion");
   addStep(workflow, 3, "Export available records", "No adaptive search decision");
 
-  addStep(agent, 1, "Choose search_papers()", "LLM selects from five available tools");
+  addStep(agent, 1, "Choose OpenAlex", "LLM picks a paper-search source from the tool menu");
   if (condition === "sparse") {
-    outcome($("#workflow-output"), "2 / 5 relevant papers", "The fixed sequence ends with an incomplete list.", "warn");
-    addStep(agent, 2, "Observe only two relevant records", "The result does not meet the goal");
-    addStep(agent, 3, "Select search_papers() again", "LLM revises its search keywords");
-    addStep(agent, 4, "Verify records, then export", "The example agent can reach five records");
-    outcome($("#agent-output"), "5 / 5 relevant papers", "The illustrative agent adapts its query after feedback.", "good");
+    outcome($("#workflow-output"), "2 / 5 papers found", "This example follows one predefined search.", "warn");
+    addStep(agent, 2, "Only two papers found", "The result does not meet the goal");
+    addStep(agent, 3, "Choose Semantic Scholar", "The LLM can switch to another paper-search source");
+    addStep(agent, 4, "Check paper details, then export", "The example agent reaches five papers");
+    outcome($("#agent-output"), "5 / 5 papers found", "The example agent switches to another search source.", "good");
     $("#compare-takeaway").textContent =
-      "Fixed workflow: predetermined operations. Agent: a model may select new actions based on the results.";
+      "A workflow follows developer-written rules. An agent can choose another search source based on the results.";
   } else {
-    outcome($("#workflow-output"), "5 / 5 relevant papers", "The fixed workflow works when a single search is sufficient.", "good");
-    addStep(agent, 2, "Observe five relevant records", "No extra search is necessary");
-    addStep(agent, 3, "Verify records, then export", "LLM finishes without repeating the search");
-    outcome($("#agent-output"), "5 / 5 relevant papers", "The illustrative agent skips unnecessary extra searches.", "good");
+    outcome($("#workflow-output"), "5 / 5 papers found", "The first search is enough.", "good");
+    addStep(agent, 2, "Five papers found", "No extra search is needed");
+    addStep(agent, 3, "Check paper details, then export", "The goal is met after one search");
+    outcome($("#agent-output"), "5 / 5 papers found", "The example agent stops after the first search.", "good");
     $("#compare-takeaway").textContent =
-      "Both approaches can succeed. Agent decisions are especially useful when the next step depends on uncertain results.";
+      "Both find five papers when the first search returns enough results. When only two are found, the agent can choose new search keywords.";
   }
 }
 
 function action(tool, args, why, result, detail) {
   return [
-    { phase: "choose", title: "LLM selects " + tool + "()", text: why, tool, data: { selected_tool: tool, note: "Simulated model choice" } },
-    { phase: "request", title: "Tool request prepared", text: "The model proposes a tool name and structured arguments.", tool, data: { name: tool, arguments: args } },
-    { phase: "execute", title: "Application executes the tool", text: "In a real system, Python would validate this request and run the selected function. This page replays a sample.", tool, data: { approved_tool: tool, implementation: EXAMPLES[currentCase].tools.find(t => t.name === tool).via, status: "simulated execution" } },
-    { phase: "observe", title: "Tool result returned", text: detail, tool, data: result }
+    { phase: "choose", title: "Gemini chooses " + tool + "()", text: why, tool, data: { selected_tool: tool, note: "Simulated model choice" } },
+    { phase: "request", title: "Tool request prepared", text: "Gemini chooses a tool and provides its inputs.", tool, data: { name: tool, arguments: args } },
+    { phase: "execute", title: "Python runs the tool", text: "Python would check the inputs and run the selected function. This page is a simulation.", tool, data: { approved_tool: tool, implementation: EXAMPLES[currentCase].tools.find(t => t.name === tool).via, status: "simulated execution" } },
+    { phase: "observe", title: "Tool returns results", text: detail, tool, data: result }
   ];
 }
 
 function buildTrace() {
   const result = [];
-  result.push(...action("search_papers", { query: "facial animation", limit: 5 },
-    "The task requires academic research, so the illustrative LLM selects search_papers() from the entire tool menu.",
+  result.push(...action("search_openalex", { query: "facial animation", limit: 5 },
+    "The task requires academic research, so the example LLM chooses OpenAlex from three search sources.",
     condition === "sparse"
       ? { relevant_found: 2, sample_titles: ["Illustrative paper A", "Illustrative paper B"] }
       : { relevant_found: 5, metadata_verified: false },
     condition === "sparse"
       ? "Only two results meet the example relevance criteria. The goal is not yet met."
-      : "Five relevant records are available. Another keyword search is unnecessary."));
+      : "Five paper records are available. Another search is unnecessary."));
 
   if (condition === "sparse") {
-    result.push(...action("search_papers", { query: "speech-driven 3D facial animation", limit: 5 },
-      "The example LLM observes insufficient results and independently selects search_papers() again with refined keywords.",
+    result.push(...action("search_semantic_scholar", { query: "speech-driven 3D facial animation", limit: 5 },
+      "Only two papers were found, so Gemini tries another source with new search keywords.",
       { newly_relevant: 3, total_relevant: 5 },
-      "The illustrative search returns three additional relevant records."));
+      "The illustrative Semantic Scholar search returns three additional papers."));
   }
 
-  result.push(...action("verify_doi", { paper_count: 5 },
-    "The example LLM requests a metadata-checking tool before completing the task.",
+  result.push(...action("check_paper_details", { paper_count: 5 },
+    "The example LLM chooses a tool to check the paper details.",
     { checked: 5, valid_records: 5, note: "Illustrative metadata verification" },
-    "The sample metadata check succeeds. The article contents have not been verified."));
+    "The paper details have been checked. The papers have not been read."));
 
   result.push(...action("export_csv", { filename: "papers.csv", rows: 5 },
-    "The goal is met, so the illustrative LLM selects export_csv().",
+    "The goal is met, so the example LLM chooses export_csv().",
     { filename: "papers.csv", rows: 5, mode: "simulation only" },
     "The teaching trace reports an export. This page does not write an actual CSV."));
 
@@ -165,7 +165,10 @@ function buildTrace() {
 function paintTools(selected) {
   const list = $("#tool-list");
   clear(list);
-  EXAMPLES[currentCase].tools.forEach((tool) => {
+  EXAMPLES[currentCase].tools.forEach((tool, index) => {
+    if (index === 0 || index === 3) {
+      list.append(node("div", "tool-group-label", index === 0 ? "PAPER SEARCH — CHOOSE A SOURCE" : "OTHER ACTIONS"));
+    }
     const item = node("div", "tool-item" + (selected === tool.name ? " selected" : ""));
     const icon = node("span", "tool-icon", tool.icon);
     icon.setAttribute("aria-hidden", "true");
@@ -194,7 +197,7 @@ function renderTrace() {
     body.append(node("div", "trace-title", ev.title), node("div", "trace-copy", ev.text));
     $("#trace-json").textContent = JSON.stringify(ev.data, null, 2);
   } else {
-    body.append(node("div", "trace-kicker", "START HERE"), node("div", "trace-title", "Which tool will the LLM choose?"), node("div", "trace-copy", "Look at the entire tool menu on the left. Select Next step to reveal the first illustrative model decision."));
+    body.append(node("div", "trace-kicker", "START HERE"), node("div", "trace-title", "Which tool will Gemini choose?"), node("div", "trace-copy", "Look at the available tools. Click Next step to see the example choice."));
     $("#trace-json").textContent = "Available tools: " + EXAMPLES[currentCase].tools.map(t=>t.name).join(", ") + "\n\nNo tool selected yet.";
   }
   document.querySelectorAll("[data-phase]").forEach((el) => {

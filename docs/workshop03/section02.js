@@ -6,7 +6,7 @@
 const PREVIEW = {
   natural: {
     text: "Here are three academic search suggestions for AI facial animation:\n\n1. Speech-driven facial animation\n2. Neural facial motion synthesis\n3. Controllable facial performance generation",
-    title: "Human-readable, but format may vary",
+    title: "Easy to read, but the format can change",
     explanation: "A model could answer with bullets, paragraphs or numbered lists. Your Python code cannot safely assume the same format every time.",
     example: "response.text"
   },
@@ -20,7 +20,7 @@ const PREVIEW = {
       ],
       start_year: 2022
     }, null, 2),
-    title: "Structured fields are easier to use",
+    title: "Python can use these fields directly",
     explanation: "The response follows a specified JSON Schema. Pydantic checks its shape and Python can access individual fields. The research content still needs evaluation.",
     example: "plan.search_queries[0]"
   }

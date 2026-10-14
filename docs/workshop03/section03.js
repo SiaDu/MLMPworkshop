@@ -6,44 +6,44 @@
 
 const S3_TRACE = [
   {
-    label: "User request",
+    label: "User instruction",
     title: "One user instruction",
-    subtitle: "The student enters the request once. Their Python program sends it to Gemini with a tool definition.",
+    subtitle: "The Python program sends the instruction to Gemini and tells it which tool is available.",
     payload: 'Find 5 academic papers about\nAI facial animation.',
     insightTitle: "Who made the request?",
-    insight: "The student asked for papers. The Python script exposes the local search_papers() function as a tool to Gemini. No paper search has happened yet."
+    insight: "The user asks for five papers about AI facial animation. Gemini can choose the search_papers() function. No search has happened yet."
   },
   {
     label: "Gemini chooses",
-    title: "A tool-call request",
-    subtitle: "Gemini may decide to use the available tool, choosing a function name and arguments.",
+    title: "Gemini chooses a tool",
+    subtitle: "Gemini chooses a tool and its inputs, such as the search keywords and paper count.",
     payload: '{\n  "name": "search_papers",\n  "args": {\n    "query": "facial animation",\n    "limit": 5\n  }\n}',
     insightTitle: "The model did NOT search OpenAlex",
-    insight: "This is only a requested function call. The query and arguments are illustrative: an actual model may choose different keywords or may not call the tool."
+    insight: "Gemini has chosen the tool, but Python has not run it yet. The keyword example may be different in a real run."
   },
   {
     label: "Python executes",
-    title: "The SDK calls local Python",
-    subtitle: "The automatic function-calling mechanism dispatches the request to the function running on the student's computer.",
+    title: "Python runs the function",
+    subtitle: "The SDK runs the Python function with the inputs chosen by Gemini.",
     payload: '[GEMINI → PYTHON] Requested tool:\nsearch_papers\n\n[ARGS] query=\'facial animation\', limit=5\n\n[PYTHON] Calling OpenAlex...',
     insightTitle: "SDK dispatches; Python executes",
-    insight: "The Gemini SDK can call the supplied Python function. That function uses requests.get() to contact api.openalex.org/works and receives bibliographic metadata."
+    insight: "The SDK runs search_papers(). Python then calls the OpenAlex API to find paper records."
   },
   {
     label: "Tool response",
-    title: "Real metadata comes back",
+    title: "OpenAlex returns papers",
     subtitle: "OpenAlex returns a list of paper records. The SDK sends the tool result back to Gemini.",
     payload: '[TOOL RESULT] Retrieved N records.\n\n[\n  {\n    "title": "<title from OpenAlex>",\n    "year": 2024,\n    "doi": "<DOI or null>"\n  },\n  ...\n]',
-    insightTitle: "Retrieved records, not generated citations",
-    insight: "Paper titles, years and DOIs come from OpenAlex, not the LLM's memory. N and the record contents will vary; the trace intentionally uses placeholders."
+    insightTitle: "The paper information comes from OpenAlex",
+    insight: "Titles, years and DOIs come from OpenAlex, not Gemini's memory. These are example records, not a live search."
   },
   {
     label: "Gemini answers",
-    title: "One answer for the student",
+    title: "Gemini answers",
     subtitle: "Gemini reads the returned data and prepares a human-readable response.",
     payload: '[GEMINI] Final response:\n\nHere are the papers returned by\nOpenAlex for your topic...\n\n[Paper titles and links go here]',
     insightTitle: "One student input ≠ one model API call",
-    insight: "The student only entered the request once. The SDK may contact Gemini again internally after executing the tool, providing the function-call history and returned results."
+    insight: "You enter the instruction once. The SDK may call Gemini again to send the tool results and receive the final answer."
   }
 ];
 
