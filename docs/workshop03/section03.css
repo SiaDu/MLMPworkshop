@@ -54,7 +54,7 @@
 .s3-checkpoint strong{color:#96edcd}
 .s3-checkpoint .mark{font-size:20px;color:#8af0c8;line-height:1}
 .s3-trace{border:1px solid #465b79;border-radius:16px;overflow:hidden;background:#101a2b;margin:20px 0}
-.s3-trace-top{padding:17px 19px;background:#1a283d;border-bottom:1px solid #3c4e65;display:flex;gap:15px;align-items:center;justify-content:space-between}
+.s3-trace-top{padding:17px 19px;background:#1a283d;border-bottom:1px solid #3c4e65;display:flex;gap:15px;align-items:center;justify-content:flex-end}
 .s3-trace-top b{font-size:12px;letter-spacing:.07em}
 .s3-trace-counter{font:12px ui-monospace,Consolas,monospace;color:#c6bbfb}
 .s3-trace-track{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:14px 18px}
