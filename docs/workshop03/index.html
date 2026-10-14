@@ -48,10 +48,10 @@
 
     <main class="main">
       <section class="hero" id="intro">
-        <div class="eyebrow"><span class="eyebrow-line"></span> SECTION 01 / THE FUNDAMENTALS </div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> SECTION 01 </div>
         <h1>What is an <em>AI Agent?</em></h1>
         <p class="lede">An LLM generates responses. An agent can <strong>choose actions</strong>, use tools, observe what happens, and decide what to do next.</p>
-        <div class="hero-pills"><span>LLM vs Agent</span><span>Workflow</span><span>Tool selection</span><span>Agent loop</span></div>
+        
         <div class="intro-comparison">
           <article class="simple-card">
             <div class="card-label"><span class="mini-symbol">◇</span> LLM-ONLY RESPONSE</div>
@@ -61,13 +61,13 @@
           <article class="simple-card accent-card">
             <div class="card-label"><span class="mini-symbol">✳</span> TOOL-USING AGENT</div>
             <div class="mini-flow"><span>User goal</span><b>→</b><span>LLM + tools</span><b>↻</b><span>Result</span></div>
-            <p>The model can request actions, examine real tool results and adapt its next choice within the application's limits.</p>
+            <p>The agent can choose a tool, use its results, and decide what to do next.</p>
           </article>
         </div>
       </section>
 
       <section class="lesson-section" id="comparison">
-        <div class="section-top"><div><span class="section-index">01 — COMPARE</span><h2>Workflow <span>vs.</span> Agent</h2><p>Both can use Python, APIs and software. The difference is <strong>who decides the next action</strong>.</p></div></div>
+        <div class="section-top"><div><span class="section-index">A — COMPARE</span><h2>Workflow <span>vs.</span> Agent</h2><p>Both can use the same tools. The difference is <strong>who decides what to do next</strong>.</p></div></div>
         <div class="playground">
           <div class="playground-header">
             <div class="header-heading"><span class="window-dots"><i></i><i></i><i></i></span><strong>Literature Research · Compare two approaches</strong></div>
@@ -95,36 +95,36 @@
       </section>
 
       <section class="lesson-section" id="anatomy">
-        <div class="section-top"><div><span class="section-index">02 — COMPONENTS</span><h2>Inside an Agent</h2><p>Three essentials, plus the code that connects them.</p></div></div>
+        <div class="section-top"><div><span class="section-index">B — COMPONENTS</span><h2>Inside an Agent</h2><p>An agent uses a model, instructions, and tools.</p></div></div>
         <div class="anatomy-grid">
-          <article class="anatomy-card"><span class="anatomy-no">01</span><div class="anatomy-icon">◉</div><h3>Model</h3><p>The LLM interprets the goal and chooses what to request next.</p><small>e.g. Gemini / GPT</small></article>
-          <article class="anatomy-card"><span class="anatomy-no">02</span><div class="anatomy-icon">≡</div><h3>Instructions</h3><p>Define the task, constraints, available scope and stopping conditions.</p><small>e.g. “Find 5 real papers”</small></article>
-          <article class="anatomy-card"><span class="anatomy-no">03</span><div class="anatomy-icon">{ }</div><h3>Tools</h3><p>Provide real capabilities: query an API, process an image, write a CSV.</p><small>e.g. search_papers()</small></article>
+          <article class="anatomy-card"><span class="anatomy-no">01</span><div class="anatomy-icon">◉</div><h3>Model</h3><p>The LLM understands the task and chooses what to do next.</p><small>e.g. Gemini / GPT</small></article>
+          <article class="anatomy-card"><span class="anatomy-no">02</span><div class="anatomy-icon">≡</div><h3>Instructions</h3><p>Tell the agent what to do, what it can use, and when to stop.</p><small>e.g. “Find 5 real papers”</small></article>
+          <article class="anatomy-card"><span class="anatomy-no">03</span><div class="anatomy-icon">{ }</div><h3>Tools</h3><p>Tools connect the agent to Python functions, external APIs, software, or other AI models.</p><small>e.g. search_papers()</small></article>
         </div>
-        <div class="fineprint"><span>IMPORTANT DISTINCTION</span><p>The <strong>LLM requests a tool</strong>; your application code validates and executes it. The model does not run your local Python function by itself.</p></div>
+        <div class="fineprint"><span>IMPORTANT DISTINCTION</span><p>The <strong>LLM chooses a tool</strong>. The application checks the call and runs the function.</p></div>
       </section>
 
       <section class="lesson-section" id="loop">
-        <div class="section-top"><div><span class="section-index">03 — INTERACTIVE EXPLORER</span><h2>The Agent Loop</h2><p>See the available tools <em>before</em> the model makes a choice. Step through selection, execution, observation and the next decision.</p></div></div>
+        <div class="section-top"><div><span class="section-index">C — AGENT LOOP</span><h2>The Agent Loop</h2><p>See which tools the agent can use. Follow how it chooses a tool and uses the result.</p></div></div>
         <div class="loop-lab">
           <div class="lab-topline">
             <div><span class="lab-overline">SIMULATED AGENT EXECUTION</span><h3 id="loop-task-title">Literature Research Agent</h3></div>
             <div class="step-counter"><span id="step-position">0</span> <span>/</span> <span id="step-total">0</span> EVENTS</div>
           </div>
           <div class="loop-stages" id="loop-stages">
-            <span data-phase="choose">01 Choose</span><b>→</b><span data-phase="request">02 Request</span><b>→</b><span data-phase="execute">03 Execute</span><b>→</b><span data-phase="observe">04 Observe</span><b>↻</b>
+            <span data-phase="choose">01 Choose</span><b>→</b><span data-phase="request">02 Call Tool</span><b>→</b><span data-phase="execute">03 Run Tool</span><b>→</b><span data-phase="observe">04 Check Result</span><b>↻</b>
           </div>
           <div class="lab-columns">
             <div class="tool-palette">
               <div class="pane-heading"><span>AVAILABLE TOOLS</span><span id="tool-count">5 TOOLS</span></div>
-              <p class="pane-sub">The model sees this menu and can request any permitted tool.</p>
+              <p class="pane-sub">Three tools can search papers. The agent can choose a source or another action.</p>
               <div id="tool-list" class="tool-list"></div>
-              <div class="tools-footnote">Tool definitions are exposed to the LLM; the app executes approved calls.</div>
+              
             </div>
             <div class="execution-pane">
               <div class="pane-heading"><span>EXECUTION TRACE</span><span id="trace-status" class="trace-status">READY</span></div>
               <div class="trace-body" id="trace-body" aria-live="polite"></div>
-              <div class="trace-terminal"><span class="terminal-label">REQUEST / RESULT</span><pre id="trace-json">Select “Next step” to start the simulation.</pre></div>
+              <div class="trace-terminal"><pre id="trace-json">Select “Next step” to start the simulation.</pre></div>
             </div>
           </div>
           <div class="lab-controls">
@@ -133,35 +133,35 @@
               <button id="loop-back" class="button-outline" type="button" disabled>← Previous</button>
               <button id="loop-next" class="button-primary" type="button">Next step →</button>
             </div>
-            <div class="lab-key">Highlighted tool = example model selection, <strong>not</strong> a live inference result.</div>
+            <div class="lab-key">Simulated choices. The Section 4 Python starter uses OpenAlex only.</div>
           </div>
         </div>
       </section>
 
       <section class="lesson-section quiz-section" id="quiz">
-        <div class="section-top"><div><span class="section-index">04 — CHECK YOUR UNDERSTANDING</span><h2>Three quick questions.</h2><p>Can you distinguish the model's decisions from the program's execution?</p></div></div>
+        <div class="section-top"><div><span class="section-index">D — QUICK QUIZ</span><h2>Three quick questions.</h2><p>Can you distinguish the model's decisions from the program's execution?</p></div></div>
         <div class="quiz-grid" id="quiz-grid"></div>
         <div class="quiz-footer"><div id="quiz-score" aria-live="polite">Answer all three to see your score.</div><button type="button" id="quiz-retry" class="secondary-action">Reset answers ↺</button></div>
       </section>
 
       <section class="s2-intro" id="s2-start">
-  <div class="s2-eyebrow">SECTION 02 / REQUIRED HANDS-ON</div>
+  <div class="s2-eyebrow">SECTION 02</div>
   <h2>LLM API <em>+ Structured Outputs</em></h2>
-  <p>Last section: how an agent selects actions. This section: how Python calls a real LLM and turns a survey topic into data that other tools can use.</p>
-  <div class="s2-objective"><div><strong>YOUR GOAL</strong><p>Generate 3 academic search queries → validate a structured SearchPlan → save search_plan.json.</p></div></div>
+  <p>Now let's call Gemini from Python and turn a research topic into structured search keywords.</p>
+  <div class="s2-objective"><div><strong>YOUR GOAL</strong><p>Generate three sets of search keywords → check their format → save search_plan.json.</p></div></div>
   <div class="s2-route" aria-label="Lesson overview">
-    <a href="#s2-api"><span>01 / CONCEPT</span>LLM API</a>
-    <a href="#s2-setup"><span>PRE-CLASS</span>Get ready</a>
-    <a href="#s2-call"><span>02 / HANDS-ON</span>First call</a>
-    <a href="#s2-format"><span>03 / COMPARE</span>Why JSON?</a>
-    <a href="#s2-schema"><span>04 / HANDS-ON</span>Structured output</a>
-    <a href="#s2-check"><span>05 / VALIDATE</span>Validation</a>
+    <a href="#s2-api"><span>A / CONCEPT</span>LLM API</a>
+    <a href="#s2-setup"><span>B / SETUP</span>Get ready</a>
+    <a href="#s2-call"><span>C / HANDS-ON</span>First call</a>
+    <a href="#s2-format"><span>D / COMPARE</span>Why JSON?</a>
+    <a href="#s2-schema"><span>E / HANDS-ON</span>Structured output</a>
+    <a href="#s2-check"><span>F / VALIDATE</span>Validation</a>
   </div>
 </section>
 
 
 <section class="s2-section" id="s2-api">
-  <div class="s2-section-head"><div><span class="s2-index">01 / UNDERSTAND</span><h3>What is an LLM API?</h3><p>An API lets Python send a prompt to a model and receive its answer. Both directions travel through the same API.</p></div></div>
+  <div class="s2-section-head"><div><span class="s2-index">A / UNDERSTAND</span><h3>What is an LLM API?</h3><p>An API lets Python send a prompt to Gemini and receive an answer.</p></div></div>
   <div class="s2-client-cloud" role="img" aria-label="The Python program runs locally on your computer. It sends an API request over the internet to Google's cloud, where the Gemini API connects to the LLM model. The response travels back to Python.">
     <div class="s2-zone s2-local-zone">
       <span class="s2-zone-label">LOCAL · YOUR COMPUTER</span>
@@ -203,15 +203,15 @@
 
 
 <section class="s2-section" id="s2-setup">
-  <div class="s2-section-head"><div><span class="s2-index">GET READY / STARTER PROJECT</span><h3>Download &amp; set up</h3><p>The complete instructions, terminal commands and commented Python examples are in the supplied <code>README.md</code>. You do not need to clone the full MLMPworkshop repository.</p></div></div>
+  <div class="s2-section-head"><div><span class="s2-index">B / SETUP</span><h3>Download &amp; set up</h3><p>Read the README on GitHub for setup instructions and code examples. The downloaded ZIP contains the Python starter files.</p></div></div>
   <div class="s2-download-card">
-    <div><span class="s2-index">START HERE</span><h4>Literature Research Agent — Starter Project</h4><p>Download the complete starter ZIP, including <code>pyproject.toml</code>, the Python examples, <code>tools.py</code> and the student README.</p></div>
+    <div><span class="s2-index">START HERE</span><h4>Literature Research Agent — Starter Project</h4><p>Download the Python starter project, including <code>pyproject.toml</code>, <code>tools.py</code> and the example scripts. Read the instructions on GitHub.</p></div>
     <a class="s2-download-btn" href="https://github.com/SiaDu/MLMPworkshop/raw/refs/heads/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter.zip" aria-label="Download Literature Research Agent starter ZIP">↓ Download starter ZIP</a>
   </div>
   <div class="s2-three">
     <div class="s2-concept"><strong>01 · API Key</strong><p>Create a Gemini Key in <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio ↗</a>. Add it to your own <code>~/.bashrc</code>.</p></div>
-    <div class="s2-concept"><strong>02 · Extract</strong><p>Unzip the project into your Downloads folder, then open <code>literature_research_agent_starter/</code> in VS Code.</p></div>
-    <div class="s2-concept"><strong>03 · Install</strong><p>From that folder, run <code>uv sync</code> and activate <code>.venv</code>.</p></div>
+    <div class="s2-concept"><strong>02 · Extract</strong><p>Move the ZIP to your Desktop and choose <strong>Extract Here</strong>. Then open <code>literature_research_agent_starter/</code> in VS Code.</p></div>
+    <div class="s2-concept"><strong>03 · Install</strong><p>From that folder, run <code>uv venv</code>, activate <code>.venv</code>, then run <code>uv sync</code>.</p></div>
   </div>
   <div class="s2-note"><strong>Follow the README step-by-step:</strong> <code>nano ~/.bashrc</code>, save with Ctrl+O / Enter / Ctrl+X, <code>source ~/.bashrc</code>, download and extract, then <code>uv sync</code>. All commands are explained there.</div>
   <a class="s2-text-link" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open the full setup and code guide (README) ↗</a>
@@ -219,15 +219,15 @@
 
 
 <section class="s2-section" id="s2-call">
-  <div class="s2-section-head"><div><span class="s2-index">02 / FIRST API CALL</span><h3>Ask Gemini from Python</h3><p>A prompt goes through the Gemini API; Python receives the response as text. The complete working file is included in your download.</p></div></div>
+  <div class="s2-section-head"><div><span class="s2-index">C / FIRST API CALL</span><h3>Ask Gemini from Python</h3><p>Python sends a prompt to Gemini and prints the answer. The code is already provided.</p></div></div>
   <div class="s2-minimal-code">
-    <span>THE KEY IDEA · PYTHON</span>
+    
     <pre><code>from google import genai
 client = genai.Client()
 
 response = client.models.generate_content(
     model="gemini-3.5-flash-lite",
-    contents="Suggest 3 research queries about AI facial animation."
+    contents="Suggest three search keyword phrases for academic papers about AI facial animation."
 )
 print(response.text)</code></pre>
   </div>
@@ -236,9 +236,9 @@ print(response.text)</code></pre>
 </section>
 
 <section class="s2-section" id="s2-format">
-  <div class="s2-section-head"><div><span class="s2-index">03 / INTERACTIVE COMPARISON</span><h3>Natural Language vs Structured JSON</h3><p>Give the same survey topic to the model. Switch between two examples of the output and think about which is easier for Python to process.</p></div></div>
+  <div class="s2-section-head"><div><span class="s2-index">D / COMPARE</span><h3>Natural Language vs Structured JSON</h3><p>Compare two ways Gemini can answer the same question. Which format is easier for Python to use?</p></div></div>
   <div class="s2-demo">
-    <div class="s2-demo-top"><strong>SAME GOAL · TWO OUTPUT FORMATS</strong><div class="s2-tabs" role="group" aria-label="Choose response format"><button type="button" class="active" data-s2-preview="natural" aria-pressed="true">Natural Language</button><button type="button" data-s2-preview="json" aria-pressed="false">Structured JSON</button></div></div>
+    <div class="s2-demo-top"><div class="s2-tabs" role="group" aria-label="Choose response format"><button type="button" class="active" data-s2-preview="natural" aria-pressed="true">Natural Language</button><button type="button" data-s2-preview="json" aria-pressed="false">Structured JSON</button></div></div>
     <div class="s2-demo-body"><pre class="s2-response" id="s2-example-response" aria-live="polite"></pre><div class="s2-demo-explain"><b id="s2-example-title"></b><p id="s2-example-detail"></p><code id="s2-example-field"></code></div></div>
     <div class="s2-demo-footnote">These are illustrative responses; the actual model output will vary.</div>
   </div>
@@ -247,20 +247,20 @@ print(response.text)</code></pre>
     <div class="s2-concept"><strong>JSON Schema</strong><p>A formal description of the fields and types the model must provide.</p></div>
     <div class="s2-concept"><strong>Pydantic</strong><p>A Python library for describing, reading and validating structured data.</p></div>
   </div>
-  <div class="s2-note"><strong>Key distinction:</strong> writing “please return JSON” in a prompt is not the same as providing an actual schema in the API request. In the next example we will supply the schema through <code>GenerateContentConfig</code>.</div>
+  <div class="s2-note"><strong>Key distinction:</strong> Asking for JSON is not enough to guarantee a consistent structure. We can provide a schema to tell Gemini exactly which fields we need.</div>
 </section>
 
 
 
 <section class="s2-section" id="s2-schema">
-  <div class="s2-section-head"><div><span class="s2-index">04 / HANDS-ON</span><h3>Structured Outputs with Pydantic</h3><p>Tell Gemini exactly what shape of JSON you need. Python validates the response and saves it for the paper-search tool.</p></div></div>
+  <div class="s2-section-head"><div><span class="s2-index">E / HANDS-ON</span><h3>Structured Outputs with Pydantic</h3><p>Tell Gemini which JSON fields we need. Python checks the result and saves it for later. A SearchPlan stores our research topic, three keyword searches, and the earliest publication year.</p></div></div>
   <div class="s2-three">
     <div class="s2-concept"><strong>topic: str</strong><p>A string: your survey topic.</p></div>
-    <div class="s2-concept"><strong>search_queries: list[str]</strong><p>A list of research-query strings.</p></div>
+    <div class="s2-concept"><strong>search_queries: list[str]</strong><p>A list of three search keyword phrases.</p></div>
     <div class="s2-concept"><strong>start_year: int</strong><p>An integer: the start of the publication period.</p></div>
   </div>
   <div class="s2-minimal-code">
-    <span>PYDANTIC · DEFINE THE OUTPUT STRUCTURE</span>
+    
     <pre><code>class SearchPlan(BaseModel):
     topic: str
     search_queries: list[str]
@@ -276,9 +276,9 @@ print(response.text)</code></pre>
 <section class="s2-section" id="s2-check">
   <div class="s2-section-head">
     <div>
-      <span class="s2-index">05 / UNDERSTANDING DATA VALIDATION</span>
-      <h3>Understanding Data Validation</h3>
-      <p>Structured Outputs help control the response format. They do not guarantee that the generated information is correct, relevant or useful.</p>
+      <span class="s2-index">F / VALIDATION</span>
+      <h3>What Does Validation Check?</h3>
+      <p>Structured Outputs control the format, not the accuracy of the information.</p>
     </div>
   </div>
 
@@ -299,7 +299,7 @@ print(response.text)</code></pre>
 
   <div class="s2-lab-panel">
     <div class="s2-lab-title">
-      <strong>INTERACTIVE · Which validation check catches the problem?</strong>
+      <strong>Which check catches the problem?</strong>
       <small>Try all four examples</small>
     </div>
     <div class="s2-lab-body">
@@ -326,27 +326,27 @@ print(response.text)</code></pre>
   </div>
 
   <div class="s2-note"><strong>Key takeaway:</strong> A JSON response can be perfectly valid and still contain irrelevant search queries. <code>02_structured_output.py</code> implements schema and rule checks; it does not automatically judge research relevance.</div>
-  <div class="s2-bridge"><span class="s2-index">NEXT / SECTION 03</span><h3>From SearchPlan to Function Calling ↗</h3><p>We have a structured SearchPlan, but not verified research papers. Next, the LLM can request <code>search_papers(query)</code> while Python retrieves paper metadata from OpenAlex.</p></div>
+  <div class="s2-bridge"><span class="s2-index">NEXT / SECTION 03</span><h3>From SearchPlan to Function Calling ↗</h3><p>We now have a SearchPlan, but no papers yet. Next, we'll connect Gemini to a tool that searches OpenAlex.</p></div>
 </section>
 
 
 <section class="s3-section s3-intro" id="s3">
-  <div class="s3-kicker">SECTION 03 / HANDS-ON</div>
+  <div class="s3-kicker">SECTION 03</div>
   <h2>Function Calling <em>+ OpenAlex</em></h2>
-  <p class="s3-lede">Give Gemini access to a Python paper-search tool. The model decides what to request, the SDK executes the function on your computer, and OpenAlex provides real academic metadata.</p>
-  <div class="s3-objective"><strong>YOUR GOAL</strong><p>Run <code>search_papers()</code> directly, then let Gemini request the same tool through Automatic Function Calling. Observe what actually happens in the terminal.</p></div>
+  <p class="s3-lede">We give Gemini a Python tool for searching papers. Gemini chooses the search keywords, Python runs the tool, and OpenAlex returns the results.</p>
+  <div class="s3-objective"><strong>YOUR GOAL</strong><p>First, run the search tool yourself. Then let Gemini use the same tool. Compare what happens in the terminal.</p></div>
   <nav class="s3-jump" aria-label="Section 3 lesson topics">
-    <a href="#s3-compare">01 / What changes?</a>
-    <a href="#s3-openalex">02 / OpenAlex</a>
-    <a href="#s3-tool">03 / Your Python tool</a>
-    <a href="#s3-sdk">04 / Automatic calling</a>
-    <a href="#s3-trace">05 / Behind the scenes</a>
-    <a href="#s3-task">06 / Your turn</a>
+    <a href="#s3-compare">A / What changes?</a>
+    <a href="#s3-openalex">B / OpenAlex</a>
+    <a href="#s3-tool">C / Your Python tool</a>
+    <a href="#s3-sdk">D / Automatic calling</a>
+    <a href="#s3-trace">E / Behind the scenes</a>
+    <a href="#s3-task">F / Your turn</a>
   </nav>
 </section>
 
 <section class="s3-section" id="s3-compare">
-  <div class="s3-section-top"><div><span class="s3-tag">01 / THE BIG IDEA</span><h3>Direct Python vs LLM Function Calling</h3><p>The function stays the same. What changes is <strong>who chooses to call it, and with which arguments</strong>.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">A / COMPARE</span><h3>Direct Python vs LLM Function Calling</h3><p>The Python function stays the same. The difference is <strong>who chooses the search keywords</strong>.</p></div></div>
   <div class="s3-split">
     <div class="s3-side">
       <span>DIRECT PYTHON CALL</span>
@@ -363,7 +363,7 @@ print(response.text)</code></pre>
     <div class="s3-side focus">
       <span>LLM FUNCTION CALLING</span>
       <h4>Gemini requests a tool</h4>
-      <p>Gemini sees a tool description and chooses its arguments.</p>
+      <p>Gemini reads the tool description and chooses what to search for.</p>
       <div class="s3-sequence">
         <div class="key">Gemini requests <code>search_papers(...)</code></div>
         <div class="arrow">↓</div>
@@ -373,44 +373,44 @@ print(response.text)</code></pre>
       </div>
     </div>
   </div>
-  <div class="s3-banner"><b>Important:</b> Gemini does not directly execute arbitrary Python on your computer. It requests a function call; your application or SDK carries out the permitted function locally.</div>
+  <div class="s3-banner"><b>Important:</b> Gemini cannot run Python by itself. It asks to use the tool, and the SDK runs the function on your computer.</div>
 </section>
 
 <section class="s3-section" id="s3-openalex">
-  <div class="s3-section-top"><div><span class="s3-tag">02 / EXTERNAL EVIDENCE</span><h3>Meet OpenAlex</h3><p>We are using <a class="s3-a" href="https://openalex.org/" target="_blank" rel="noopener">OpenAlex ↗</a>, an open scholarly-metadata platform. Gemini interprets the task; OpenAlex searches indexed academic records. They are two <strong>different APIs</strong>.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">B / OPENALEX</span><h3>Meet OpenAlex</h3><p><a class="s3-a" href="https://openalex.org/" target="_blank" rel="noopener">OpenAlex ↗</a> is a database of academic paper information. Gemini helps decide what to search for, while OpenAlex finds the papers. We connect to both through APIs.</p></div></div>
   <div class="s3-source-flow" role="img" aria-label="Gemini requests search_papers, local Python calls the OpenAlex API, and bibliographic data returns to the program">
-    <div class="s3-flow-card"><span>✳</span><b>Gemini API</b><small>Requests search_papers(query, limit)</small></div>
+    <div class="s3-flow-card"><span>✳</span><b>Gemini API</b><small>Chooses search_papers(query, limit)</small></div>
     <div class="s3-flow-arrow">⇄</div>
-    <div class="s3-flow-card"><span>⌨</span><b>Local Python</b><small>Executes tools.py using requests</small></div>
+    <div class="s3-flow-card"><span>⌨</span><b>Local Python</b><small>Runs our Python search function</small></div>
     <div class="s3-flow-arrow">⇄</div>
     <div class="s3-flow-card"><span>⌕</span><b>OpenAlex API</b><small>Returns paper metadata as JSON</small></div>
   </div>
   <div class="s3-facts">
     <div class="s3-fact"><b>What can it return?</b><p>Title, year, authors, DOI, and OpenAlex record URL. Some metadata may be missing.</p></div>
     <div class="s3-fact"><b>Does it read full papers?</b><p>No. Our existing tool retrieves bibliographic metadata, not PDF full text.</p></div>
-    <div class="s3-fact"><b>Need another API Key?</b><p>Small anonymous queries are supported. A free OpenAlex API Key increases the daily allowance.</p></div>
+    <div class="s3-fact"><b>Need another API Key?</b><p>Small searches work without a key. A free key allows more searches per day. OpenAlex supports up to 100 results per page; our Python example limits each search to 10.</p></div>
   </div>
   <div class="s3-checkpoint"><span class="mark">✓</span><div><strong>First test OpenAlex without Gemini.</strong> Run <code>python tools.py</code> in your starter folder. It searches for two example records using ordinary Python and the OpenAlex API.</div></div>
 </section>
 
 <section class="s3-section" id="s3-tool">
-  <div class="s3-section-top"><div><span class="s3-tag">03 / PREPARED TOOL</span><h3>Your first Python Tool</h3><p>There are <strong>two separate Python files</strong> in the starter folder: <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/tools.py" target="_blank" rel="noopener"><code>tools.py</code> ↗</a> contains the OpenAlex search function; <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/03_function_calling.py" target="_blank" rel="noopener"><code>03_function_calling.py</code> ↗</a> lets Gemini request that function. They are provided for you — inspect and run them, not recreate them.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">C / PYTHON TOOL</span><h3>Your first Python Tool</h3><p>The starter folder contains two prepared files: <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/tools.py" target="_blank" rel="noopener"><code>tools.py</code> ↗</a> contains the OpenAlex search function; <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/03_function_calling.py" target="_blank" rel="noopener"><code>03_function_calling.py</code> ↗</a> lets Gemini request that function. Inspect and run these files; you do not need to rewrite them.</p></div></div>
   <div class="s3-tool-signature"><code>def search_papers(query: str, limit: int = 5) -&gt; list[dict]:</code></div>
   <div class="s3-args">
     <div class="s3-arg"><b>query: str</b><p>Academic search keywords chosen by the program or requested by Gemini.</p></div>
-    <div class="s3-arg"><b>limit: int = 5</b><p>Maximum number of papers to request (between 1 and 10).</p></div>
+    <div class="s3-arg"><b>limit: int = 5</b><p>The workshop tool allows 1–10 papers per search.</p></div>
     <div class="s3-arg"><b>list[dict]</b><p>Python list of paper records containing fields such as title, year, and DOI.</p></div>
   </div>
   <div class="s3-demo-code"><span>DIRECT CALL · NO LLM INVOLVED</span><pre><code>from tools import search_papers
 
 papers = search_papers("facial animation", limit=5)
 print(papers)</code></pre></div>
-  <div class="s3-banner"><b>Function Declaration:</b> The Gemini SDK can read a callable's name, docstring and typed parameters, and pass that description to the model. The function's actual Python implementation still runs locally.</div>
+  <div class="s3-banner"><b>Function Declaration:</b> The SDK tells Gemini which Python function is available and what inputs it needs. Python runs the function when Gemini calls it.</div>
 </section>
 
 <section class="s3-section" id="s3-sdk">
-  <div class="s3-section-top"><div><span class="s3-tag">04 / LET THE SDK HANDLE THE LOOP</span><h3>Automatic Function Calling</h3><p>You could write a dispatcher and manually send every function response back to Gemini. For this workshop, we use the <strong>Google Gen AI SDK</strong> to handle the repeated steps.</p></div></div>
-  <div class="s3-demo-code"><span>KEY CODE · SIMPLIFIED FROM THE PROVIDED SCRIPT</span><pre><code>from google import genai
+  <div class="s3-section-top"><div><span class="s3-tag">D / AUTOMATIC CALLING</span><h3>Automatic Function Calling</h3><p>The <strong>Google Gen AI SDK</strong> handles the steps between Gemini and our Python tool. We don't need to write that process ourselves.</p></div></div>
+  <div class="s3-demo-code"><span>EXAMPLE CODE</span><pre><code>from google import genai
 from google.genai import types
 from tools import search_papers
 
@@ -423,17 +423,17 @@ response = client.models.generate_content(
     ),
 )</code></pre></div>
   <div class="s3-facts">
-    <div class="s3-fact"><b>Tool Declaration</b><p>The SDK shares the function name, description, and parameters with Gemini.</p></div>
-    <div class="s3-fact"><b>Tool Execution</b><p>The SDK receives the requested arguments and runs the allowed Python function.</p></div>
-    <div class="s3-fact"><b>Tool Response</b><p>The SDK sends returned data back to Gemini so it can prepare an answer.</p></div>
+    <div class="s3-fact"><b>Available Tool</b><p>The SDK tells Gemini which Python tools it can use.</p></div>
+    <div class="s3-fact"><b>Tool Call</b><p>Gemini chooses a tool and provides the inputs.</p></div>
+    <div class="s3-fact"><b>Tool Result</b><p>Python runs the function and sends the results back to Gemini.</p></div>
   </div>
-  <div class="s3-banner"><b>One user message, potentially multiple Gemini API calls.</b> The SDK can handle the tool-request/result exchange internally. In our full <code>03_function_calling.py</code> example, a small logging wrapper makes that hidden execution visible.</div>
+  <div class="s3-banner"><b>One user instruction, possibly multiple Gemini API calls.</b> You enter the instruction once. The SDK may call Gemini more than once to complete the tool-calling process. This is different from searching OpenAlex multiple times.</div>
 </section>
 
 <section class="s3-section" id="s3-trace">
-  <div class="s3-section-top"><div><span class="s3-tag">05 / INTERACTIVE TRACE</span><h3>Behind the Scenes</h3><p>Click through a typical Function Calling exchange. Pay attention to the boundary between <strong>Gemini's decision</strong> and <strong>Python's execution</strong>.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">E / TRACE</span><h3>Behind the Scenes</h3><p>Follow what happens when Gemini calls a Python tool. Notice which parts Gemini chooses and which parts Python runs.</p></div></div>
   <div class="s3-trace">
-    <div class="s3-trace-top"><b>FUNCTION CALLING TRACE</b><span id="s3-trace-count" class="s3-trace-counter">1 / 5</span></div>
+    <div class="s3-trace-top"><span id="s3-trace-count" class="s3-trace-counter">1 / 5</span></div>
     <div id="s3-trace-track" class="s3-trace-track" aria-label="Five stages">
       <span class="s3-trace-stage active"></span><span class="s3-trace-stage"></span><span class="s3-trace-stage"></span><span class="s3-trace-stage"></span><span class="s3-trace-stage"></span>
     </div>
@@ -445,7 +445,7 @@ response = client.models.generate_content(
         <pre class="s3-trace-code" id="s3-trace-code"></pre>
       </div>
       <div class="s3-trace-insight">
-        <span>WHAT IS REALLY HAPPENING?</span>
+        
         <h4 id="s3-trace-insight-title">Who made the request?</h4>
         <p id="s3-trace-insight-text">The student's Python program passes tool information to Gemini.</p>
       </div>
@@ -456,14 +456,14 @@ response = client.models.generate_content(
         <button type="button" id="s3-prev" disabled>← Previous</button>
         <button type="button" id="s3-next" class="primary">Next step →</button>
       </div>
-      <div class="s3-trace-footnote">Illustrative execution trace, not a live Gemini or OpenAlex search. The students' Python files perform the real requests.</div>
+      <div class="s3-trace-footnote">This is an example. Real searches run in the Python files.</div>
     </div>
   </div>
   <div class="s3-checkpoint"><span class="mark">!</span><div><strong>Two Gemini API calls do not mean two user inputs.</strong> The user enters their request once; the SDK may send additional model requests internally after the tool result arrives.</div></div>
 </section>
 
 <section class="s3-section" id="s3-task">
-  <div class="s3-section-top"><div><span class="s3-tag">06 / STUDENT HANDS-ON</span><h3>Your Turn — Real Paper Search</h3><p>The starter folder now includes <code>03_function_calling.py</code>. Follow the README for all commented code and detailed commands. No manual tool-dispatcher code is required.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">F / HANDS-ON</span><h3>Your Turn — Real Paper Search</h3><p>Run the prepared <code>03_function_calling.py</code> file. The commands and explanations are in the README on GitHub.</p></div></div>
   <div class="s3-demo-code"><span>LINUX TERMINAL · RUN IN YOUR STARTER FOLDER</span><pre><code>python tools.py
 python 03_function_calling.py</code></pre></div>
   <div class="s3-task-grid">
@@ -473,21 +473,21 @@ python 03_function_calling.py</code></pre></div>
   </div>
   <div class="s3-ready">
     <h4>Need the complete tutorial?</h4>
-    <p>The detailed instructions, ready-to-run Python file, trace explanations and troubleshooting are in the <strong>Starter Project README</strong>. Download the starter ZIP above, then follow its README for the hands-on exercises.</p>
+    <p>Read the <strong>Starter Project README</strong> on GitHub for instructions and troubleshooting. The ZIP contains the Python files, not the README.</p>
     <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener">Open Section 3 README ↗</a>
   </div>
-  <div class="s3-banner"><b>Next — Section 4:</b> Turn one tool call into a multi-step research workflow. Combine the SearchPlan, repeated queries, result checks, deduplication, and CSV export. The Section 3 script does not pass <code>start_year</code>; Section 4 uses the tool’s optional year filter.</div>
+  <div class="s3-banner"><b>Next — Section 4:</b> Next, we'll turn one search into an agent that can try new keywords, remove duplicates, and save a paper list. The Section 3 script does not pass <code>start_year</code>; Section 4 uses the tool’s optional year filter.</div>
 </section>
 
 
 <section class="s4-section" id="s4">
-  <div class="s4-eyebrow">SECTION 04 / BUILD &amp; TEST</div>
+  <div class="s4-eyebrow">SECTION 04</div>
   <h2>Your Literature <em>Research Agent</em></h2>
-  <p class="s4-lead">Now connect the skills from Sections 2 and 3 into one working pipeline. The agent starts with a structured <code>SearchPlan</code>, asks Gemini to search OpenAlex, checks the returned metadata, revises its query if needed, and exports a reading list.</p>
+  <p class="s4-lead">Now combine Sections 2 and 3. Our agent searches for papers, checks the results, and tries new keywords if needed. Finally, it saves a reading list.</p>
 
   <div class="s4-pipeline">
     <div class="s4-pipeline-head">
-      <span class="s4-label">INTERACTIVE / ONE COMPLETE AGENT PIPELINE</span>
+      
       <span class="s4-badge" id="s4-outcome">ENOUGH PAPERS → EXPORT</span>
     </div>
     <div class="s4-controls" aria-label="Choose a search result scenario">
@@ -507,17 +507,18 @@ python 03_function_calling.py</code></pre></div>
         <div class="s4-arrow">↓</div>
         <div class="s4-decision-box s4-node" data-s4-node="decision">
           <span class="s4-diamond">◇</span>
-          <span><b>Enough unique records?</b><small>Target reached OR maximum rounds reached?</small></span>
+          <span><b>Enough papers?</b><small>Based on the checked, non-duplicate results</small></span>
         </div>
-        <div class="s4-arrow">↓ YES / STOP</div>
+        <div class="s4-arrow">↓ YES</div>
         <div class="s4-node" data-s4-node="export"><b>05 / Export CSV + Search Log</b><small>papers.csv · search_log.json · human relevance review</small></div>
       </div>
 
       <div class="s4-loop-marker" aria-hidden="true"><span>↖</span><small>RETRY LOOP</small><span>↙</span></div>
       <div class="s4-loop-lane">
         <div class="s4-loop-title">NO / NEED MORE PAPERS</div>
+        <div class="s4-node" data-s4-node="rounds"><b>More rounds left?</b><small>YES → Try new keywords</small><small>NO → Export available papers</small></div>
         <div class="s4-loop-line">
-          <div class="s4-node" data-s4-node="revise"><b>Gemini Revises Query</b><small>Use previous results and SearchPlan alternatives</small></div>
+          <div class="s4-node" data-s4-node="revise"><b>Gemini Revises Query</b><small>Use previous results and unused search keywords</small></div>
           <small>↺ Call search_papers() again. Repeat only while another round is allowed.</small>
         </div>
         <div class="s4-banner s4-loop-line">
@@ -541,7 +542,7 @@ python 03_function_calling.py</code></pre></div>
   </div>
 
   <div class="s4-exercise">
-    <span>HANDS-ON / RUN YOUR AGENT</span>
+    
     <h3>One script, one complete pipeline.</h3>
     <p>Run the prepared Python file in your activated starter project. Change <code>TOPIC</code>, <code>TARGET_PAPERS</code> and <code>MAX_SEARCH_ROUNDS</code>; inspect the exported paper list and the search log.</p>
     <code class="s4-command">python 04_research_agent.py</code>
