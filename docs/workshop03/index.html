@@ -42,7 +42,7 @@
       <div class="sidebar-bottom">
         <span class="sidebar-card-eyebrow">TODAY'S PROJECT</span>
         <strong>Literature Research Agent</strong>
-        <p>Survey topic → search queries → OpenAlex papers → research list.</p>
+        <p>Survey topic → search keywords → OpenAlex papers → reading list.</p>
       </div>
     </aside>
 
@@ -89,7 +89,7 @@
             </article>
           </div>
           <div class="playground-bottom">
-            <span class="compare-takeaway"><span class="takeaway-mark">↳</span><span id="compare-takeaway">Fixed workflow: pre-programmed steps. Agent: adapt tool choices using observed results.</span></span>
+            <span class="compare-takeaway"><span class="takeaway-mark">↳</span><span id="compare-takeaway">Workflow: follow developer-written rules. Agent: choose the next action from results.</span></span>
           </div>
         </div>
       </section>
@@ -122,7 +122,7 @@
               
             </div>
             <div class="execution-pane">
-              <div class="pane-heading"><span>EXECUTION TRACE</span><span id="trace-status" class="trace-status">READY</span></div>
+              <div class="pane-heading"><span>EXAMPLE STEPS</span><span id="trace-status" class="trace-status">READY</span></div>
               <div class="trace-body" id="trace-body" aria-live="polite"></div>
               <div class="trace-terminal"><pre id="trace-json">Select “Next step” to start the simulation.</pre></div>
             </div>
@@ -362,10 +362,10 @@ print(response.text)</code></pre>
     </div>
     <div class="s3-side focus">
       <span>LLM FUNCTION CALLING</span>
-      <h4>Gemini requests a tool</h4>
+      <h4>Gemini chooses a tool</h4>
       <p>Gemini reads the tool description and chooses what to search for.</p>
       <div class="s3-sequence">
-        <div class="key">Gemini requests <code>search_papers(...)</code></div>
+        <div class="key">Gemini chooses <code>search_papers(...)</code></div>
         <div class="arrow">↓</div>
         <div>Local Gemini SDK calls our Python function</div>
         <div class="arrow">↓</div>
@@ -441,13 +441,13 @@ response = client.models.generate_content(
       <div class="s3-trace-pane">
         <span class="s3-trace-label" id="s3-trace-stage">USER REQUEST</span>
         <h4 id="s3-trace-title">One user instruction</h4>
-        <p id="s3-trace-desc">The student enters a request once.</p>
+        <p id="s3-trace-desc">Python sends one instruction to Gemini.</p>
         <pre class="s3-trace-code" id="s3-trace-code"></pre>
       </div>
       <div class="s3-trace-insight">
         
         <h4 id="s3-trace-insight-title">Who made the request?</h4>
-        <p id="s3-trace-insight-text">The student's Python program passes tool information to Gemini.</p>
+        <p id="s3-trace-insight-text">Python tells Gemini which tool is available.</p>
       </div>
     </div>
     <div class="s3-trace-actions">
@@ -459,7 +459,7 @@ response = client.models.generate_content(
       <div class="s3-trace-footnote">This is an example. Real searches run in the Python files.</div>
     </div>
   </div>
-  <div class="s3-checkpoint"><span class="mark">!</span><div><strong>Two Gemini API calls do not mean two user inputs.</strong> The user enters their request once; the SDK may send additional model requests internally after the tool result arrives.</div></div>
+  <div class="s3-checkpoint"><span class="mark">!</span><div><strong>API calls are not paper searches.</strong> One paper search may involve multiple Gemini API calls.</div></div>
 </section>
 
 <section class="s3-section" id="s3-task">
