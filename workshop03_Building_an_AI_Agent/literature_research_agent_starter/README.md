@@ -94,7 +94,7 @@ cd ~/Desktop/literature_research_agent_starter
 # Open this folder in VScode
 code .
 
-# List the files. You should see pyproject.toml and the two .py examples.
+# List the files. You should see pyproject.toml, four numbered .py scripts, and tools.py.
 ls
 ```
 
