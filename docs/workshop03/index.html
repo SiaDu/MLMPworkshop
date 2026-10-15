@@ -336,48 +336,16 @@ print(response.text)</code></pre>
   <p class="s3-lede">We give Gemini a Python tool for searching papers. Gemini chooses the search keywords, Python runs the tool, and OpenAlex returns the results.</p>
   <div class="s3-objective"><strong>YOUR GOAL</strong><p>First, run the search tool yourself. Then let Gemini use the same tool. Compare what happens in the terminal.</p></div>
   <nav class="s3-jump" aria-label="Section 3 lesson topics">
-    <a href="#s3-compare">A / What changes?</a>
-    <a href="#s3-openalex">B / OpenAlex</a>
-    <a href="#s3-tool">C / Your Python tool</a>
-    <a href="#s3-sdk">D / Automatic calling</a>
-    <a href="#s3-trace">E / Behind the scenes</a>
-    <a href="#s3-task">F / Your turn</a>
+    <a href="#s3-openalex">A / OpenAlex</a>
+    <a href="#s3-tool">B / Your Python tool</a>
+    <a href="#s3-sdk">C / Automatic calling</a>
+    <a href="#s3-trace">D / Behind the scenes</a>
+    <a href="#s3-task">E / Your turn</a>
   </nav>
 </section>
 
-<section class="s3-section" id="s3-compare">
-  <div class="s3-section-top"><div><span class="s3-tag">A / COMPARE</span><h3>Direct Python vs LLM Function Calling</h3><p>The Python function stays the same. The difference is <strong>who chooses the search keywords</strong>.</p></div></div>
-  <div class="s3-split">
-    <div class="s3-side">
-      <span>DIRECT PYTHON CALL</span>
-      <h4>Developer decides</h4>
-      <p>Our Python script specifies the search query.</p>
-      <div class="s3-sequence">
-        <div class="key">Python code chooses <code>query</code> + <code>limit</code></div>
-        <div class="arrow">↓</div>
-        <div><code>search_papers(query, limit)</code></div>
-        <div class="arrow">↓</div>
-        <div>OpenAlex returns paper metadata</div>
-      </div>
-    </div>
-    <div class="s3-side focus">
-      <span>LLM FUNCTION CALLING</span>
-      <h4>Gemini chooses a tool</h4>
-      <p>Gemini reads the tool description and chooses what to search for.</p>
-      <div class="s3-sequence">
-        <div class="key">Gemini chooses <code>search_papers(...)</code></div>
-        <div class="arrow">↓</div>
-        <div>Local Gemini SDK calls our Python function</div>
-        <div class="arrow">↓</div>
-        <div>OpenAlex metadata → Gemini final response</div>
-      </div>
-    </div>
-  </div>
-  <div class="s3-banner"><b>Important:</b> Gemini cannot run Python by itself. It asks to use the tool, and the SDK runs the function on your computer.</div>
-</section>
-
 <section class="s3-section" id="s3-openalex">
-  <div class="s3-section-top"><div><span class="s3-tag">B / OPENALEX</span><h3>Meet OpenAlex</h3><p><a class="s3-a" href="https://openalex.org/" target="_blank" rel="noopener">OpenAlex ↗</a> is a database of academic paper information. Gemini helps decide what to search for, while OpenAlex finds the papers. We connect to both through APIs.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">A / OPENALEX</span><h3>Meet OpenAlex</h3><p><a class="s3-a" href="https://openalex.org/" target="_blank" rel="noopener">OpenAlex ↗</a> is a database of academic paper information. Gemini helps decide what to search for, while OpenAlex finds the papers. We connect to both through APIs.</p></div></div>
   <div class="s3-source-flow" role="img" aria-label="Gemini requests search_papers, local Python calls the OpenAlex API, and bibliographic data returns to the program">
     <div class="s3-flow-card"><span>✳</span><b>Gemini API</b><small>Chooses search_papers(query, limit)</small></div>
     <div class="s3-flow-arrow">⇄</div>
@@ -394,7 +362,7 @@ print(response.text)</code></pre>
 </section>
 
 <section class="s3-section" id="s3-tool">
-  <div class="s3-section-top"><div><span class="s3-tag">C / PYTHON TOOL</span><h3>Your first Python Tool</h3><p>The starter folder contains two prepared files: <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/tools.py" target="_blank" rel="noopener"><code>tools.py</code> ↗</a> contains the OpenAlex search function; <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/03_function_calling.py" target="_blank" rel="noopener"><code>03_function_calling.py</code> ↗</a> lets Gemini request that function. Inspect and run these files; you do not need to rewrite them.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">B / PYTHON TOOL</span><h3>Your first Python Tool</h3><p>We have prepared a Python function called <code>search_papers()</code> that searches OpenAlex. It is in <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/tools.py" target="_blank" rel="noopener"><code>tools.py</code> ↗</a>. The next example uses <a class="s3-a" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/03_function_calling.py" target="_blank" rel="noopener"><code>03_function_calling.py</code> ↗</a> to let Gemini call it.</p></div></div>
   <div class="s3-tool-signature"><code>def search_papers(query: str, limit: int = 5) -&gt; list[dict]:</code></div>
   <div class="s3-args">
     <div class="s3-arg"><b>query: str</b><p>Academic search keywords chosen by the program or requested by Gemini.</p></div>
@@ -405,11 +373,11 @@ print(response.text)</code></pre>
 
 papers = search_papers("facial animation", limit=5)
 print(papers)</code></pre></div>
-  <div class="s3-banner"><b>Function Declaration:</b> The SDK tells Gemini which Python function is available and what inputs it needs. Python runs the function when Gemini calls it.</div>
+  <div class="s3-banner">Here, <strong>we choose the search keywords</strong> and call the function directly.</div>
 </section>
 
 <section class="s3-section" id="s3-sdk">
-  <div class="s3-section-top"><div><span class="s3-tag">D / AUTOMATIC CALLING</span><h3>Automatic Function Calling</h3><p>The <strong>Google Gen AI SDK</strong> handles the steps between Gemini and our Python tool. We don't need to write that process ourselves.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">C / AUTOMATIC CALLING</span><h3>Automatic Function Calling</h3><p>Instead of choosing the search keywords ourselves, we can let <strong>Gemini choose them</strong>. The Google Gen AI SDK handles the Function Calling steps for us.</p></div></div>
   <div class="s3-demo-code"><span>EXAMPLE CODE</span><pre><code>from google import genai
 from google.genai import types
 from tools import search_papers
@@ -422,16 +390,11 @@ response = client.models.generate_content(
         tools=[search_papers]
     ),
 )</code></pre></div>
-  <div class="s3-facts">
-    <div class="s3-fact"><b>Available Tool</b><p>The SDK tells Gemini which Python tools it can use.</p></div>
-    <div class="s3-fact"><b>Tool Call</b><p>Gemini chooses a tool and provides the inputs.</p></div>
-    <div class="s3-fact"><b>Tool Result</b><p>Python runs the function and sends the results back to Gemini.</p></div>
-  </div>
-  <div class="s3-banner"><b>One user instruction, possibly multiple Gemini API calls.</b> You enter the instruction once. The SDK may call Gemini more than once to complete the tool-calling process. This is different from searching OpenAlex multiple times.</div>
+  <div class="s3-banner">We provide <code>search_papers()</code> to Gemini as a tool. <strong>Gemini chooses the search keywords and paper count</strong>, and the SDK runs the Python function.</div>
 </section>
 
 <section class="s3-section" id="s3-trace">
-  <div class="s3-section-top"><div><span class="s3-tag">E / TRACE</span><h3>Behind the Scenes</h3><p>Follow what happens when Gemini calls a Python tool. Notice which parts Gemini chooses and which parts Python runs.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">D / TRACE</span><h3>Behind the Scenes</h3><p>Follow what happens when Gemini calls a Python tool. Notice which parts Gemini chooses and which parts Python runs.</p></div></div>
   <div class="s3-trace">
     <div class="s3-trace-top"><span id="s3-trace-count" class="s3-trace-counter">1 / 5</span></div>
     <div id="s3-trace-track" class="s3-trace-track" aria-label="Five stages">
@@ -463,7 +426,7 @@ response = client.models.generate_content(
 </section>
 
 <section class="s3-section" id="s3-task">
-  <div class="s3-section-top"><div><span class="s3-tag">F / HANDS-ON</span><h3>Your Turn — Real Paper Search</h3><p>Run the prepared <code>03_function_calling.py</code> file. The commands and explanations are in the README on GitHub.</p></div></div>
+  <div class="s3-section-top"><div><span class="s3-tag">E / HANDS-ON</span><h3>Your Turn — Real Paper Search</h3><p>Run the prepared <code>03_function_calling.py</code> file. The commands and explanations are in the README on GitHub.</p></div></div>
   <div class="s3-demo-code"><span>LINUX TERMINAL · RUN IN YOUR STARTER FOLDER</span><pre><code>python tools.py
 python 03_function_calling.py</code></pre></div>
   <div class="s3-task-grid">
