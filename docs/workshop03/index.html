@@ -388,7 +388,7 @@ print(response.text)</code></pre>
   <div class="s3-facts">
     <div class="s3-fact"><b>What can it return?</b><p>Title, year, authors, DOI, and OpenAlex record URL. Some metadata may be missing.</p></div>
     <div class="s3-fact"><b>Does it read full papers?</b><p>No. Our existing tool retrieves bibliographic metadata, not PDF full text.</p></div>
-    <div class="s3-fact"><b>Need another API Key?</b><p>Small searches work without a key. A free key allows more searches per day. OpenAlex supports up to 100 results per page; our Python example limits each search to 10.</p></div>
+    <div class="s3-fact"><b>OpenAlex Free Tier</b><p><strong>Without an API Key:</strong> Approximately 100 paper searches per day.</p><p><strong>With a Free API Key:</strong> Approximately 1,000 paper searches per day.</p><p><strong>Results per Search:</strong> OpenAlex supports up to 100 papers per request, but our workshop tool limits this to 10.</p></div>
   </div>
   <div class="s3-checkpoint"><span class="mark">✓</span><div><strong>First test OpenAlex without Gemini.</strong> Run <code>python tools.py</code> in your starter folder. It searches for two example records using ordinary Python and the OpenAlex API.</div></div>
 </section>
