@@ -526,7 +526,14 @@ References: [OpenAlex filtering documentation](https://help.openalex.org/api/fil
 
 1. Choose a paper relevant to your AI for Media survey. It can be from Section 4's `papers.csv` or from your own search.
 2. Download an appropriately licensed/openly accessible paper **lawfully**. Use a PDF with selectable text rather than a scanned image. Avoid sending restricted or confidential material to third-party cloud APIs without permission.
-3. Place it in a new `papers/` folder inside the **existing** `literature_research_agent_starter/` directory:
+3. enter your `literature_research_agent_starter/` directory in Terminal, make a new folder `papers/`
+
+```bash
+# if you put the directory in Desktop
+cd Desktop/literature_research_agent_starter 
+mkdir papers
+```
+4. Place it in the new `papers/` folder inside the **existing** `literature_research_agent_starter/` directory:
 
 ```text
 literature_research_agent_starter/
@@ -536,7 +543,6 @@ literature_research_agent_starter/
 ├── 02_structured_output.py
 ├── 03_function_calling.py
 ├── 04_research_agent.py
-├── 05_rag.py
 ├── tools.py
 └── papers/
     └── my_paper.pdf   ← your own downloaded paper
@@ -566,16 +572,16 @@ The other **four** CSV columns are bibliography metadata. The script also tries 
 
 **RAG** means **Retrieval-Augmented Generation**. Python retrieves text passages first; Gemini then answers using those passages. **BM25** searches for matching words.
 
-**PDF reading order:** PyMuPDF reads text blocks by position. On typical two-column papers, the script reads the left column before the right, while keeping wide sections between column groups. The terminal reports `[LAYOUT]` with the number of pages detected as two-column. Complex figures, tables and unusual layouts can still need manual checking.
-
 ### Part C — Run the script
 
-Open a Linux terminal **in the starter folder**. The ZIP includes the updated `pyproject.toml`. Install the extra dependencies and activate the environment:
+Download the new zip (link not availabel yet). The ZIP includes the updated `pyproject.toml`,`05_rag.py`,`06.py(haven't decide name)`. Move these file into your `literature_research_agent_starter\` directory (replace the `pyproject.toml`). Use list to check. Then install the extra dependencies and activate the environment:
 
 ```bash
 pwd
-uv sync
+# Should be "/home/yourID/Desktop/literature_research_agent_starter"
+ls
 source .venv/bin/activate
+uv sync
 python -c "import os; print('API key is set' if os.getenv('GEMINI_API_KEY') else 'Missing API key')"
 ```
 
