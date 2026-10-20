@@ -303,8 +303,11 @@ def lookup_metadata(pages: list[str], paper_title: str,
         work = None
         candidate_doi = doi or meta["doi"]
         if candidate_doi:
-            work = openalex_get(f"https://api.openalex.org/works/doi:{candidate_doi}")
-            if not (title_on_page
+            try:
+                work = openalex_get(f"https://api.openalex.org/works/doi:{candidate_doi}")
+            except requests.RequestException as error:
+                warnings.append(f"DOI lookup failed; trying title search: {error}")
+            if work is not None and not (title_on_page
                     and title_match(paper_title, work.get("display_name", ""))):
                 warnings.append("DOI lookup did not match PDF title; ignored.")
                 work = None
