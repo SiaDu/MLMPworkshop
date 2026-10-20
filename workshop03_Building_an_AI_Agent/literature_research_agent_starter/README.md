@@ -520,7 +520,7 @@ References: [OpenAlex filtering documentation](https://help.openalex.org/api/fil
 
 **Guided Hands-on.** Section 4 found paper *metadata* using OpenAlex. In Section 5 you analyse the *contents* of **one paper of your own choosing**.
 
-**Your goal:** Download your own research paper PDF, provide its file path, and produce a **15-column, one-row Literature Review table** with evidence references.
+**Your goal:** Download your own research paper PDF, provide its file path, and produce a **13-column, one-row Literature Review table** with evidence references.
 
 ### Part A — Prepare your own paper
 
@@ -553,7 +553,7 @@ PyMuPDF extracts selectable text, keeping page numbers
   ↓
 Python creates overlapping chunks
   ↓
-BM25 lexical retrieval finds evidence for 11 analysis questions
+BM25 lexical retrieval finds evidence for 9 analysis questions
   ↓
 Gemini + Pydantic creates structured answers citing chunk IDs
   ↓
@@ -602,7 +602,7 @@ For `papers/my_paper.pdf`, output appears at:
 ```text
 outputs/
 └── my_paper/
-    ├── literature_review.csv  ← one row; 15 columns
+    ├── literature_review.csv  ← one row; 13 columns
     ├── evidence.json          ← per-field answers + source chunk IDs and pages
     └── paper.bib              ← only if a verified DOI returns BibTeX
 ```
@@ -612,11 +612,11 @@ CSV columns:
 ```text
 BibTeX, Year, Journal / Conference, Paper Title,
 Model, Dataset Name, Evaluation Metric, Core Research Question, Solution,
-Motion Representation Explain, Model Explain, Dataset Description,
+Dataset Description,
 Contributions, Limitations, Future Work
 ```
 
-`Dataset Name` is the dataset identifier; `Dataset Description` explains the data. `Model` names the model or architecture; `Model Explain` explains the mechanism. `Motion Representation Explain` may not apply to every AI for Media paper.
+`Dataset Name` is the dataset identifier; `Dataset Description` explains the data. `Model` names the model or architecture.
 
 **Bibliographic metadata is optional.** The PDF's title is extracted separately from the first page by Gemini, and checked against the first pages before OpenAlex matching. No verified DOI means no fabricated BibTeX; other fields may still be analysed. A missing `paper.bib` is therefore not a failed RAG run.
 
