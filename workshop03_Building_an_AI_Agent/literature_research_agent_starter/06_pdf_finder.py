@@ -457,15 +457,6 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
     if pages:
         record["manual_url"] = pages[0]
 
-    # Independent sources: useful when a publisher returns HTTP 403.
-    # A lookup failure must never prevent the original sources from working.
-    other_pdfs, other_pages, provider_errors = additional_open_pdf_sources(
-        session, record["doi"]
-    )
-    pdf_urls = unique_urls([*pdf_urls, *other_pdfs])
-    pages = unique_urls([*pages, *other_pages])
-    errors.extend(provider_errors)
-
     attempted_urls = set()
     attempts = 0
 
@@ -489,8 +480,20 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
             errors.append(f"PDF {url}: {short_error(exc)}")
             return False
 
-    # Direct OA PDFs are always attempted before scraping landing pages.
+    # Try OpenAlex's direct OA / cached URLs before calling other APIs.
     for url in pdf_urls:
+        if try_pdf(url):
+            return record
+
+    # Independent sources only if OpenAlex PDFs failed. API errors are nonfatal.
+    other_pdfs, other_pages, provider_errors = additional_open_pdf_sources(
+        session, record["doi"]
+    )
+    errors.extend(provider_errors)
+    if not pages and other_pages:
+        record["manual_url"] = other_pages[0]
+    pages = unique_urls([*pages, *other_pages])
+    for url in other_pdfs:
         if try_pdf(url):
             return record
 
