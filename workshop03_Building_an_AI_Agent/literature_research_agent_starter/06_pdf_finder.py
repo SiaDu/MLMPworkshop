@@ -201,20 +201,44 @@ def validate_pdf(path: Path):
             raise ValueError("PDF is encrypted or has no readable pages")
 
 
+def get_public_resource(session, robots, url, accept, timeout):
+    """Check each redirect against robots.txt before requesting its destination."""
+    current = url
+    for _ in range(6):
+        allowed, explanation = robots.allowed(current)
+        if not allowed:
+            raise ValueError(explanation)
+        response = session.get(
+            current, headers={"Accept": accept},
+            timeout=timeout, stream=True, allow_redirects=False,
+        )
+        if response.status_code in (301, 302, 303, 307, 308):
+            location = response.headers.get("Location")
+            destination = urljoin(current, location) if location else ""
+            response.close()
+            if not public_http_url(destination):
+                raise ValueError("Redirected to an unsupported URL")
+            current = destination
+            continue
+        try:
+            response.raise_for_status()
+            if response.status_code >= 300:
+                raise ValueError(f"Unexpected HTTP {response.status_code}")
+            return response
+        except BaseException:
+            response.close()
+            raise
+    raise ValueError("Too many HTTP redirects")
+
+
 def download_pdf(session, robots, url, target, max_bytes):
-    allowed, explanation = robots.allowed(url)
-    if not allowed:
-        raise ValueError(explanation)
     target.parent.mkdir(parents=True, exist_ok=True)
     temp = target.with_suffix(".pdf.part")
+    final_url = url
     try:
-        with session.get(
-            url, headers={"Accept": "application/pdf,*/*"},
-            timeout=(8, 30), stream=True
-        ) as response:
-            response.raise_for_status()
-            if not public_http_url(response.url):
-                raise ValueError("Redirected to an unsupported URL")
+        with get_public_resource(session, robots, url, "application/pdf,*/*",
+                                 (8, 30)) as response:
+            final_url = response.url
             length = response.headers.get("Content-Length")
             if length and length.isdigit() and int(length) > max_bytes:
                 raise ValueError("PDF exceeds size limit")
@@ -231,7 +255,7 @@ def download_pdf(session, robots, url, target, max_bytes):
 
         validate_pdf(temp)
         temp.replace(target)
-        return response.url
+        return final_url
     finally:
         temp.unlink(missing_ok=True)
 
@@ -273,16 +297,8 @@ def extract_pdf_urls(html: str, page_url: str):
 
 
 def scrape_landing_page(session, robots, url):
-    allowed, explanation = robots.allowed(url)
-    if not allowed:
-        raise ValueError(explanation)
-    with session.get(
-        url, headers={"Accept": "text/html,application/xhtml+xml"},
-        timeout=(8, 20), stream=True
-    ) as response:
-        response.raise_for_status()
-        if not public_http_url(response.url):
-            raise ValueError("Redirected to an unsupported URL")
+    with get_public_resource(session, robots, url,
+                             "text/html,application/xhtml+xml", (8, 20)) as response:
         content_type = response.headers.get("Content-Type", "").lower()
         if "pdf" in content_type:
             return [response.url]
@@ -339,48 +355,53 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
         except (OSError, ValueError, RuntimeError):
             errors.append("Existing file was invalid; retrying download")
 
+    pdf_urls, pages = [], []
     try:
         work = openalex_work(session, row)
         record["doi"] = (work.get("doi") or doi).removeprefix("https://doi.org/")
         pdf_urls, pages = openalex_locations(work)
-        if pages:
-            record["manual_url"] = pages[0]
-
-        attempted_urls = set()
-        attempts = 0
-
-        def try_pdf(url):
-            nonlocal attempts
-            if url in attempted_urls or attempts >= MAX_PDF_ATTEMPTS:
-                return False
-            attempted_urls.add(url)
-            attempts += 1
-            try:
-                resolved = download_pdf(session, robots, url, target, max_bytes)
-                record.update(status="DOWNLOADED", pdf_path=str(target),
-                              source_pdf_url=resolved, error="")
-                return True
-            except (requests.RequestException, OSError, ValueError, RuntimeError) as exc:
-                errors.append(f"PDF {url}: {short_error(exc)}")
-                return False
-
-        # Direct OA PDFs are always attempted before scraping landing pages.
-        for url in pdf_urls:
-            if try_pdf(url):
-                return record
-
-        for page_url in pages[:MAX_LANDING_PAGES]:
-            try:
-                discovered = scrape_landing_page(session, robots, page_url)
-                if not discovered:
-                    errors.append(f"Page {page_url}: No PDF link found in HTML")
-                for candidate in discovered:
-                    if try_pdf(candidate):
-                        return record
-            except (requests.RequestException, OSError, ValueError, RuntimeError) as exc:
-                errors.append(f"Page {page_url}: {short_error(exc)}")
     except (requests.RequestException, OSError, ValueError, RuntimeError) as exc:
         errors.append(f"OpenAlex: {short_error(exc)}")
+        # Even if OpenAlex fails, a DOI from Section 4 may lead to a public page.
+        if doi:
+            pages = ["https://doi.org/" + quote(doi, safe="/")]
+
+    if pages:
+        record["manual_url"] = pages[0]
+
+    attempted_urls = set()
+    attempts = 0
+
+    def try_pdf(url):
+        nonlocal attempts
+        if url in attempted_urls or attempts >= MAX_PDF_ATTEMPTS:
+            return False
+        attempted_urls.add(url)
+        attempts += 1
+        try:
+            resolved = download_pdf(session, robots, url, target, max_bytes)
+            record.update(status="DOWNLOADED", pdf_path=str(target),
+                          source_pdf_url=resolved, error="")
+            return True
+        except (requests.RequestException, OSError, ValueError, RuntimeError) as exc:
+            errors.append(f"PDF {url}: {short_error(exc)}")
+            return False
+
+    # Direct OA PDFs are always attempted before scraping landing pages.
+    for url in pdf_urls:
+        if try_pdf(url):
+            return record
+
+    for page_url in pages[:MAX_LANDING_PAGES]:
+        try:
+            discovered = scrape_landing_page(session, robots, page_url)
+            if not discovered:
+                errors.append(f"Page {page_url}: No PDF link found in HTML")
+            for candidate in discovered:
+                if try_pdf(candidate):
+                    return record
+        except (requests.RequestException, OSError, ValueError, RuntimeError) as exc:
+            errors.append(f"Page {page_url}: {short_error(exc)}")
 
     # Do not infer "login required" or "paywalled" from a failed request.
     record["error"] = (
