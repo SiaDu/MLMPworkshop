@@ -34,7 +34,7 @@ MAX_LANDING_PAGES = 3
 MAX_PDF_ATTEMPTS = 8
 MANIFEST_COLUMNS = [
     "title", "doi", "openalex_url", "status", "pdf_path",
-    "source_pdf_url", "manual_url", "scholar_url", "error",
+    "source_pdf_url", "candidate_pdf_url", "manual_url", "scholar_url", "error",
 ]
 
 
@@ -343,7 +343,7 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
     record = {
         "title": title, "doi": doi, "openalex_url": openalex_url,
         "status": "FAILED", "pdf_path": "", "source_pdf_url": "",
-        "manual_url": manual_url, "scholar_url": scholar, "error": "",
+        "candidate_pdf_url": "", "manual_url": manual_url, "scholar_url": scholar, "error": "",
     }
     errors = []
     target = output_dir / safe_filename(index, title)
@@ -378,6 +378,8 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
             return False
         attempted_urls.add(url)
         attempts += 1
+        if not record["candidate_pdf_url"]:
+            record["candidate_pdf_url"] = url
         try:
             resolved = download_pdf(session, robots, url, target, max_bytes)
             record.update(status="DOWNLOADED", pdf_path=str(target),
@@ -450,7 +452,7 @@ def main():
                     "title": row.get("title") or "", "doi": row.get("doi") or "",
                     "openalex_url": row.get("openalex_url") or "",
                     "status": "FAILED", "pdf_path": "", "source_pdf_url": "",
-                    "manual_url": row.get("doi") or row.get("openalex_url") or "",
+                    "candidate_pdf_url": "", "manual_url": row.get("doi") or row.get("openalex_url") or "",
                     "scholar_url": scholar_search_url(row.get("title") or ""),
                     "error": f"Unexpected error ({type(exc).__name__}); manual review needed",
                 }
