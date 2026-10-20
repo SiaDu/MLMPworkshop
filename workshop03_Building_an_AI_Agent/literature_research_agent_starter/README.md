@@ -566,6 +566,8 @@ The other **four** CSV columns are bibliography metadata. The script also tries 
 
 **RAG** means **Retrieval-Augmented Generation**. Python retrieves text passages first; Gemini then answers using those passages. **BM25** searches for matching words.
 
+**PDF reading order:** PyMuPDF reads text blocks by position. On typical two-column papers, the script reads the left column before the right, while keeping wide sections between column groups. The terminal reports `[LAYOUT]` with the number of pages detected as two-column. Complex figures, tables and unusual layouts can still need manual checking.
+
 ### Part C — Run the script
 
 Open a Linux terminal **in the starter folder**. The ZIP includes the updated `pyproject.toml`. Install the extra dependencies and activate the environment:
@@ -629,7 +631,7 @@ Contributions, Limitations, Future Work
 
 If a field is `Not found in retrieved evidence`, it means **the current retrieval did not find enough evidence**. It does **not** mean the paper definitely omits that information. Cite your **original paper**, not the LLM.
 
-**Limitations:** Simple PDF text extraction may mishandle two-column layouts, tables and equations. BM25 may miss semantic synonyms. Python validates chunk references but **cannot guarantee factual correctness**. Do not treat these outputs as verified citations without checking.
+**Limitations:** Column-aware extraction improves common two-column layouts but may still mishandle tables, equations and unusual page designs. BM25 may miss semantic synonyms. Python validates chunk references but **cannot guarantee factual correctness**. Do not treat these outputs as verified citations without checking.
 
 ### Part F — Troubleshooting
 
@@ -637,7 +639,7 @@ If a field is `Not found in retrieved evidence`, it means **the current retrieva
 | --- | --- |
 | `PDF not found` | Check the actual filename, path and current working directory. |
 | Very little PDF text extracted | Choose a text-based PDF. OCR is not included. |
-| Missing `fitz` / `rank_bm25` | Run `uv sync` using the updated project and activate `.venv`. |
+| Missing `pymupdf` / `rank_bm25` | Run `uv sync` using the updated project and activate `.venv`. |
 | Missing Gemini key | Follow Section 2's API key setup. Never paste a key in source code. |
 | Gemini 429 / 503 | Limits and availability vary. The script retries temporary errors three times. |
 | Missing BibTeX or journal | The paper could not be reliably identified, or the DOI service could not produce BibTeX. |
