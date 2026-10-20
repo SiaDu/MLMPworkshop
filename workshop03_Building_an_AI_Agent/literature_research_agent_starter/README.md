@@ -652,7 +652,7 @@ If a field is `Not found in retrieved evidence`, it means **the current retrieva
 | `Not found in retrieved evidence` | Review the PDF and `FIELD_QUERIES` in `05_rag.py`; keyword retrieval has limits. |
 | Wrong answer or citation | Check the referenced page, correct your own notes and report the problem. |
 
-### Advanced challenges (optional, not part of the 15 minutes)
+### Advanced challenges (optional, No starter code or solutions are provided. Try to design and implement your own approach.)
 
 - Compare BM25 with Embedding-based semantic search on the *same* PDF.
 - Use OpenAlex to find an appropriately licensed PDF URL automatically.
