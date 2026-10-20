@@ -516,9 +516,9 @@ References: [OpenAlex filtering documentation](https://help.openalex.org/api/fil
 
 ---
 
-## Section 5 — RAG: Analyse Your Own Research Paper (15 min)
+# Section 5 — RAG: Analyse Your Own Research Paper
 
-**Guided Hands-on.** Section 4 found paper *metadata* using OpenAlex. In Section 5 you analyse the *contents* of **one paper of your own choosing**. You do not need to run Section 4 first, or use a teacher-selected sample paper.
+**Guided Hands-on.** Section 4 found paper *metadata* using OpenAlex. In Section 5 you analyse the *contents* of **one paper of your own choosing**.
 
 **Your goal:** Download your own research paper PDF, provide its file path, and produce a **15-column, one-row Literature Review table** with evidence references.
 
@@ -542,7 +542,7 @@ literature_research_agent_starter/
     └── my_paper.pdf   ← your own downloaded paper
 ```
 
-**Only the PDF path is required.** You do not enter the paper title or run Section 4 first.
+**Only the PDF path is required.** 
 
 ### Part B — Understand the workflow
 
@@ -564,9 +564,7 @@ literature_review.csv + evidence.json (+ paper.bib if available)
 
 The other **four** CSV columns are bibliography metadata. The script also tries to find a DOI on the first pages, matches the paper using OpenAlex, and requests BibTeX using DOI Content Negotiation. Section 4's `papers.csv` may be reused as an optional metadata cache, but **does not contain full paper text**.
 
-**RAG** means **Retrieval-Augmented Generation**. Python retrieves text passages first; Gemini then answers using those passages. **BM25** searches for matching words. Embedding-based *semantic search* is introduced conceptually on the website, not required for this exercise. You do not need a vector database, LangChain, LangGraph or any new API keys.
-
-This is a **fixed LLM workflow**, not another autonomous agent. Section 6 will demonstrate how it could be connected to the Section 4 agent.
+**RAG** means **Retrieval-Augmented Generation**. Python retrieves text passages first; Gemini then answers using those passages. **BM25** searches for matching words.
 
 ### Part C — Run the script
 
