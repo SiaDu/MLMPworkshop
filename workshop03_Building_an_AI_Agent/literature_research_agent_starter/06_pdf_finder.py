@@ -20,7 +20,7 @@ import os
 import re
 import time
 from pathlib import Path
-from urllib.parse import quote, urlencode, urljoin, urlparse
+from urllib.parse import quote, urlencode, urljoin, urlparse, parse_qsl, urlunparse
 from urllib.robotparser import RobotFileParser
 
 import pymupdf
@@ -29,12 +29,15 @@ from bs4 import BeautifulSoup
 
 USER_AGENT = "Workshop03PaperFinder/1.0 (educational open-access PDF finder)"
 OPENALEX_API = "https://api.openalex.org/works/"
+SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/"
+EUROPE_PMC_API = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
 MAX_HTML_BYTES = 2 * 1024 * 1024
 MAX_LANDING_PAGES = 3
 MAX_PDF_ATTEMPTS = 8
 MANIFEST_COLUMNS = [
     "title", "doi", "openalex_url", "status", "pdf_path",
-    "source_pdf_url", "candidate_pdf_url", "manual_url", "scholar_url", "error",
+    "source_pdf_url", "candidate_pdf_url", "manual_url", "scholar_url",
+    "research_status", "error",
 ]
 
 
@@ -151,6 +154,74 @@ def openalex_locations(work):
     return pdf_urls, page_urls
 
 
+def additional_open_pdf_sources(session, doi):
+    """Check independent scholarly APIs, without scraping their search pages.
+
+    Both APIs are optional fallbacks. HTTP 429, 404, timeouts, and missing
+    metadata are ordinary failures, not reasons to stop other papers.
+    """
+    if not doi:
+        return [], [], []
+    pdfs, pages, issues = [], [], []
+
+    try:
+        endpoint = SEMANTIC_SCHOLAR_API + "DOI:" + quote(doi, safe="/")
+        headers = {}
+        if os.getenv("SEMANTIC_SCHOLAR_API_KEY"):
+            headers["x-api-key"] = os.environ["SEMANTIC_SCHOLAR_API_KEY"]
+        response = session.get(
+            endpoint, params={"fields": "title,openAccessPdf,isOpenAccess,url"},
+            headers=headers, timeout=(8, 15),
+        )
+        response.raise_for_status()
+        info = response.json()
+        if isinstance(info, dict):
+            open_pdf = info.get("openAccessPdf")
+            if isinstance(open_pdf, dict) and open_pdf.get("url"):
+                pdfs.append(open_pdf["url"])
+            if isinstance(info.get("url"), str):
+                pages.append(info["url"])
+    except (requests.RequestException, ValueError) as exc:
+        issues.append(f"Semantic Scholar: {short_error(exc)}")
+
+    try:
+        response = session.get(
+            EUROPE_PMC_API, params={"query": f"DOI:{doi}", "format": "json",
+                                    "resultType": "core", "pageSize": 3},
+            timeout=(8, 15),
+        )
+        response.raise_for_status()
+        data = response.json()
+        matches = data.get("resultList", {}).get("result", [])
+        for match in matches:
+            # Only use the matching DOI and articles confirmed OA by Europe PMC.
+            found_doi = str(match.get("doi") or "").lower().strip()
+            if found_doi != doi.lower() or str(match.get("isOpenAccess", "")).upper() != "Y":
+                continue
+            pmcid = str(match.get("pmcid") or "")
+            if re.fullmatch(r"PMC[0-9]+", pmcid):
+                pages.append("https://europepmc.org/articles/" + pmcid)
+                pdfs.append("https://europepmc.org/articles/" + pmcid + "?pdf=render")
+            for full_text in (match.get("fullTextUrlList") or {}).get("fullTextUrl", []):
+                if (str(full_text.get("documentStyle", "")).lower() == "pdf"
+                        and full_text.get("url")):
+                    pdfs.append(full_text["url"])
+    except (requests.RequestException, ValueError, TypeError, AttributeError) as exc:
+        issues.append(f"Europe PMC: {short_error(exc)}")
+
+    return unique_urls(pdfs), unique_urls(pages), issues
+
+
+def redact_api_keys(url):
+    """Never put the optional OpenAlex credential into manifest URLs."""
+    parsed = urlparse(url)
+    query = [
+        (k, v) for k, v in parse_qsl(parsed.query, keep_blank_values=True)
+        if k.lower() not in {"api_key", "apikey", "access_token"}
+    ]
+    return urlunparse(parsed._replace(query=urlencode(query)))
+
+
 class RobotsPolicy:
     """Read robots.txt once per domain and respect its published crawl-delay."""
 
@@ -201,15 +272,19 @@ def validate_pdf(path: Path):
             raise ValueError("PDF is encrypted or has no readable pages")
 
 
-def get_public_resource(session, robots, url, accept, timeout):
+def get_public_resource(session, robots, url, accept, timeout, api_key=None):
     """Check each redirect against robots.txt before requesting its destination."""
     current = url
     for _ in range(6):
         allowed, explanation = robots.allowed(current)
         if not allowed:
             raise ValueError(explanation)
+        # Send an OpenAlex key only to the official cached-content domain.
+        params = ({"api_key": api_key}
+                  if api_key and urlparse(current).hostname == "content.openalex.org"
+                  else None)
         response = session.get(
-            current, headers={"Accept": accept},
+            current, headers={"Accept": accept}, params=params,
             timeout=timeout, stream=True, allow_redirects=False,
         )
         if response.status_code in (301, 302, 303, 307, 308):
@@ -231,13 +306,13 @@ def get_public_resource(session, robots, url, accept, timeout):
     raise ValueError("Too many HTTP redirects")
 
 
-def download_pdf(session, robots, url, target, max_bytes):
+def download_pdf(session, robots, url, target, max_bytes, api_key=None):
     target.parent.mkdir(parents=True, exist_ok=True)
     temp = target.with_suffix(".pdf.part")
     final_url = url
     try:
         with get_public_resource(session, robots, url, "application/pdf,*/*",
-                                 (8, 30)) as response:
+                                 (8, 30), api_key=api_key) as response:
             final_url = response.url
             length = response.headers.get("Content-Length")
             if length and length.isdigit() and int(length) > max_bytes:
@@ -255,7 +330,7 @@ def download_pdf(session, robots, url, target, max_bytes):
 
         validate_pdf(temp)
         temp.replace(target)
-        return final_url
+        return redact_api_keys(final_url)
     finally:
         temp.unlink(missing_ok=True)
 
@@ -343,7 +418,8 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
     record = {
         "title": title, "doi": doi, "openalex_url": openalex_url,
         "status": "FAILED", "pdf_path": "", "source_pdf_url": "",
-        "candidate_pdf_url": "", "manual_url": manual_url, "scholar_url": scholar, "error": "",
+        "candidate_pdf_url": "", "manual_url": manual_url, "scholar_url": scholar,
+        "research_status": "UNKNOWN", "error": "",
     }
     errors = []
     target = output_dir / safe_filename(index, title)
@@ -359,7 +435,19 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
     try:
         work = openalex_work(session, row)
         record["doi"] = (work.get("doi") or doi).removeprefix("https://doi.org/")
+        record["research_status"] = ("RETRACTED" if work.get("is_retracted") is True
+                                     else "NOT_FLAGGED" if work.get("is_retracted") is False
+                                     else "UNKNOWN")
+        if record["research_status"] == "RETRACTED":
+            print("  [ACADEMIC WARNING] OpenAlex flags this paper as retracted.")
         pdf_urls, pages = openalex_locations(work)
+        # OpenAlex's own cached OA PDFs use a separate content endpoint.
+        # Only attempt it when a free OPENALEX_API_KEY is configured.
+        cache_pdf = (work.get("content_urls") or {}).get("pdf")
+        if (os.getenv("OPENALEX_API_KEY")
+                and (work.get("has_content") or {}).get("pdf")
+                and isinstance(cache_pdf, str)):
+            pdf_urls = unique_urls([cache_pdf, *pdf_urls])
     except (requests.RequestException, OSError, ValueError, RuntimeError) as exc:
         errors.append(f"OpenAlex: {short_error(exc)}")
         # Even if OpenAlex fails, a DOI from Section 4 may lead to a public page.
@@ -368,6 +456,15 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
 
     if pages:
         record["manual_url"] = pages[0]
+
+    # Independent sources: useful when a publisher returns HTTP 403.
+    # A lookup failure must never prevent the original sources from working.
+    other_pdfs, other_pages, provider_errors = additional_open_pdf_sources(
+        session, record["doi"]
+    )
+    pdf_urls = unique_urls([*pdf_urls, *other_pdfs])
+    pages = unique_urls([*pages, *other_pages])
+    errors.extend(provider_errors)
 
     attempted_urls = set()
     attempts = 0
@@ -381,7 +478,10 @@ def process_paper(session, robots, row, index, output_dir, max_bytes):
         if not record["candidate_pdf_url"]:
             record["candidate_pdf_url"] = url
         try:
-            resolved = download_pdf(session, robots, url, target, max_bytes)
+            key = (os.getenv("OPENALEX_API_KEY")
+                   if urlparse(url).hostname == "content.openalex.org" else None)
+            resolved = download_pdf(session, robots, url, target, max_bytes,
+                                    api_key=key)
             record.update(status="DOWNLOADED", pdf_path=str(target),
                           source_pdf_url=resolved, error="")
             return True
@@ -454,6 +554,7 @@ def main():
                     "status": "FAILED", "pdf_path": "", "source_pdf_url": "",
                     "candidate_pdf_url": "", "manual_url": row.get("doi") or row.get("openalex_url") or "",
                     "scholar_url": scholar_search_url(row.get("title") or ""),
+                    "research_status": "UNKNOWN",
                     "error": f"Unexpected error ({type(exc).__name__}); manual review needed",
                 }
             writer.writerow(result)
