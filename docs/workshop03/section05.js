@@ -72,7 +72,7 @@
     evidenceBox.classList.toggle("has-evidence", retrieved);
     evidenceText.textContent = retrieved
       ? "“" + item.evidence + "”"
-      : "Select a question, then retrieve its supporting passage.";
+      : "Select a question, then retrieve its supporting chunk.";
     evidenceSource.textContent = retrieved
       ? "Example source: " + item.chunk + " · PDF page " + item.page
       : "Waiting for retrieval";
