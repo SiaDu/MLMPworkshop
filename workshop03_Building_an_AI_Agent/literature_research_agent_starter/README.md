@@ -94,7 +94,7 @@ cd ~/Desktop/literature_research_agent_starter
 # Open this folder in VScode
 code .
 
-# List the files. You should see pyproject.toml, four numbered .py scripts, and tools.py.
+# List the files. You should see pyproject.toml, five numbered .py scripts, and tools.py.
 ls
 ```
 
@@ -512,3 +512,145 @@ Open `papers.csv` in a spreadsheet program or VS Code. Choose a real paper and o
 **Before citing:** Inspect the actual paper, confirm the DOI and bibliographic metadata, and assess its relevance yourself. OpenAlex metadata is for discovery, not a substitute for reading or verifying the paper.
 
 References: [OpenAlex filtering documentation](https://help.openalex.org/api/filtering/) · [Gemini Python SDK function calling](https://googleapis.github.io/python-genai/#function-calling)
+
+
+---
+
+## Section 5 — RAG: Analyse Your Own Research Paper (15 min)
+
+**Guided Hands-on.** Section 4 found paper *metadata* using OpenAlex. In Section 5 you analyse the *contents* of **one paper of your own choosing**. You do not need to run Section 4 first, or use a teacher-selected sample paper.
+
+**Your goal:** Download your own research paper PDF, provide its file path, and produce a **15-column, one-row Literature Review table** with evidence references.
+
+### Part A — Prepare your own paper
+
+1. Choose a paper relevant to your AI for Media survey. It can be from Section 4's `papers.csv` or from your own search.
+2. Download an appropriately licensed/openly accessible paper **lawfully**. Use a PDF with selectable text rather than a scanned image. Avoid sending restricted or confidential material to third-party cloud APIs without permission.
+3. Place it in a new `papers/` folder inside the **existing** `literature_research_agent_starter/` directory:
+
+```text
+literature_research_agent_starter/
+├── README.md
+├── pyproject.toml
+├── 01_first_api_call.py
+├── 02_structured_output.py
+├── 03_function_calling.py
+├── 04_research_agent.py
+├── 05_rag.py
+├── tools.py
+└── papers/
+    └── my_paper.pdf   ← your own downloaded paper
+```
+
+**Only the PDF path is required.** You do not enter the paper title or run Section 4 first.
+
+### Part B — Understand the workflow
+
+```text
+Your PDF
+  ↓
+PyMuPDF extracts selectable text, keeping page numbers
+  ↓
+Python creates overlapping chunks
+  ↓
+BM25 lexical retrieval finds evidence for 11 analysis questions
+  ↓
+Gemini + Pydantic creates structured answers citing chunk IDs
+  ↓
+Python checks that cited IDs exist and exports the results
+  ↓
+literature_review.csv + evidence.json (+ paper.bib if available)
+```
+
+The other **four** CSV columns are bibliography metadata. The script also tries to find a DOI on the first pages, matches the paper using OpenAlex, and requests BibTeX using DOI Content Negotiation. Section 4's `papers.csv` may be reused as an optional metadata cache, but **does not contain full paper text**.
+
+**RAG** means **Retrieval-Augmented Generation**. Python retrieves text passages first; Gemini then answers using those passages. **BM25** searches for matching words. Embedding-based *semantic search* is introduced conceptually on the website, not required for this exercise. You do not need a vector database, LangChain, LangGraph or any new API keys.
+
+This is a **fixed LLM workflow**, not another autonomous agent. Section 6 will demonstrate how it could be connected to the Section 4 agent.
+
+### Part C — Run the script
+
+Open a Linux terminal **in the starter folder**. The ZIP includes the updated `pyproject.toml`. Install the extra dependencies and activate the environment:
+
+```bash
+pwd
+uv sync
+source .venv/bin/activate
+python -c "import os; print('API key is set' if os.getenv('GEMINI_API_KEY') else 'Missing API key')"
+```
+
+Run the analysis on **your own PDF**:
+
+```bash
+python 05_rag.py --pdf "papers/my_paper.pdf"
+```
+
+Replace `my_paper.pdf` with your real filename. Quotation marks handle spaces in paths. Absolute paths also work.
+
+**Optional:** If your PDF's DOI is unclear or was not detected, provide the verified DOI yourself:
+
+```bash
+python 05_rag.py --pdf "papers/my_paper.pdf" --doi "10.1234/your-doi"
+```
+
+The DOI above is a **placeholder, not a real DOI**. Replace it with your paper's DOI.
+
+Follow the terminal log: `[PDF]` → `[CHUNK]` → `[RETRIEVE]` → `[EVIDENCE]` → `[METADATA]` → `[EXPORT]`. The Retriever is ordinary Python, and Gemini generates the analysis.
+
+### Part D — Inspect the output
+
+For `papers/my_paper.pdf`, output appears at:
+
+```text
+outputs/
+└── my_paper/
+    ├── literature_review.csv  ← one row; 15 columns
+    ├── evidence.json          ← per-field answers + source chunk IDs and pages
+    └── paper.bib              ← only if a verified DOI returns BibTeX
+```
+
+CSV columns:
+
+```text
+BibTeX, Year, Journal / Conference, Paper Title,
+Model, Dataset Name, Evaluation Metric, Core Research Question, Solution,
+Motion Representation Explain, Model Explain, Dataset Description,
+Contributions, Limitations, Future Work
+```
+
+`Dataset Name` is the dataset identifier; `Dataset Description` explains the data. `Model` names the model or architecture; `Model Explain` explains the mechanism. `Motion Representation Explain` may not apply to every AI for Media paper.
+
+**Bibliographic metadata is optional.** The PDF's title is extracted separately from the first page by Gemini, and checked against the first pages before OpenAlex matching. No verified DOI means no fabricated BibTeX; other fields may still be analysed. A missing `paper.bib` is therefore not a failed RAG run.
+
+### Part E — Verify two fields (required)
+
+1. Open `literature_review.csv`.
+2. Choose **two fields** (for example, `Evaluation Metric` and `Limitations`).
+3. In `evidence.json`, find each field's `answer`, `evidence_ids`, and evidence `page` / `text`.
+4. Locate the original passages **in your own PDF** and decide if the answers are actually justified.
+
+If a field is `Not found in retrieved evidence`, it means **the current retrieval did not find enough evidence**. It does **not** mean the paper definitely omits that information. Cite your **original paper**, not the LLM.
+
+**Limitations:** Simple PDF text extraction may mishandle two-column layouts, tables and equations. BM25 may miss semantic synonyms. Python validates chunk references but **cannot guarantee factual correctness**. Do not treat these outputs as verified citations without checking.
+
+### Part F — Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| `PDF not found` | Check the actual filename, path and current working directory. |
+| Very little PDF text extracted | Choose a text-based PDF. OCR is not included. |
+| Missing `fitz` / `rank_bm25` | Run `uv sync` using the updated project and activate `.venv`. |
+| Missing Gemini key | Follow Section 2's API key setup. Never paste a key in source code. |
+| Gemini 429 / 503 | Limits and availability vary. The script retries temporary errors three times. |
+| Missing BibTeX or journal | The paper could not be reliably identified, or the DOI service could not produce BibTeX. |
+| `Not found in retrieved evidence` | Review the PDF and `FIELD_QUERIES` in `05_rag.py`; keyword retrieval has limits. |
+| Wrong answer or citation | Check the referenced page, correct your own notes and report the problem. |
+
+### Advanced challenges (optional, not part of the 15 minutes)
+
+- Compare BM25 with Embedding-based semantic search on the *same* PDF.
+- Use OpenAlex to find an appropriately licensed PDF URL automatically.
+- Process multiple PDFs and append each paper's row to an aggregate CSV.
+- Integrate Section 4 (paper discovery) and Section 5 (RAG analysis) in Section 6's LangGraph instructor demonstration.
+
+Documentation: [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/) · [rank-bm25](https://pypi.org/project/rank-bm25/) · [Gemini Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output) · [OpenAlex](https://developers.openalex.org/) · [Crossref DOI Content Negotiation](https://www.crossref.org/documentation/retrieve-metadata/content-negotiation/).
