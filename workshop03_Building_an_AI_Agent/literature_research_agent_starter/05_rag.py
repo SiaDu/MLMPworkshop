@@ -14,7 +14,7 @@ import time
 from difflib import SequenceMatcher
 from pathlib import Path
 
-import fitz
+import pymupdf
 import requests
 from google import genai
 from google.genai import types
@@ -79,16 +79,98 @@ def parse_args():
     return parser.parse_args()
 
 
+def extract_page_in_reading_order(page) -> tuple[str, bool]:
+    """Read common one- or two-column PDF layouts without mixing columns.
+
+    PyMuPDF's get_text(sort=True) can interleave lines from two columns.
+    Text blocks have their own bounding boxes, allowing us to read the left
+    column before the right. Full-width blocks separate horizontal bands.
+    This is a layout heuristic, not a universal PDF reading-order parser.
+    """
+    blocks = []
+    for block in page.get_text("blocks"):
+        if block[6] != 0:  # Ignore image metadata; keep selectable text only.
+            continue
+        content = re.sub(r"\s+", " ", block[4]).strip()
+        if content:
+            blocks.append({
+                "x0": block[0], "y0": block[1],
+                "x1": block[2], "y1": block[3], "text": content,
+            })
+    if not blocks:
+        return "", False
+
+    middle = (page.rect.x0 + page.rect.x1) / 2
+    tolerance = page.rect.width * 0.025
+
+    for block in blocks:
+        if block["x1"] <= middle + tolerance:
+            block["lane"] = "left"
+        elif block["x0"] >= middle - tolerance:
+            block["lane"] = "right"
+        elif (block["x0"] < middle - page.rect.width * 0.16
+              and block["x1"] > middle + page.rect.width * 0.16):
+            block["lane"] = "spanning"
+        else:
+            # Small centred blocks (e.g. an equation) stay in one lane.
+            centre = (block["x0"] + block["x1"]) / 2
+            block["lane"] = "left" if centre < middle else "right"
+
+    left = [b for b in blocks if b["lane"] == "left"]
+    right = [b for b in blocks if b["lane"] == "right"]
+    overlap = 0
+    if left and right:
+        overlap = max(
+            0,
+            min(max(b["y1"] for b in left), max(b["y1"] for b in right))
+            - max(min(b["y0"] for b in left), min(b["y0"] for b in right)),
+        )
+    two_columns = bool(
+        left and right
+        and sum(len(b["text"]) for b in left) > 250
+        and sum(len(b["text"]) for b in right) > 250
+        and overlap > page.rect.height * 0.12
+    )
+
+    by_position = sorted(blocks, key=lambda b: (b["y0"], b["x0"]))
+    if not two_columns:
+        return "\n".join(b["text"] for b in by_position), False
+
+    result = []
+    lanes = {"left": [], "right": []}
+
+    def flush_columns():
+        for lane in ("left", "right"):
+            result.extend(
+                b["text"] for b in sorted(
+                    lanes[lane], key=lambda b: (b["y0"], b["x0"])
+                )
+            )
+            lanes[lane].clear()
+
+    for block in by_position:
+        if block["lane"] == "spanning":
+            flush_columns()
+            result.append(block["text"])
+        else:
+            lanes[block["lane"]].append(block)
+    flush_columns()
+    return "\n".join(result), True
+
+
 def read_pdf(path: Path) -> list[str]:
     if not path.is_file() or path.suffix.lower() != ".pdf":
         raise ValueError(f"PDF not found: {path}. Put a .pdf file in papers/.")
-    with fitz.open(path) as doc:
+    with pymupdf.open(path) as doc:
         if doc.needs_pass:
             raise ValueError("This PDF is password-protected. Choose an accessible PDF.")
-        pages = [re.sub(r"\s+", " ", page.get_text(sort=True)).strip() for page in doc]
+        extracted = [extract_page_in_reading_order(page) for page in doc]
+    pages = [text for text, _ in extracted]
+    two_column_pages = sum(is_two_column for _, is_two_column in extracted)
     if sum(map(len, pages)) < 700:
         raise ValueError("Very little selectable text. Try a text-based PDF rather than a scan.")
     print(f"[PDF] {len(pages)} pages; {sum(map(len, pages)):,} extracted characters")
+    print(f"[LAYOUT] Column-aware ordering on {two_column_pages}/{len(pages)} pages")
     return pages
 
 
