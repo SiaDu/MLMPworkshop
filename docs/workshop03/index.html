@@ -10,11 +10,13 @@
   <link rel="stylesheet" href="./section02.css">
   <link rel="stylesheet" href="./section03.css">
   <link rel="stylesheet" href="./section04.css">
+  <link rel="stylesheet" href="./section05.css">
   <link rel="stylesheet" href="./branding.css">
   <script src="./app.js" defer></script>
   <script src="./section02.js" defer></script>
   <script src="./section03.js" defer></script>
   <script src="./section04.js" defer></script>
+  <script src="./section05.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -35,7 +37,7 @@
         <a href="#s2-start" class="nav-item"><span class="nav-num">02</span>LLM API + Structured Outputs</a>
         <a href="#s3" class="nav-item"><span class="nav-num">03</span>Function Calling + OpenAlex</a>
         <a href="#s4" class="nav-item"><span class="nav-num">04</span>Build &amp; Test an Agent</a>
-        <a href="#s5" class="nav-item"><span class="nav-num">05</span>RAG: Evidence Retrieval</a>
+        <a href="#s5" class="nav-item"><span class="nav-num">05</span>RAG: Paper Analysis</a>
         <a href="#s6" class="nav-item"><span class="nav-num">06</span>LangGraph</a>
         <a href="#s7" class="nav-item"><span class="nav-num">07</span>MCP + Multi-Agent</a>
       </nav>
@@ -514,9 +516,179 @@ python 03_function_calling.py</code></pre></div>
   <p class="s4-tiny"><strong>Remember:</strong> The automatic checks verify basic metadata, publication year and duplicates. They do not measure semantic research relevance. Verify each paper before citing it. A SearchPlan created in Section 2 is reused only when its topic matches the current task. Temporary Gemini API errors trigger bounded retries; if a later round still fails, the script saves the papers already found.</p>
 </section>
 
-<section class="s2-section s2-roadmap" id="s5">
-        <div class="s2-section-head"><div><span class="s2-index">SECTION 05 / RAG</span><h3>Retrieve Evidence from Papers</h3><p>Retrieve relevant passages from provided paper excerpts before the model generates an answer.</p></div></div>
-      </section>
+<section class="s5-section" id="s5" aria-labelledby="s5-title">
+  <div class="s5-kicker">SECTION 05 <span>/ RAG · 15 MIN</span></div>
+  <h2 id="s5-title">From Papers to <em>Evidence.</em></h2>
+  <p class="s5-lead">Section 4 helped us <strong>find</strong> research papers. Now we will <strong>read and analyse</strong> one paper of your choice — without asking an LLM to guess what the paper says.</p>
+
+  <div class="s5-bridge" aria-label="Section 4 and Section 5 comparison">
+    <div class="s5-bridge-half">
+      <div class="s5-overline">PREVIOUSLY · SECTION 04</div>
+      <h3>Find the papers</h3>
+      <p><strong>Research topic</strong> → Gemini + OpenAlex → <code>papers.csv</code></p>
+      <div class="s5-metadata">Title <span>·</span> Year <span>·</span> DOI <span>·</span> Authors</div>
+    </div>
+    <div class="s5-bridge-chevron" aria-hidden="true">→</div>
+    <div class="s5-bridge-half s5-bridge-active">
+      <div class="s5-overline">NOW · SECTION 05</div>
+      <h3>Analyse one paper</h3>
+      <p><strong>Your own PDF</strong> → RAG + Gemini → <code>literature_review.csv</code></p>
+      <div class="s5-metadata">Model <span>·</span> Dataset <span>·</span> Metrics <span>·</span> Evidence</div>
+    </div>
+  </div>
+  <p class="s5-definition"><strong>RAG — Retrieval-Augmented Generation:</strong> retrieve relevant information from a source <em>before</em> asking the LLM to generate its answer. RAG is a technique; it does not require a separate Agent.</p>
+
+  <div class="s5-block-head">
+    <div><div class="s5-label">01 / UNDERSTAND</div><h3>How does RAG work?</h3><p>The LLM does not need to read every page for every question. Python retrieves relevant passages first.</p></div>
+    <div class="s5-time">3 MIN</div>
+  </div>
+  <div class="s5-flow" aria-label="Real Section 5 workflow">
+    <div class="s5-flow-card">
+      <span class="s5-flow-num">01 / INPUT</span>
+      <div class="s5-flow-icon" aria-hidden="true">▤</div>
+      <strong>Your PDF</strong>
+      <small>Selectable paper text</small>
+    </div>
+    <div class="s5-flow-arrow" aria-hidden="true">→</div>
+    <div class="s5-flow-card">
+      <span class="s5-flow-num">02 / PREPARE</span>
+      <div class="s5-flow-mini-chunks" aria-hidden="true"><i></i><i></i><i></i></div>
+      <strong>Text + Chunks</strong>
+      <small>PyMuPDF · Page numbers</small>
+    </div>
+    <div class="s5-flow-arrow" aria-hidden="true">→</div>
+    <div class="s5-flow-card s5-flow-search">
+      <span class="s5-flow-num">03 / RETRIEVE</span>
+      <div class="s5-flow-icon" aria-hidden="true">⌕</div>
+      <strong>BM25</strong>
+      <small>Questions → Relevant chunks</small>
+    </div>
+    <div class="s5-flow-arrow" aria-hidden="true">→</div>
+    <div class="s5-flow-card">
+      <span class="s5-flow-num">04 / GENERATE</span>
+      <div class="s5-flow-icon" aria-hidden="true">✳</div>
+      <strong>Gemini + Pydantic</strong>
+      <small>Structured answers + evidence IDs</small>
+    </div>
+    <div class="s5-flow-arrow" aria-hidden="true">→</div>
+    <div class="s5-flow-card s5-flow-result">
+      <span class="s5-flow-num">05 / EXPORT</span>
+      <div class="s5-flow-icon" aria-hidden="true">▦</div>
+      <strong>Review table</strong>
+      <small>CSV + Evidence JSON</small>
+    </div>
+  </div>
+  <div class="s5-concepts">
+    <div><b>Chunking</b><p>Split long paper text into smaller passages, keeping page numbers.</p></div>
+    <div><b>Retrieval</b><p>Find passages that may answer a question. Our script uses <strong>BM25 keyword matching</strong>.</p></div>
+    <div><b>Generation</b><p>Gemini answers using those passages and returns structured fields with Pydantic.</p></div>
+  </div>
+  <div class="s5-search-note"><b>BM25 vs. Embeddings</b><span>BM25 matches words and keywords. Embedding-based retrieval can match <em>semantic similarity</em>. Today we use BM25 — no vector database or Embedding API required.</span></div>
+
+  <div class="s5-block-head s5-demo-intro">
+    <div><div class="s5-label">02 / INTERACTIVE DEMO</div><h3>Question → Evidence → Answer</h3><p>Choose a Literature Review field, retrieve a matching paper passage, then fill in the example table.</p></div>
+    <div class="s5-time">4 MIN</div>
+  </div>
+  <div class="s5-lab" id="s5-lab">
+    <div class="s5-lab-top"><span class="s5-window-dots" aria-hidden="true"><i></i><i></i><i></i></span><strong>Paper Analysis Playground</strong><span class="s5-demo-pill">SIMULATED · NO API CALLS</span></div>
+    <div class="s5-paper-strip">
+      <div><span class="s5-overline">SAMPLE RESEARCH PAPER</span><strong>S³: Speech, Script and Scene driven Head and Eye Animation</strong><small>Pan et al. · ACM Transactions on Graphics · 2024</small></div>
+      <span class="s5-pdf-chip">PDF · 12 PAGES</span>
+    </div>
+
+    <div class="s5-lab-content">
+      <div class="s5-lab-left">
+        <div class="s5-pane-title"><span>01</span><b>Choose a question</b></div>
+        <div class="s5-question-list" role="group" aria-label="Choose a literature review field">
+          <button type="button" class="s5-question active" data-s5-field="dataset" aria-pressed="true"><small>FIELD / DATASET NAME</small><span>Which dataset is used?</span></button>
+          <button type="button" class="s5-question" data-s5-field="metrics" aria-pressed="false"><small>FIELD / EVALUATION METRIC</small><span>How is the method evaluated?</span></button>
+          <button type="button" class="s5-question" data-s5-field="limitations" aria-pressed="false"><small>FIELD / LIMITATIONS</small><span>What do the authors identify as limitations?</span></button>
+        </div>
+        <div class="s5-pane-title s5-chunks-title"><span>02</span><b>Source chunks</b><small>Click Retrieve to highlight a match</small></div>
+        <div class="s5-chunks">
+          <div class="s5-chunk" data-s5-chunk="dataset">
+            <div class="s5-chunk-head"><span>DEMO CHUNK D01</span><span>PAGE 4</span></div>
+            <p>“Our audition dataset is comprised of 111 audition videos ... with a total length of 379 minutes.”</p>
+          </div>
+          <div class="s5-chunk" data-s5-chunk="metrics">
+            <div class="s5-chunk-head"><span>DEMO CHUNK D02</span><span>PAGE 8</span></div>
+            <p>“We evaluated each model’s predictions ... using accuracy, Jaccard similarity (IOU), gaze-on/off transition accuracy, and aversion instance ratio.”</p>
+          </div>
+          <div class="s5-chunk" data-s5-chunk="limitations">
+            <div class="s5-chunk-head"><span>DEMO CHUNK D03</span><span>PAGE 10</span></div>
+            <p>“We do not exploit any emotional or cognitive information in the input speech audio or transcript.”</p>
+          </div>
+        </div>
+      </div>
+      <div class="s5-lab-right">
+        <div class="s5-pane-title"><span>03</span><b>Generate a table entry</b></div>
+        <div class="s5-selected-question"><small>SELECTED QUESTION</small><strong id="s5-selected-question">Which dataset is used?</strong></div>
+        <div class="s5-controls">
+          <button type="button" class="s5-retrieve" id="s5-retrieve">1 · Retrieve evidence →</button>
+          <button type="button" class="s5-generate" id="s5-generate" disabled>2 · Generate answer →</button>
+        </div>
+        <div class="s5-evidence-result" id="s5-evidence-result" aria-live="polite">
+          <span>RETRIEVED EVIDENCE</span>
+          <p id="s5-evidence-text">Select a question, then retrieve its supporting passage.</p>
+          <small id="s5-evidence-source">Waiting for retrieval</small>
+        </div>
+        <div class="s5-table-title"><b>Literature Review</b><span>3 of 13 columns · teaching preview</span></div>
+        <div class="s5-table-wrap">
+          <table class="s5-table">
+            <thead><tr><th scope="col">FIELD</th><th scope="col">EXTRACTED ANSWER</th></tr></thead>
+            <tbody>
+              <tr data-s5-row="dataset"><th scope="row">Dataset Name</th><td id="s5-answer-dataset">—</td></tr>
+              <tr data-s5-row="metrics"><th scope="row">Evaluation Metric</th><td id="s5-answer-metrics">—</td></tr>
+              <tr data-s5-row="limitations"><th scope="row">Limitations</th><td id="s5-answer-limitations">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="s5-result-footer"><span id="s5-count" aria-live="polite">0 / 3 example fields filled</span><button type="button" id="s5-reset">Reset example ↺</button></div>
+      </div>
+    </div>
+    <p class="s5-lab-footnote"><strong>Teaching simulation:</strong> Excerpts are shortened from a real paper; D01–D03 are <em>illustrative IDs</em>, not chunks produced by <code>05_rag.py</code>. In the real script, Python retrieves passages for <strong>all 9 analysis fields</strong>, deduplicates the selected chunks, and Gemini produces a structured result in <strong>one generation call</strong>.</p>
+  </div>
+
+  <div class="s5-block-head s5-hands-intro">
+    <div><div class="s5-label">03 / GUIDED HANDS-ON</div><h3>Now analyse <em>your</em> paper.</h3><p>Your PDF, your survey topic, your Literature Review table. The complete setup is in the student README.</p></div>
+    <div class="s5-time">4 MIN</div>
+  </div>
+  <div class="s5-hands">
+    <div class="s5-hands-step"><span>01</span><h4>Prepare your PDF</h4><p>Choose a paper for your AI for Media survey. Download a permitted text-based PDF and place it in <code>papers/</code>.</p></div>
+    <div class="s5-hands-step"><span>02</span><h4>Run the workflow</h4><p>In your existing starter project, follow the README for updated dependencies, then run:</p>
+      <code class="s5-command">python 05_rag.py --pdf "papers/my_paper.pdf"</code>
+    </div>
+    <div class="s5-hands-step"><span>03</span><h4>Inspect the results</h4><p>Open <code>outputs/my_paper/literature_review.csv</code> and <code>evidence.json</code>. A verified DOI may also produce <code>paper.bib</code>.</p></div>
+  </div>
+  <a class="s5-readme-link" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener noreferrer">Open the full Section 5 README tutorial <span aria-hidden="true">↗</span></a>
+
+  <div class="s5-block-head s5-verify-intro">
+    <div><div class="s5-label">04 / VERIFY</div><h3>Retrieved ≠ Correct.</h3><p>Structured JSON and valid chunk IDs help you trace answers, but they do not prove the answer is accurate.</p></div>
+    <div class="s5-time">2 MIN</div>
+  </div>
+  <div class="s5-check-panel">
+    <div class="s5-evidence-code">
+      <span>evidence.json · example structure</span>
+      <pre><code>{
+  "answer": "Accuracy, IoU, ...",
+  "evidence_ids": ["C0049"],
+  "evidence": [
+    { "id": "C0049", "page": 8, "text": "..." }
+  ]
+}</code></pre>
+      <small>Chunk IDs vary by PDF and by extraction run.</small>
+    </div>
+    <div class="s5-check-steps">
+      <span class="s5-overline">YOUR TWO-FIELD CHECK</span>
+      <div><b>1</b><p>Choose two extracted fields in <code>literature_review.csv</code>.</p></div>
+      <div><b>2</b><p>Find the answers, chunk IDs and page numbers in <code>evidence.json</code>.</p></div>
+      <div><b>3</b><p>Read the corresponding passages in your <strong>original PDF</strong>. Does the evidence support the answer?</p></div>
+      <p class="s5-warning"><strong>“Not found in retrieved evidence”</strong> does not mean the paper never mentions it. The retriever may simply have missed it.</p>
+    </div>
+  </div>
+
+  <div class="s5-next"><div><span>UP NEXT · SECTION 06</span><strong>One Agent + One RAG Workflow. How do we connect them?</strong><p>LangGraph introduces state and routing when the research workflow becomes more complex.</p></div><a href="#s6">Explore LangGraph →</a></div>
+</section>
       <section class="s2-section s2-roadmap" id="s6">
         <div class="s2-section-head"><div><span class="s2-index">SECTION 06 / LANGGRAPH</span><h3>Stateful Agent Workflows</h3><p>Explore nodes, state and conditional routing in a guided instructor demonstration.</p></div></div>
       </section>
