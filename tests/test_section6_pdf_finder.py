@@ -161,16 +161,109 @@ class PDFTests(unittest.TestCase):
     def test_openalex_failure_still_tries_doi_landing(self):
         with tempfile.TemporaryDirectory() as temp:
             with patch.object(finder, "openalex_work", side_effect=ValueError("failed")):
-                with patch.object(finder, "scrape_landing_page", return_value=[]) as scrape:
-                    result = finder.process_paper(
-                        None, None,
-                        {"title": "Test paper", "doi": "10.1234/demo"},
-                        1, Path(temp), 10_000_000
-                    )
+                with patch.object(finder, "additional_open_pdf_sources",
+                                  return_value=([], [], [])):
+                    with patch.object(finder, "scrape_landing_page", return_value=[]) as scrape:
+                        result = finder.process_paper(
+                            None, None,
+                            {"title": "Test paper", "doi": "10.1234/demo"},
+                            1, Path(temp), 10_000_000
+                        )
             self.assertEqual(result["status"], "FAILED")
             self.assertIn("OpenAlex", result["error"])
             self.assertTrue(result["manual_url"].startswith("https://doi.org/"))
             scrape.assert_called_once()
+
+
+    def test_additional_source_apis_find_distinct_public_pdfs(self):
+        doi = "10.1234/example"
+        semantic = {
+            "title": "Example", "openAccessPdf": {"url": "https://arxiv.org/pdf/2201.12345"}
+        }
+        pmc = {
+            "resultList": {"result": [{
+                "doi": doi, "isOpenAccess": "Y", "pmcid": "PMC1234567",
+                "fullTextUrlList": {"fullTextUrl": []}
+            }]}
+        }
+
+        class JSONResponse:
+            def __init__(self, payload):
+                self.payload = payload
+            def raise_for_status(self):
+                pass
+            def json(self):
+                return self.payload
+
+        class APISession:
+            def get(self, url, **kwargs):
+                if "semanticscholar" in url:
+                    return JSONResponse(semantic)
+                if "ebi.ac.uk" in url:
+                    return JSONResponse(pmc)
+                raise AssertionError(url)
+
+        pdfs, pages, errors = finder.additional_open_pdf_sources(APISession(), doi)
+        self.assertIn("https://arxiv.org/pdf/2201.12345", pdfs)
+        self.assertIn("https://europepmc.org/articles/PMC1234567?pdf=render", pdfs)
+        self.assertEqual(errors, [])
+        self.assertIn("https://europepmc.org/articles/PMC1234567", pages)
+
+    def test_provider_failure_is_not_a_batch_stopper(self):
+        class ErrorResponse:
+            def raise_for_status(self):
+                raise ValueError("HTTP 429")
+        class APISession:
+            def get(self, url, **kwargs):
+                return ErrorResponse()
+
+        pdfs, pages, errors = finder.additional_open_pdf_sources(
+            APISession(), "10.1234/example"
+        )
+        self.assertEqual(pdfs, [])
+        self.assertEqual(pages, [])
+        self.assertEqual(len(errors), 2)
+
+    def test_openalex_cache_api_key_is_not_exposed_in_manifest(self):
+        raw = ("https://content.openalex.org/works/W123.pdf?"
+               "api_key=SECRET&download=1")
+        self.assertNotIn("SECRET", finder.redact_api_keys(raw))
+        self.assertIn("download=1", finder.redact_api_keys(raw))
+
+        class CaptureSession:
+            def __init__(self):
+                self.kwargs = None
+            def get(self, url, **kwargs):
+                self.kwargs = kwargs
+                return FakeResponse(url)
+
+        session = CaptureSession()
+        with patch.dict(finder.os.environ, {"OPENALEX_API_KEY": "SECRET"}):
+            response = finder.get_public_resource(
+                session, FakeRobots(), "https://content.openalex.org/works/W123.pdf",
+                "application/pdf", (8, 20), api_key="SECRET"
+            )
+        self.assertEqual(session.kwargs["params"], {"api_key": "SECRET"})
+        self.assertIsNotNone(response)
+
+    def test_retraction_flag_from_openalex_is_reported(self):
+        work = {
+            "id": "https://openalex.org/W123",
+            "doi": "https://doi.org/10.1234/example",
+            "is_retracted": True,
+            "locations": [], "best_oa_location": None,
+        }
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(finder, "openalex_work", return_value=work):
+                with patch.object(finder, "additional_open_pdf_sources",
+                                  return_value=([], [], [])):
+                    with patch.object(finder, "scrape_landing_page", return_value=[]):
+                        record = finder.process_paper(
+                            None, None, {"title": "Example", "doi": "10.1234/example"},
+                            1, Path(temp), 10_000_000
+                        )
+        self.assertEqual(record["research_status"], "RETRACTED")
+
 
     def test_manifest_continues_after_an_unexpected_row_error(self):
         with tempfile.TemporaryDirectory() as temp:
