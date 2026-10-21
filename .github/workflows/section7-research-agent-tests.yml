@@ -1,0 +1,27 @@
+name: Section 7 Research Agent Tests
+
+on:
+  push:
+    paths:
+      - "workshop03_Building_an_AI_Agent/literature_research_agent_starter/07_research_agent.py"
+      - "workshop03_Building_an_AI_Agent/literature_research_agent_starter/research_agent/**"
+      - "tests/test_section7_research_agent.py"
+      - ".github/workflows/section7-research-agent-tests.yml"
+  workflow_dispatch:
+
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install minimum test dependencies
+        run: python -m pip install "requests>=2.31"
+      - name: Verify Python syntax
+        run: |
+          python -m compileall -q workshop03_Building_an_AI_Agent/literature_research_agent_starter/research_agent
+          python -m py_compile workshop03_Building_an_AI_Agent/literature_research_agent_starter/07_research_agent.py
+      - name: Run offline Section 7 regression tests
+        run: python -m unittest discover -s tests -p "test_section7_research_agent.py" -v
