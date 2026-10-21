@@ -5,7 +5,7 @@ on:
     paths:
       - "workshop03_Building_an_AI_Agent/literature_research_agent_starter/07_research_agent.py"
       - "workshop03_Building_an_AI_Agent/literature_research_agent_starter/research_agent/**"
-      - "tests/test_section7_research_agent.py"
+      - "tests/test_section7_*.py"
       - ".github/workflows/section7-research-agent-tests.yml"
   workflow_dispatch:
 
@@ -24,4 +24,4 @@ jobs:
           python -m compileall -q workshop03_Building_an_AI_Agent/literature_research_agent_starter/research_agent
           python -m py_compile workshop03_Building_an_AI_Agent/literature_research_agent_starter/07_research_agent.py
       - name: Run offline Section 7 regression tests
-        run: python -m unittest discover -s tests -p "test_section7_research_agent.py" -v
+        run: python -m unittest discover -s tests -p "test_section7_*.py" -v
