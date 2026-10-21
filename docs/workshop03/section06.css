@@ -112,3 +112,5 @@
 @media(max-width:1000px){.s6-page-compare{grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr)}.s6-flow-branches{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}}
 @media(max-width:850px){.s6-parser-grid{grid-template-columns:1fr}.s6-parser-col:first-child{border-right:0;border-bottom:1px solid #374b65}.s6-page-compare{grid-template-columns:1fr}.s6-compare-arrow{transform:rotate(90deg);min-height:25px}}
 @media(max-width:650px){.s6-flow{padding:18px 12px}.s6-flow-branches{grid-template-columns:1fr}.s6-flow-branch{padding:10px}.s6-request-lesson{gap:7px}.s6-flow-legend{gap:10px}.s6-parser-grid .s6-code{font-size:10px}.s6-parser-col{padding:13px}.s6-parser-tabs{padding:12px 12px 0}.s6-parser-top{padding:12px}.s6-flow-node{padding:12px}.s6-result-table table{font-size:10px}}
+
+.s6-python-imports{margin:0 0 10px;padding:10px 14px;background:#182639;border:1px solid #354f66;border-radius:8px;white-space:pre-wrap;font:10px/1.6 ui-monospace,Consolas,monospace;color:#9fd3d4}
