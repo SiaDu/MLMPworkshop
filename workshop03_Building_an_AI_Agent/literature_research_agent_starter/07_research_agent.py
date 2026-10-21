@@ -39,46 +39,50 @@ def main():
 
     # Lazy import keeps --status usable without Gemini dependencies/API access.
     from research_agent.agent import create_agent
-    chat = create_agent(pipeline, args.model)
+    client, chat = create_agent(pipeline, args.model)
+    try:
+        def respond(text):
+            if not text.strip():
+                return
+            try:
+                message = chat.send_message(text)
+                print("\nAgent:", message.text or "[No text response; check tool results.]")
+            except Exception as exc:
+                print(f"\n[AGENT ERROR] {type(exc).__name__}: {exc}")
+                print("Your local files are preserved. You can try another request.")
 
-    def respond(text):
-        if not text.strip():
+        if args.once is not None:
+            respond(args.once)
             return
-        try:
-            message = chat.send_message(text)
-            print("\nAgent:", message.text or "[No text response; check tool results.]")
-        except Exception as exc:
-            print(f"\n[AGENT ERROR] {type(exc).__name__}: {exc}")
-            print("Your local files are preserved. You can try another request.")
 
-    if args.once is not None:
-        respond(args.once)
-        return
+        print("\nLiterature Research Agent — Section 7")
+        print("Search papers, download open PDFs, analyse papers, or update the method table.")
+        print("You can add a PDF to papers/ and ask to analyse only that file.")
+        print("Type 'exit' or 'quit' to stop; 'help' for examples.\n")
+        while True:
+            try:
+                request = input("You: ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print("\n[EXIT] Bye.")
+                break
+            if request.casefold() in {"exit", "quit"}:
+                print("[EXIT] Bye.")
+                break
+            if request.casefold() == "help":
+                print("Examples:\n"
+                      "  Find 10 papers about speech-driven facial animation since 2022.\n"
+                      "  Download the open PDFs from papers.csv.\n"
+                      "  Analyse all unprocessed PDFs and update the method table.\n"
+                      "  I added new_paper.pdf to papers/. Analyse only that PDF.\n"
+                      "  Analyse the only new PDF I added.\n"
+                      "  Show download failures and manual URLs.\n"
+                      "  Show my research library status.")
+                continue
+            respond(request)
 
-    print("\nLiterature Research Agent — Section 7")
-    print("Search papers, download open PDFs, analyse papers, or update the method table.")
-    print("You can add a PDF to papers/ and ask to analyse only that file.")
-    print("Type 'exit' or 'quit' to stop; 'help' for examples.\n")
-    while True:
-        try:
-            request = input("You: ").strip()
-        except (EOFError, KeyboardInterrupt):
-            print("\n[EXIT] Bye.")
-            break
-        if request.casefold() in {"exit", "quit"}:
-            print("[EXIT] Bye.")
-            break
-        if request.casefold() == "help":
-            print("Examples:\n"
-                  "  Find 10 papers about speech-driven facial animation since 2022.\n"
-                  "  Download the open PDFs from papers.csv.\n"
-                  "  Analyse all unprocessed PDFs and update the method table.\n"
-                  "  I added new_paper.pdf to papers/. Analyse only that PDF.\n"
-                  "  Analyse the only new PDF I added.\n"
-                  "  Show download failures and manual URLs.\n"
-                  "  Show my research library status.")
-            continue
-        respond(request)
+    finally:
+        # Keep Client alive for every send_message, then release its resources.
+        client.close()
 
 
 if __name__ == "__main__":
