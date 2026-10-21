@@ -29,7 +29,11 @@
         "Use BeautifulSoup to read the tag and urljoin() to resolve the path"
       ],
       correct: 2,
-      explain: "BeautifulSoup can find an HTML element; urljoin() turns the relative address into a complete URL."
+      explain: "BeautifulSoup finds the PDF link in HTML; urljoin() converts its relative path into a full URL.",
+      wrongExplanations: {
+        0: "response.json() parses a JSON response into Python data (usually a dictionary). OpenAlex and our other academic APIs return JSON, but this example is an HTML webpage, not JSON. Use BeautifulSoup to parse its HTML.",
+        1: "This response is an HTML webpage containing a PDF link, not the PDF file itself. Python must extract the link before attempting a separate PDF download."
+      }
     },
     {
       type: "HTTP 403 · text/html",
@@ -84,7 +88,8 @@
       feedback.hidden = false;
       const label = document.createElement("strong");
       label.textContent = correct ? "Correct. " : "Not quite. ";
-      feedback.replaceChildren(label, document.createTextNode(item.explain));
+      const explanation = correct ? item.explain : (item.wrongExplanations?.[index] ?? item.explain);
+      feedback.replaceChildren(label, document.createTextNode(explanation));
     });
   });
 
