@@ -1,0 +1,86 @@
+name: Section 8 Website Smoke Test
+
+on:
+  push:
+    paths:
+      - "docs/workshop03/index.html"
+      - "docs/workshop03/section08.css"
+      - "docs/workshop03/section08.js"
+      - "tests/section8_web_interaction.test.js"
+      - ".github/workflows/section8-website-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify JavaScript syntax
+        run: node --check docs/workshop03/section08.js
+      - name: Test terminology scenario quiz
+        run: node tests/section8_web_interaction.test.js
+      - name: Validate HTML, resource links and concepts
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from collections import Counter
+          from pathlib import Path
+
+          html = Path("docs/workshop03/index.html").read_text(encoding="utf-8")
+          css = Path("docs/workshop03/section08.css").read_text(encoding="utf-8")
+          js = Path("docs/workshop03/section08.js").read_text(encoding="utf-8")
+          start = '<section class="s8-section" id="s8"'
+          assert html.count(start) == 1
+          section = html.split(start)[1].split('<footer class="footer">')[0]
+
+          class Probe(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+                  self.resources = []
+                  self.attributes = []
+              def handle_starttag(self, tag, attrs):
+                  values = dict(attrs)
+                  if "id" in values:
+                      self.ids.append(values["id"])
+                  if tag in ("script", "link"):
+                      self.resources.append(values.get("src") or values.get("href"))
+                  self.attributes.append(values)
+
+          probe = Probe()
+          probe.feed(html)
+          counts = Counter(probe.ids)
+          assert all(value == 1 for value in counts.values()), "Duplicate HTML IDs"
+          required = [
+              "s8", "s8-title", "s8-quiz", "s8-choices",
+              "s8-question-counter", "s8-quiz-progress", "s8-question",
+              "s8-feedback", "s8-next", "s8-result", "s8-question-panel",
+              "s8-restart", "s8-score", "s8-progress-fill", "s8-total",
+          ]
+          assert all(counts[name] == 1 for name in required), "Missing quiz elements"
+          assert "./section08.css" in probe.resources
+          assert "./section08.js" in probe.resources
+
+          headings = [
+              "A / AGENT FRAMEWORKS", "B / CONNECTIONS &amp; PROTOCOLS",
+              "C / AGENT ARCHITECTURE", "D / RELIABLE AGENTS",
+              "E / WHICH TECHNOLOGY WOULD YOU USE?",
+          ]
+          assert all(h in section for h in headings)
+          assert [section.index(h) for h in headings] == sorted(section.index(h) for h in headings)
+          concepts = ["LangChain", "LangGraph", "Model Context Protocol",
+                      "Agent Skills", "Agent2Agent", "Multi-Agent",
+                      "ReAct", "Plan-and-Execute", "Context Engineering",
+                      "Human-in-the-Loop", "Guardrails", "Agent Evaluation",
+                      "Observability"]
+          assert all(concept in section for concept in concepts)
+          assert section.count('class="s8-reliability"') == 4
+          assert "not a coding exercise" in section
+          assert ".s8-choice" in css and ".s8-connection-grid" in css
+          assert "fetch(" not in js and "XMLHttpRequest" not in js
+          assert "localStorage" not in js and "eval(" not in js
+          print("Section 8 HTML structure and glossary: PASS")
+          PY
