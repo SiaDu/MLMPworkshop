@@ -126,6 +126,49 @@ class CompleteAgentTests(unittest.TestCase):
         self.assertEqual(len(self.library.state["search_history"]), 0)
         self.assertEqual(len(pipeline.library.state["search_history"]), 2)
 
+    def test_only_download_latest_search_and_analyse_that_batch(self):
+        self.library.merge_papers([
+            {"title": "Old topic", "doi": "10.1234/old"},
+            {"title": "New topic", "doi": "10.1234/new"},
+        ])
+        self.library.state["latest_search_ids"] = ["doi:10.1234/new"]
+        self.library.save()
+
+        seen_indexes = []
+        fake = SimpleNamespace(
+            USER_AGENT="Workshop test",
+            MANIFEST_COLUMNS=[
+                "title", "doi", "openalex_url", "status", "pdf_path",
+                "source_pdf_url", "candidate_pdf_url", "manual_url",
+                "scholar_url", "research_status", "error"
+            ],
+            RobotsPolicy=lambda session: object(),
+        )
+        def process(_session, _robots, row, index, directory, _max_bytes):
+            seen_indexes.append(index)
+            filename = "new_topic.pdf"
+            (directory / filename).write_bytes(b"%PDF-1.4\nmock PDF contents")
+            return {"title": row["title"], "doi": row["doi"],
+                    "status": "DOWNLOADED", "pdf_path": "papers/" + filename}
+        fake.process_paper = process
+
+        pipeline = ResearchPipeline(self.root)
+        with patch("research_agent.pipeline.load_script", return_value=fake):
+            result = pipeline.download()
+        self.assertEqual(result["scope"], "latest_search")
+        self.assertEqual(result["processed"], 1)
+        self.assertEqual(seen_indexes, [2])  # Preserves stable original row numbering.
+        self.assertEqual(pipeline.library.state["latest_download_paths"],
+                         ["new_topic.pdf"])
+
+        # An older unrelated PDF must not join this analysis batch.
+        (self.library.papers / "old_unprocessed.pdf").write_bytes(b"%PDF-1.4\nolder")
+        with patch.object(pipeline, "analyse_one",
+                          return_value={"status": "ANALYSED"}) as analyse:
+            report = pipeline.analyse_latest_downloads()
+        self.assertEqual(report["selected"], 1)
+        analyse.assert_called_once_with("new_topic.pdf")
+
     def test_analyse_single_pdf_appends_once_without_repeating_llm(self):
         pdf = self.library.papers / "my_manually_added.pdf"
         pdf.write_bytes(b"%PDF-1.4\nunique content")
