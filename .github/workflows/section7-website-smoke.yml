@@ -1,0 +1,80 @@
+name: Section 7 Website Smoke Test
+
+on:
+  push:
+    paths:
+      - "docs/workshop03/index.html"
+      - "docs/workshop03/section07.css"
+      - "docs/workshop03/section07.js"
+      - "tests/section7_web_interaction.test.js"
+      - ".github/workflows/section7-website-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify JavaScript syntax
+        run: node --check docs/workshop03/section07.js
+      - name: Test tool routing and state interactions
+        run: node tests/section7_web_interaction.test.js
+      - name: Validate Section 7 HTML elements and links
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from collections import Counter
+
+          html = Path("docs/workshop03/index.html").read_text(encoding="utf-8")
+          css = Path("docs/workshop03/section07.css").read_text(encoding="utf-8")
+          js = Path("docs/workshop03/section07.js").read_text(encoding="utf-8")
+          section = html.split('<section class="s7-section" id="s7"')[1].split('id="s8"')[0]
+
+          class Probe(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+                  self.links = []
+                  self.attrs = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if "id" in attrs:
+                      self.ids.append(attrs["id"])
+                  if tag in ("script", "link"):
+                      self.links.append(attrs.get("href") or attrs.get("src"))
+                  self.attrs.append(attrs)
+          parser = Probe()
+          parser.feed(html)
+          counts = Counter(parser.ids)
+          assert not [key for key, count in counts.items() if count > 1], "Duplicate HTML IDs"
+
+          required = [
+              "s7", "s7-title", "s7-tool-demo", "s7-case-prompt",
+              "s7-route-count", "s7-route-why", "s7-route-takeaway",
+              "s7-tool-path", "s7-route-prev", "s7-route-next", "s7-route-reset",
+              "s7-state-demo", "s7-state-pdfs", "s7-state-pending", "s7-state-rows",
+              "s7-state-new-file", "s7-state-new-row", "s7-state-message",
+              "s7-state-activity", "s7-state-add", "s7-state-analyse",
+              "s7-state-replay", "s7-state-reset",
+          ]
+          assert all(counts[key] == 1 for key in required), "Section 7 required ID missing"
+          assert "./section07.js" in parser.links
+          assert "./section07.css" in parser.links
+          assert sum("data-s7-case" in attrs for attrs in parser.attrs) == 4
+
+          labels = ["A / FROM SCRIPTS TO AN AGENT", "B / AGENT DECISION MAKING",
+                    "C / STATE MANAGEMENT", "D / FAILURES &amp; LIMITATIONS",
+                    "E / YOUR TURN"]
+          assert all(label in section for label in labels)
+          assert [section.index(label) for label in labels] == sorted(section.index(label) for label in labels)
+          assert "SIMULATED" in section
+          assert "#section-7--complete-literature-research-agent" in section
+          assert not any(name in js for name in ("fetch(", "XMLHttpRequest", "localStorage", "eval("))
+          assert ".s7-case-tabs" in css and ".s7-state-lab" in css
+          assert "COMING NEXT · SECTION 07" not in html
+          print("Section 7 HTML/CSS/JS structure: PASS")
+          PY
