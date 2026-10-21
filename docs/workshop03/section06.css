@@ -35,6 +35,12 @@
 .s6-extracted{border:1px solid #416965;border-radius:10px;background:#182f36;margin-top:13px;padding:12px}.s6-extracted span{display:block;font-size:10px;color:#9ac5d4;font-weight:800;letter-spacing:.1em}.s6-extracted code{display:block;font-size:12px;color:#aeefcf;margin-top:8px;overflow-wrap:anywhere}.s6-extracted small{display:block;font-size:11px;color:#c0cadb;margin-top:6px;line-height:1.6}
 .s6-parser-note{margin:0 0 48px;font-size:11px;color:#adc4d5;line-height:1.75}
 .s6-realities{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:0 0 48px}.s6-reality{background:#151f32;border:1px solid #3a4f67;padding:18px;border-radius:11px}.s6-reality small{font-size:10px;letter-spacing:.06em;color:#90d7ca}.s6-reality h4{margin:10px 0;font-size:15px}.s6-reality p{margin:0;font-size:11px;line-height:1.75;color:#bac9db}
+/* Separate observations from conclusions for each HTTP / PDF result. */
+.s6-reality-fact{padding-top:11px;margin-top:11px;border-top:1px solid #2f4157}
+.s6-reality-fact b{display:block;font-size:9px;line-height:1.4;letter-spacing:.075em;margin-bottom:6px}
+.s6-reality-fact .s6-know{color:#8de7c7}
+.s6-reality-fact .s6-unknown{color:#d4bd9b}
+.s6-reality-fact p{font-size:11px;color:#c0d0e0;line-height:1.65;margin:0}
 .s6-handoff{background:linear-gradient(125deg,#163139,#1d2134);border:1px solid #578383;border-radius:14px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:25px}.s6-handoff h3{font-size:22px;letter-spacing:-.025em;margin:7px 0}.s6-handoff p{margin:0;color:#b8cddd;font-size:12px;line-height:1.7;max-width:570px}.s6-handoff a{display:inline-block;white-space:nowrap;border-radius:8px;padding:12px 15px;background:#95e5d4;color:#102b2b;font-size:11px;font-weight:850}.s6-handoff a:hover{background:#c1fff1}
 .s6-next{display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid #334960;padding-top:21px}.s6-next strong{font-size:16px;display:block;margin-top:5px}.s6-next p{color:#aebed2;font-size:11px;margin:6px 0 0}.s6-next a{border:1px solid #577c85;border-radius:8px;padding:10px 13px;font-size:11px;color:#d0f1ea;white-space:nowrap}
 @media(max-width:950px){.s6-inspector-grid{grid-template-columns:1fr}.s6-inspector-right{border-left:1px solid #3b506a;border-radius:0 0 12px 12px}.s6-response-code{border-radius:0}.s6-code{min-height:158px}.s6-parser{grid-template-columns:1fr}.s6-parser-left{border-right:0;border-bottom:1px solid #374b65}}
