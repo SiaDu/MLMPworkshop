@@ -1047,12 +1047,45 @@ from urllib.parse import urljoin</code></pre>
         <div class="s7-head">
           <div class="s7-label">D / FAILURES &amp; LIMITATIONS</div>
           <h3>Making Decisions <em>Doesn't Guarantee Success.</em></h3>
-          <p>An Agent can decide which tool to try next, but it cannot guarantee access to a paper, successful PDF extraction, or correct scientific interpretation.</p>
+          <p>Our Agent can search for papers, download PDFs and extract information into a structured table. But a successful workflow does not necessarily produce a good literature review. <strong>The researcher must still judge relevance, evaluate quality, check extracted information and critically compare the findings.</strong></p>
         </div>
-        <div class="s7-limit-copy">
-          <p><strong>Metadata ≠ Full text.</strong> When some PDFs are unavailable, the Agent must report which papers could not be analysed from full text. It must not invent missing research methods.</p>
-          <p><strong>Evidence needs review.</strong> RAG output and valid evidence IDs are not proof of scientific accuracy. Verify important claims against the original PDFs.</p>
-          <p><strong>Current implementation:</strong> Section 7 can analyse local PDFs and append results; it does not yet have a dedicated tool to import a previous <code>literature_review.csv</code> without re-running RAG.</p>
+
+        <div class="s7-critical-grid" aria-label="Four research limitations and what the researcher should do">
+          <article class="s7-critical-card">
+            <div class="s7-critical-top"><span class="s7-critical-number">01</span><span class="s7-critical-category">PAPER SELECTION</span></div>
+            <h4>Research Relevance</h4>
+            <p class="s7-critical-question">Is this paper actually relevant?</p>
+            <p>A broad topic may return papers that share the same keywords but investigate different research questions.</p>
+            <div class="s7-critical-action"><span>RESEARCHER'S ROLE</span><p>Refine the research question and define inclusion and exclusion criteria.</p></div>
+          </article>
+          <article class="s7-critical-card">
+            <div class="s7-critical-top"><span class="s7-critical-number">02</span><span class="s7-critical-category">SOURCE EVALUATION</span></div>
+            <h4>Publication Quality</h4>
+            <p class="s7-critical-question">Is this a credible research source?</p>
+            <p>Search results may include less selective venues, unreviewed preprints or studies with weak methodology. Venue ranking alone does not establish quality.</p>
+            <div class="s7-critical-action"><span>RESEARCHER'S ROLE</span><p>Check peer-review status, venue reputation and the quality of methods and evidence.</p></div>
+          </article>
+          <article class="s7-critical-card">
+            <div class="s7-critical-top"><span class="s7-critical-number">03</span><span class="s7-critical-category">COMPARISON DESIGN</span></div>
+            <h4>Paper Type Mismatch</h4>
+            <p class="s7-critical-question">Does every paper fit the same table?</p>
+            <p>Survey papers and non-ML methods may not propose a new neural network, training dataset or directly comparable evaluation metrics.</p>
+            <div class="s7-critical-action"><span>RESEARCHER'S ROLE</span><p>Identify paper types and adapt comparison categories rather than forcing every paper into one schema.</p></div>
+          </article>
+          <article class="s7-critical-card">
+            <div class="s7-critical-top"><span class="s7-critical-number">04</span><span class="s7-critical-category">EVIDENCE CHECKING</span></div>
+            <h4>LLM Extraction Errors</h4>
+            <p class="s7-critical-question">Is the extracted information correct?</p>
+            <p>The LLM may confuse a proposed method with a baseline, misidentify a dataset or misinterpret evaluation results.</p>
+            <div class="s7-critical-action"><span>RESEARCHER'S ROLE</span><p>Verify important fields against the original PDF and its supporting evidence.</p></div>
+          </article>
+        </div>
+
+        <div class="s7-synthesis">
+          <span class="s7-synthesis-kicker">FROM INFORMATION EXTRACTION TO CRITICAL SYNTHESIS</span>
+          <h4>A Completed Table Is Not a Literature Review.</h4>
+          <p>A literature review must compare approaches, explain strengths and weaknesses, identify trends and contradictions, and discuss remaining research gaps.</p>
+          <p><strong>The Agent helps collect and organise evidence. The researcher is responsible for interpreting and synthesising it.</strong></p>
         </div>
 
         <div class="s7-handoff">
