@@ -1049,18 +1049,10 @@ from urllib.parse import urljoin</code></pre>
           <h3>Making Decisions <em>Doesn't Guarantee Success.</em></h3>
           <p>An Agent can decide which tool to try next, but it cannot guarantee access to a paper, successful PDF extraction, or correct scientific interpretation.</p>
         </div>
-        <div class="s7-limits">
-          <div class="s7-limits-numbers" aria-label="Illustrative results for a ten-paper search">
-            <div class="s7-limit-stat"><strong>10</strong><span>PAPER RECORDS FOUND</span></div>
-            <div class="s7-limit-stat"><strong>6</strong><span>PDFs AVAILABLE</span></div>
-            <div class="s7-limit-stat"><strong>6</strong><span>FULL-TEXT ANALYSES</span></div>
-            <div class="s7-limit-stat"><strong>4</strong><span>NEED MANUAL FOLLOW-UP</span></div>
-          </div>
-          <div class="s7-limit-copy">
-            <p><strong>Metadata ≠ Full text.</strong> If four PDFs are unavailable, the Agent must report that those papers were not analysed from full text. It must not invent missing research methods.</p>
-            <p><strong>Evidence needs review.</strong> RAG output and valid evidence IDs are not proof of scientific accuracy. Verify important claims against the original PDFs.</p>
-            <p><strong>Current implementation:</strong> Section 7 can analyse local PDFs and append results; it does not yet have a dedicated tool to import a previous <code>literature_review.csv</code> without re-running RAG.</p>
-          </div>
+        <div class="s7-limit-copy">
+          <p><strong>Metadata ≠ Full text.</strong> When some PDFs are unavailable, the Agent must report which papers could not be analysed from full text. It must not invent missing research methods.</p>
+          <p><strong>Evidence needs review.</strong> RAG output and valid evidence IDs are not proof of scientific accuracy. Verify important claims against the original PDFs.</p>
+          <p><strong>Current implementation:</strong> Section 7 can analyse local PDFs and append results; it does not yet have a dedicated tool to import a previous <code>literature_review.csv</code> without re-running RAG.</p>
         </div>
 
         <div class="s7-handoff">
