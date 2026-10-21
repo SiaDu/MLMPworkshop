@@ -289,9 +289,50 @@ function setupNavigation() {
     });
   };
 
+  // Sidebar links must land on the requested section, not appear to stop at
+  // the previous one while a long CSS smooth-scroll animation is in progress.
+  // Use the target element's measured page position, independently of CSS
+  // scroll-padding / scroll-margin, and keep the address-bar anchor intact.
+  function jumpToSection(id) {
+    const section = document.getElementById(id);
+    if (!section) return;
+    const header = document.querySelector(".topbar");
+    const headerHeight = header ? header.getBoundingClientRect().height : 70;
+    const targetY = Math.max(
+      0,
+      Math.round(window.scrollY + section.getBoundingClientRect().top - headerHeight - 18)
+    );
+    const documentRoot = document.documentElement;
+    const previousBehavior = documentRoot.style.scrollBehavior;
+    documentRoot.style.scrollBehavior = "auto";
+    window.scrollTo({top: targetY, behavior: "instant"});
+    documentRoot.style.scrollBehavior = previousBehavior;
+    updateActiveSection();
+  }
+
+  for (const link of links) {
+    link.addEventListener("click", (event) => {
+      if (event.defaultPrevented || event.button !== 0 ||
+          event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const id = link.getAttribute("href").slice(1);
+      if (!ids.includes(id)) return;
+      event.preventDefault();
+      const hash = "#" + id;
+      if (window.location.hash !== hash) {
+        window.history.pushState(null, "", hash);
+      }
+      jumpToSection(id);
+    });
+  }
+
   window.addEventListener("scroll", scheduleUpdate, {passive: true});
   window.addEventListener("resize", scheduleUpdate);
   window.addEventListener("hashchange", scheduleUpdate);
+  window.addEventListener("popstate", () => {
+    const id = window.location.hash.slice(1);
+    if (ids.includes(id)) jumpToSection(id);
+    else scheduleUpdate();
+  });
   window.addEventListener("load", scheduleUpdate);
   scheduleUpdate();
 }
