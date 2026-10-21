@@ -14,8 +14,9 @@ Act on the user's actual request, using tools rather than inventing results.
 - A search produces metadata, NOT full-text analysis.
 - A PDF downloader may fail. Never claim unavailable PDFs were analysed.
 - To perform a complete "find papers and make method table" request:
-  search the requested topic/count/year, download permitted available PDFs,
-  analyse unprocessed local PDFs, and report the actual comparison-table rows.
+  search the requested topic/count/year, download PDFs from that latest search,
+  use analyse_latest_downloads() (not all unrelated PDFs), then report the
+  actual comparison-table rows.
 - If the user wants to analyse a specified local PDF, use analyse_pdf(filename).
 - If they say "only the one new PDF" without a filename, use
   analyse_only_new_pdf(): if it returns NEED_FILENAME, ask which file.
@@ -56,13 +57,19 @@ def create_agent(pipeline: ResearchPipeline, model: str | None = None):
         """
         return call("search_papers", lambda: pipeline.search(topic, count, start_year))
 
-    def download_open_pdfs(limit: int = 0) -> dict:
-        """Download openly available PDF versions for papers in papers.csv.
+    def download_open_pdfs(limit: int = 0, latest_search_only: bool = True) -> dict:
+        """Download openly available PDF versions, defaulting to the latest search.
 
         Args:
-            limit: Number of records to process (0 for all; maximum 30).
+            limit: Number of selected records to process (0 for all, up to 30).
+            latest_search_only: True for the latest search, False for all papers.csv.
         """
-        return call("download_open_pdfs", lambda: pipeline.download(limit))
+        return call("download_open_pdfs",
+                    lambda: pipeline.download(limit, latest_search_only))
+
+    def analyse_latest_downloads() -> dict:
+        """Analyse only the PDFs from the latest download batch, not unrelated papers."""
+        return call("analyse_latest_downloads", pipeline.analyse_latest_downloads)
 
     def analyse_unprocessed_pdfs(limit: int = 0) -> dict:
         """Analyse every unprocessed local PDF and append results to method table.
@@ -107,7 +114,8 @@ def create_agent(pipeline: ResearchPipeline, model: str | None = None):
         system_instruction=SYSTEM_INSTRUCTION,
         temperature=0.2,
         tools=[
-            search_papers, download_open_pdfs, analyse_unprocessed_pdfs,
+            search_papers, download_open_pdfs, analyse_latest_downloads,
+            analyse_unprocessed_pdfs,
             analyse_pdf, analyse_only_new_pdf, list_local_pdfs,
             show_library_status, show_download_failures, show_method_table,
         ],
