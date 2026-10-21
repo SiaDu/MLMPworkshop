@@ -542,7 +542,7 @@ python 03_function_calling.py</code></pre></div>
   <p class="s5-definition"><strong>RAG — Retrieval-Augmented Generation:</strong> retrieve relevant information from a source <em>before</em> asking the LLM to generate its answer. RAG is a technique; it does not require a separate Agent.</p>
 
   <div class="s5-block-head">
-    <div><div class="s5-label">01 / UNDERSTAND</div><h3>How does RAG work?</h3><p>The LLM does not need to read every page for every question. Python retrieves relevant chunks first.</p></div>
+    <div><div class="s5-label">A / UNDERSTAND</div><h3>How does RAG work?</h3><p>The LLM does not need to read every page for every question. Python retrieves relevant chunks first.</p></div>
   </div>
   <div class="s5-flow" aria-label="Real Section 5 workflow">
     <div class="s5-flow-card">
@@ -588,7 +588,7 @@ python 03_function_calling.py</code></pre></div>
   <div class="s5-search-note"><b>BM25 vs. Embeddings</b><span>BM25 matches words and keywords. Embedding-based retrieval can match <em>semantic similarity</em>. Today we use BM25 — no vector database or Embedding API required.</span></div>
 
   <div class="s5-block-head s5-demo-intro">
-    <div><div class="s5-label">02 / INTERACTIVE DEMO</div><h3>Question → Evidence → Answer</h3><p>Choose a Literature Review field, retrieve a matching paper chunk, then fill in the example table.</p></div>
+    <div><div class="s5-label">B / INTERACTIVE DEMO</div><h3>Question → Evidence → Answer</h3><p>Choose a Literature Review field, retrieve a matching paper chunk, then fill in the example table.</p></div>
   </div>
   <div class="s5-lab" id="s5-lab">
     <div class="s5-lab-top"><span class="s5-window-dots" aria-hidden="true"><i></i><i></i><i></i></span><strong>Paper Analysis Playground</strong><span class="s5-demo-pill">SIMULATED · NO API CALLS</span></div>
@@ -651,7 +651,7 @@ python 03_function_calling.py</code></pre></div>
   </div>
 
   <div class="s5-block-head s5-hands-intro">
-    <div><div class="s5-label">03 / GUIDED HANDS-ON</div><h3>Now analyse <em>your</em> paper.</h3><p>Your PDF, your survey topic, your Literature Review table. The complete setup is in the student README.</p></div>
+    <div><div class="s5-label">C / GUIDED HANDS-ON</div><h3>Now analyse <em>your</em> paper.</h3><p>Your PDF, your survey topic, your Literature Review table. The complete setup is in the student README.</p></div>
   </div>
   <div class="s5-hands">
     <div class="s5-hands-step"><span>01</span><h4>Prepare your PDF</h4><p>Choose a paper for your AI for Media survey. Download a permitted text-based PDF and place it in <code>papers/</code>.</p></div>
@@ -663,7 +663,7 @@ python 03_function_calling.py</code></pre></div>
   <a class="s5-readme-link" href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md" target="_blank" rel="noopener noreferrer">Open the full Section 5 README tutorial <span aria-hidden="true">↗</span></a>
 
   <div class="s5-block-head s5-verify-intro">
-    <div><div class="s5-label">04 / VERIFY</div><h3>Retrieved ≠ Correct.</h3><p>Structured JSON and valid chunk IDs help you trace answers, but they do not prove the answer is accurate.</p></div>
+    <div><div class="s5-label">D / VERIFY</div><h3>Retrieved ≠ Correct.</h3><p>Structured JSON and valid chunk IDs help you trace answers, but they do not prove the answer is accurate.</p></div>
   </div>
   <div class="s5-check-panel">
     <div class="s5-evidence-code">
@@ -699,7 +699,7 @@ python 03_function_calling.py</code></pre></div>
         </div>
 
         <div class="s6-head">
-          <div class="s6-label">01 / UNDERSTAND</div>
+          <div class="s6-label">A / UNDERSTAND</div>
           <h3>One HTTP request. <em>Three possible responses.</em></h3>
           <p>In Section 3 you called OpenAlex through <code>requests.get()</code>. Web scraping often starts with the <em>same</em> Python request — but the server may return JSON, HTML, or file bytes.</p>
         </div>
@@ -726,7 +726,7 @@ python 03_function_calling.py</code></pre></div>
         <p class="s6-note"><strong>Key idea:</strong> If an API already provides a working PDF URL, there is no reason to scrape HTML. Scraping is useful when the link is hidden inside a webpage. A URL alone does not guarantee a successful download.</p>
 
         <div class="s6-head">
-          <div class="s6-label">02 / INTERACTIVE LAB</div>
+          <div class="s6-label">B / INTERACTIVE LAB</div>
           <h3>HTTP Response <em>Inspector.</em></h3>
           <p>Choose a server response. Examine what Python receives, then decide the correct next step. All examples are simulated and require no API key.</p>
         </div>
@@ -761,7 +761,7 @@ python 03_function_calling.py</code></pre></div>
         </div>
 
         <div class="s6-head">
-          <div class="s6-label">03 / CODE EXPERIMENT</div>
+          <div class="s6-label">C / CODE EXPERIMENT</div>
           <h3>From HTML to a <em>PDF link.</em></h3>
           <p>Try extracting a URL from two common HTML patterns. The highlight represents which part Python finds; <code>urljoin()</code> converts a relative path into a complete address.</p>
         </div>
@@ -804,31 +804,34 @@ python 03_function_calling.py</code></pre></div>
         <p class="s6-parser-note"><strong>Important:</strong> Extracting a URL is not downloading a file. The next HTTP request may return a PDF, HTML, a redirect or an error. The real Python script also checks a downloaded file using PyMuPDF.</p>
 
         <div class="s6-head">
-          <div class="s6-label">04 / THINK LIKE A DEVELOPER</div>
-          <h3>What can a download <em>really prove?</em></h3>
-          <p>Three common mistakes when automating research downloads.</p>
+          <div class="s6-label">D / UNDERSTAND THE RESULTS</div>
+          <h3>What Does Each Result <em>Actually Tell Us?</em></h3>
+          <p>A program can verify what happened, but it cannot always explain why.</p>
         </div>
         <div class="s6-realities">
           <article class="s6-reality">
-            <small>ACCESS</small>
-            <h4>HTTP 403 ≠ Paywall</h4>
-            <p>The server rejected the request. We cannot conclude why. Respect <code>robots.txt</code> and use permitted alternative sources or manual links.</p>
+            <small>HTTP STATUS</small>
+            <h4>HTTP 403</h4>
+            <div class="s6-reality-fact"><b class="s6-know">✓ WHAT WE KNOW</b><p>The server rejected the request.</p></div>
+            <div class="s6-reality-fact"><b class="s6-unknown">? WHAT WE CANNOT CONCLUDE</b><p>Whether the paper requires payment or login.</p></div>
+          </article>
+          <article class="s6-reality">
+            <small>HTTP STATUS</small>
+            <h4>HTTP 200</h4>
+            <div class="s6-reality-fact"><b class="s6-know">✓ WHAT WE KNOW</b><p>The HTTP request succeeded.</p></div>
+            <div class="s6-reality-fact"><b class="s6-unknown">? WHAT WE CANNOT CONCLUDE</b><p>Whether the returned content is a valid PDF.</p></div>
           </article>
           <article class="s6-reality">
             <small>FILE VALIDATION</small>
-            <h4>HTTP 200 ≠ Valid PDF</h4>
-            <p>A successful HTTP response might contain an HTML login page. Check the PDF signature and confirm the file opens correctly.</p>
-          </article>
-          <article class="s6-reality">
-            <small>ACADEMIC QUALITY</small>
-            <h4>Downloaded ≠ Reliable</h4>
-            <p>A real paper may be irrelevant or retracted. OpenAlex's <code>is_retracted</code> flag is useful, but never replaces academic verification.</p>
+            <h4>PDF Validated</h4>
+            <div class="s6-reality-fact"><b class="s6-know">✓ WHAT WE KNOW</b><p>The PDF can be opened and read.</p></div>
+            <div class="s6-reality-fact"><b class="s6-unknown">? WHAT WE CANNOT CONCLUDE</b><p>Whether the research is relevant, reliable or retracted.</p></div>
           </article>
         </div>
 
         <div class="s6-handoff">
           <div>
-            <div class="s6-label">05 / YOUR TURN</div>
+            <div class="s6-label">E / YOUR TURN</div>
             <h3>Run the real PDF Finder.</h3>
             <p>Use the Student README for the exact commands, <code>papers/</code> output, <code>pdf_manifest.csv</code> statuses and manual follow-up tasks. No extra environment setup here.</p>
           </div>
