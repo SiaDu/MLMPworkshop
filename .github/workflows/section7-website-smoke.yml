@@ -72,6 +72,14 @@ jobs:
           assert all(label in section for label in labels)
           assert [section.index(label) for label in labels] == sorted(section.index(label) for label in labels)
           assert "SIMULATED" in section
+          assert section.count('class="s7-critical-card"') == 4
+          assert all(topic in section for topic in (
+              "Research Relevance", "Publication Quality",
+              "Paper Type Mismatch", "LLM Extraction Errors",
+          ))
+          assert "A Completed Table Is Not a Literature Review." in section
+          assert "The researcher is responsible for interpreting and synthesising it." in section
+          assert "s7-limits-numbers" not in section
           assert "#section-7--complete-literature-research-agent" in section
           assert not any(name in js for name in ("fetch(", "XMLHttpRequest", "localStorage", "eval("))
           assert ".s7-case-tabs" in css and ".s7-state-lab" in css
