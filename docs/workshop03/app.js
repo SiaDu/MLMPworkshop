@@ -250,19 +250,25 @@ function drawQuiz() {
 }
 
 function setupNavigation() {
-  // The sidebar lists eight major sections; it does not track progress.
-  const sections = ["intro", "s2-start", "s3", "s4", "s5", "s6", "s7", "s8"];
+  // Highlight exactly one major section according to the visible viewport,
+  // rather than relying on a potentially stale URL hash or a fixed 170px line.
+  const ids = ["intro", "s2-start", "s3", "s4", "s5", "s6", "s7", "s8"];
+  const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
   const links = [...document.querySelectorAll(".side-nav .nav-item")];
+  if (!sections.length || !links.length) return;
 
   const updateActiveSection = () => {
-    let active = "intro";
-    const topBoundary = window.scrollY + 170;
+    // Read a point inside the reading area. A section can be active when its
+    // heading is already visible but its border is above the viewport top.
+    const probe = Math.min(320, Math.max(180, window.innerHeight * 0.32));
+    let active = sections[0].id;
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= probe) active = section.id;
+    }
 
-    for (const id of sections) {
-      const element = document.getElementById(id);
-      if (element && element.getBoundingClientRect().top + window.scrollY <= topBoundary) {
-        active = id;
-      }
+    // Short final sections may never reach the probe line at the page end.
+    if (document.documentElement.scrollHeight - window.scrollY - window.innerHeight <= 8) {
+      active = sections[sections.length - 1].id;
     }
 
     for (const link of links) {
@@ -273,9 +279,21 @@ function setupNavigation() {
     }
   };
 
-  window.addEventListener("scroll", updateActiveSection, {passive: true});
-  window.addEventListener("hashchange", updateActiveSection);
-  updateActiveSection();
+  let scheduled = false;
+  const scheduleUpdate = () => {
+    if (scheduled) return;
+    scheduled = true;
+    window.requestAnimationFrame(() => {
+      scheduled = false;
+      updateActiveSection();
+    });
+  };
+
+  window.addEventListener("scroll", scheduleUpdate, {passive: true});
+  window.addEventListener("resize", scheduleUpdate);
+  window.addEventListener("hashchange", scheduleUpdate);
+  window.addEventListener("load", scheduleUpdate);
+  scheduleUpdate();
 }
 
 $("#scenario-condition").addEventListener("change", (event) => {
