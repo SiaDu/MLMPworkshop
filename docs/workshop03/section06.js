@@ -88,51 +88,113 @@
     });
   });
 
+  // Five highlighted Python lines. This is a teaching simulation, not Python execution.
   const patterns = {
     meta: {
-      python: 'tag = soup.find("meta", attrs={"name": "citation_pdf_url"})\npath = tag.get("content")\npdf_url = urljoin(page_url, path)',
-      url: "https://example.org/files/paper.pdf",
-      explanation: "The content attribute contains /files/paper.pdf. urljoin() resolves it relative to the page's origin."
+      find: 'tag = soup.find("meta", attrs={"name": "citation_pdf_url"})',
+      attribute: 'path = tag.get("content")',
+      found: '<meta name="citation_pdf_url" content="/files/paper.pdf">',
+      path: '/files/paper.pdf',
+      finalUrl: 'https://example.org/files/paper.pdf',
+      findExplain: 'Find the <meta> element whose name attribute equals citation_pdf_url. This identifies the PDF metadata tag.',
+      valueExplain: 'Read the content attribute from the matching tag. It contains a relative URL, not the complete address.',
+      finalExplain: 'urljoin() combines the webpage address with /files/paper.pdf. Because the path starts with /, it is relative to the domain root.'
     },
     anchor: {
-      python: 'tag = soup.find("a", href=True)\npath = tag.get("href")\npdf_url = urljoin(page_url, path)',
-      url: "https://example.org/article/paper.pdf",
-      explanation: "The href attribute contains paper.pdf. urljoin() resolves it relative to the article page."
+      find: 'tag = soup.find("a", href=True)',
+      attribute: 'path = tag.get("href")',
+      found: '<a href="paper.pdf">Download PDF</a>',
+      path: 'paper.pdf',
+      finalUrl: 'https://example.org/article/paper.pdf',
+      findExplain: 'Find the first <a> tag with an href attribute. Our teaching HTML has only one link; real sites may have many.',
+      valueExplain: 'Read the href attribute. It contains a filename relative to the current article page.',
+      finalExplain: 'urljoin() combines the webpage address with paper.pdf. Without a leading /, it resolves inside /article/.'
     }
   };
 
-  let patternIndex = "meta";
   const patternButtons = Array.from(parser.querySelectorAll("[data-s6-pattern]"));
   const htmlSamples = Array.from(parser.querySelectorAll("[data-s6-html]"));
-  const pythonCode = parser.querySelector("#s6-python-code");
-  const outputUrl = parser.querySelector("#s6-output-url");
-  const outputInfo = parser.querySelector("#s6-output-info");
-  const run = parser.querySelector("#s6-extract-run");
-  const reset = parser.querySelector("#s6-extract-reset");
+  const codeLines = Array.from(parser.querySelectorAll("[data-s6-line]"));
+  const outputValue = parser.querySelector("#s6-output-url");
+  const description = parser.querySelector("#s6-step-description");
+  const position = parser.querySelector("#s6-step-position");
+  const previous = parser.querySelector("#s6-step-prev");
+  const next = parser.querySelector("#s6-step-next");
+  const reset = parser.querySelector("#s6-step-reset");
+  let activePattern = "meta";
+  let stepIndex = -1;
 
-  function selectPattern(pattern) {
-    patternIndex = pattern;
-    parser.classList.remove("s6-found");
-    patternButtons.forEach(button => {
-      button.setAttribute("aria-pressed", String(button.dataset.s6Pattern === pattern));
-    });
-    htmlSamples.forEach(element => {
-      element.hidden = element.dataset.s6Html !== pattern;
-    });
-    pythonCode.textContent = patterns[pattern].python;
-    outputUrl.textContent = "Waiting for extraction";
-    outputInfo.textContent = "Click Find PDF Link to locate an HTML attribute.";
+  function setLines(pattern) {
+    codeLines[0].textContent = "response = requests.get(page_url)";
+    codeLines[1].textContent = 'soup = BeautifulSoup(response.text, "html.parser")';
+    codeLines[2].textContent = pattern.find;
+    codeLines[3].textContent = pattern.attribute;
+    codeLines[4].textContent = "pdf_url = urljoin(page_url, path)";
   }
 
-  patternButtons.forEach(button => {
+  function renderStep() {
+    const pattern = patterns[activePattern];
+    parser.classList.toggle("s6-highlight-tag", stepIndex >= 2);
+    parser.classList.toggle("s6-highlight-attr", stepIndex >= 3);
+    codeLines.forEach((line, i) => {
+      line.classList.toggle("s6-active-line", i === stepIndex);
+    });
+    position.textContent = String(stepIndex + 1) + " / 5";
+    previous.disabled = stepIndex < 0;
+    next.textContent = stepIndex === -1 ? "Start walkthrough →"
+      : stepIndex === 4 ? "Restart ↺" : "Next line →";
+
+    const stages = [
+      [
+        "Python sends an HTTP GET request to the paper landing page. We expect the response body to contain HTML.",
+        "HTTP 200 · text/html (simulated)"
+      ],
+      [
+        "response.text gives the HTML as text. BeautifulSoup parses it into HTML elements that Python can search.",
+        "BeautifulSoup object: <html> ... </html>"
+      ],
+      [pattern.findExplain, pattern.found],
+      [pattern.valueExplain, 'path = "' + pattern.path + '"'],
+      [pattern.finalExplain, 'pdf_url = "' + pattern.finalUrl + '"']
+    ];
+
+    if (stepIndex < 0) {
+      description.textContent = "Click Start walkthrough. Each click will highlight one Python line and explain its result.";
+      outputValue.textContent = "Waiting to start...";
+    } else {
+      description.textContent = stages[stepIndex][0];
+      outputValue.textContent = stages[stepIndex][1];
+    }
+  }
+
+  function selectPattern(name) {
+    activePattern = name;
+    stepIndex = -1;
+    patternButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.s6Pattern === name));
+    });
+    htmlSamples.forEach((sample) => {
+      sample.hidden = sample.dataset.s6Html !== name;
+    });
+    setLines(patterns[name]);
+    renderStep();
+  }
+
+  patternButtons.forEach((button) => {
     button.addEventListener("click", () => selectPattern(button.dataset.s6Pattern));
   });
-  run.addEventListener("click", () => {
-    parser.classList.add("s6-found");
-    outputUrl.textContent = patterns[patternIndex].url;
-    outputInfo.textContent = patterns[patternIndex].explanation;
+  next.addEventListener("click", () => {
+    stepIndex = stepIndex === 4 ? -1 : stepIndex + 1;
+    renderStep();
   });
-  reset.addEventListener("click", () => selectPattern(patternIndex));
+  previous.addEventListener("click", () => {
+    stepIndex = Math.max(-1, stepIndex - 1);
+    renderStep();
+  });
+  reset.addEventListener("click", () => {
+    stepIndex = -1;
+    renderStep();
+  });
 
   showCase(0);
   selectPattern("meta");
