@@ -52,7 +52,8 @@ jobs:
               "s6", "s7", "s8", "s6-inspector", "s6-parser",
               "s6-response-code", "s6-response-type", "s6-question",
               "s6-feedback", "s6-python-code", "s6-output-url",
-              "s6-output-info", "s6-extract-run", "s6-extract-reset"
+              "s6-step-description", "s6-step-position", "s6-step-prev",
+              "s6-step-next", "s6-step-reset"
           )
           assert all(counts[id] == 1 for id in required), "Missing Section 6 ID"
           assert "./section06.css" in probe.links
@@ -61,6 +62,18 @@ jobs:
           assert sum("data-s6-answer" in a for a in probe.attrs) == 3
           assert sum("data-s6-html" in a for a in probe.attrs) == 2
           assert sum("data-s6-pattern" in a for a in probe.attrs) == 2
+          assert sum("data-s6-line" in a for a in probe.attrs) == 5
+          assert sum("data-s6-html" in a and a.get("hidden") is None for a in probe.attrs) == 2
+          section = html.split('id="s6"')[1].split('id="s7"')[0]
+          headings = [
+              "A / WHAT IS WEB SCRAPING?", "B / OUR PDF FINDER",
+              "C / STEP-BY-STEP CODE LAB", "D / UNDERSTAND HTTP RESULTS",
+              "E / YOUR TURN",
+          ]
+          assert all(heading in section for heading in headings)
+          assert [section.index(h) for h in headings] == sorted(section.index(h) for h in headings)
+          assert "s6-flow-scrape" in section and "s6-flow-api" in section
+          assert "s6-python-imports" in section
           assert "05_rag.py" not in html.split('id="s6"')[1].split('id="s7"')[0]
           assert "fetch(" not in js and "XMLHttpRequest" not in js
           print("Section 6 HTML/JS structure: PASS")
