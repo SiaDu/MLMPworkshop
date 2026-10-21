@@ -250,8 +250,8 @@ function drawQuiz() {
 }
 
 function setupNavigation() {
-  // The sidebar lists all seven major sections; it does not track progress.
-  const sections = ["intro", "s2-start", "s3", "s4", "s5", "s6", "s7"];
+  // The sidebar lists eight major sections; it does not track progress.
+  const sections = ["intro", "s2-start", "s3", "s4", "s5", "s6", "s7", "s8"];
   const links = [...document.querySelectorAll(".side-nav .nav-item")];
 
   const updateActiveSection = () => {
