@@ -628,6 +628,8 @@ outputs/
     └── paper.bib              ← only if a verified DOI returns BibTeX
 ```
 
+![Example](images/12.png)
+
 CSV columns:
 
 ```text
@@ -636,8 +638,11 @@ Model, Dataset Name, Evaluation Metric, Core Research Question, Solution,
 Dataset Description,
 Contributions, Limitations, Future Work
 ```
+![Example](images/11.png)
 
 `Dataset Name` is the dataset identifier; `Dataset Description` explains the data. `Model` names the model or architecture.
+
+![Example](images/13.png)
 
 **Note:** If the paper's details cannot be verified, `paper.bib` may be missing. This does not mean RAG analysis failed.
 
@@ -724,6 +729,8 @@ literature_research_agent_starter/
     ├── paper_004_example.pdf
     └── paper_007_another_example.pdf
 ```
+
+![Example](images/14.png)
 
 The terminal prints a status for **each** processed paper:
 
@@ -874,6 +881,7 @@ A successful run may include these tool names:
 [EXPORT] outputs/.../literature_review.csv
 [TOOL] show_method_table
 ```
+![Example](images/15.png)
 
 Your results will vary. Check how many papers were **found**, how many PDFs were **downloaded**, and how many were **successfully analysed**. Finding two papers does not guarantee two full-text analyses.
 
@@ -888,8 +896,9 @@ This workflow processes the **latest search/download batch**. If you ask for “
 I added TOG2024Pan.pdf to papers/.
 Analyse only this PDF and add it to the method comparison table.
 ```
+![Example](images/16.png)
 
-`paper.pdf` and `paper.pdf.pdf` are different filenames. If unsure, ask `List my local PDFs and their filenames.` If several PDFs are unprocessed, the Agent may ask for a filename instead of choosing one.
+If several PDFs are unprocessed, the Agent may ask for a filename instead of choosing one.
 
 **Resume later:** You can restart the Agent and ask it to analyse unprocessed PDFs. Python uses each file's **SHA-256 hash** to skip unchanged PDFs it has already analysed.
 
