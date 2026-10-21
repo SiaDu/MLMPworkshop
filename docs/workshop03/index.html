@@ -818,6 +818,9 @@ python 03_function_calling.py</code></pre></div>
             </div>
             <div class="s6-parser-col">
               <span class="s6-subhead">PYTHON · FOLLOW THE HIGHLIGHTED LINE</span>
+              <pre class="s6-python-imports"><code>import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin</code></pre>
               <pre class="s6-code s6-python"><code id="s6-python-code"><span class="s6-step-line" data-s6-line="0">response = requests.get(page_url)</span>
 <span class="s6-step-line" data-s6-line="1">soup = BeautifulSoup(response.text, "html.parser")</span>
 <span class="s6-step-line" data-s6-line="2">tag = soup.find("meta", attrs={"name": "citation_pdf_url"})</span>
