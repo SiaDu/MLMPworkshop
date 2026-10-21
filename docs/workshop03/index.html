@@ -11,12 +11,14 @@
   <link rel="stylesheet" href="./section03.css">
   <link rel="stylesheet" href="./section04.css">
   <link rel="stylesheet" href="./section05.css">
+  <link rel="stylesheet" href="./section06.css">
   <link rel="stylesheet" href="./branding.css">
   <script src="./app.js" defer></script>
   <script src="./section02.js" defer></script>
   <script src="./section03.js" defer></script>
   <script src="./section04.js" defer></script>
   <script src="./section05.js" defer></script>
+  <script src="./section06.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -38,8 +40,9 @@
         <a href="#s3" class="nav-item"><span class="nav-num">03</span>Function Calling + OpenAlex</a>
         <a href="#s4" class="nav-item"><span class="nav-num">04</span>Build &amp; Test an Agent</a>
         <a href="#s5" class="nav-item"><span class="nav-num">05</span>RAG: Paper Analysis</a>
-        <a href="#s6" class="nav-item"><span class="nav-num">06</span>LangGraph</a>
-        <a href="#s7" class="nav-item"><span class="nav-num">07</span>MCP + Multi-Agent</a>
+        <a href="#s6" class="nav-item"><span class="nav-num">06</span>Web Scraping</a>
+        <a href="#s7" class="nav-item"><span class="nav-num">07</span>Complete Research Agent</a>
+        <a href="#s8" class="nav-item"><span class="nav-num">08</span>Agent Ecosystem</a>
       </nav>
       <div class="sidebar-bottom">
         <span class="sidebar-card-eyebrow">TODAY'S PROJECT</span>
@@ -683,13 +686,166 @@ python 03_function_calling.py</code></pre></div>
     </div>
   </div>
 
-  <div class="s5-next"><div><span>UP NEXT · SECTION 06</span><strong>One Agent + One RAG Workflow. How do we connect them?</strong><p>LangGraph introduces state and routing when the research workflow becomes more complex.</p></div><a href="#s6">Explore LangGraph →</a></div>
+  <div class="s5-next"><div><span>UP NEXT · SECTION 06</span><strong>From paper metadata to real PDFs.</strong><p>Learn how Python retrieves open research PDFs through APIs and HTML parsing.</p></div><a href="#s6">Explore Web Scraping →</a></div>
 </section>
-      <section class="s2-section s2-roadmap" id="s6">
-        <div class="s2-section-head"><div><span class="s2-index">SECTION 06 / LANGGRAPH</span><h3>Stateful Agent Workflows</h3><p>Explore nodes, state and conditional routing in a guided instructor demonstration.</p></div></div>
+      <section class="s6-section" id="s6" aria-labelledby="s6-title">
+        <div class="s6-kicker">SECTION 06 <span>/ WEB SCRAPING</span></div>
+        <h2 id="s6-title">From Metadata to <em>PDFs.</em></h2>
+        <p class="s6-lead">Your paper search returns <strong>metadata</strong> — but where is the actual document? Learn how Python requests a webpage, identifies a PDF link and checks whether a download is real. <strong>No LLM is needed.</strong></p>
+        <div class="s6-input" aria-label="Section 6 inputs and outputs">
+          <b>SECTION 04</b><code>papers.csv</code><span aria-hidden="true">→</span>
+          <b>PYTHON</b><code>06_pdf_finder.py</code><span aria-hidden="true">→</span>
+          <b>SECTION 06 OUTPUT</b><code>papers/*.pdf</code>
+        </div>
+
+        <div class="s6-head">
+          <div class="s6-label">01 / UNDERSTAND</div>
+          <h3>One HTTP request. <em>Three possible responses.</em></h3>
+          <p>In Section 3 you called OpenAlex through <code>requests.get()</code>. Web scraping often starts with the <em>same</em> Python request — but the server may return JSON, HTML, or file bytes.</p>
+        </div>
+        <div class="s6-types" aria-label="Compare response types">
+          <article class="s6-type s6-type-accent">
+            <small>01 / API · JSON</small>
+            <h4>Structured data</h4>
+            <p>An API gives Python named fields, such as a paper's PDF URL.</p>
+            <code>response.json()</code>
+          </article>
+          <article class="s6-type">
+            <small>02 / WEBPAGE · HTML</small>
+            <h4>Page structure</h4>
+            <p>BeautifulSoup reads HTML elements and extracts attributes.</p>
+            <code>BeautifulSoup(response.text)</code>
+          </article>
+          <article class="s6-type">
+            <small>03 / DOWNLOAD · PDF</small>
+            <h4>File content</h4>
+            <p>Python saves the returned bytes and validates the PDF.</p>
+            <code>response.content</code>
+          </article>
+        </div>
+        <p class="s6-note"><strong>Key idea:</strong> If an API already provides a working PDF URL, there is no reason to scrape HTML. Scraping is useful when the link is hidden inside a webpage. A URL alone does not guarantee a successful download.</p>
+
+        <div class="s6-head">
+          <div class="s6-label">02 / INTERACTIVE LAB</div>
+          <h3>HTTP Response <em>Inspector.</em></h3>
+          <p>Choose a server response. Examine what Python receives, then decide the correct next step. All examples are simulated and require no API key.</p>
+        </div>
+        <div class="s6-inspector" id="s6-inspector">
+          <div class="s6-bar">
+            <span class="s6-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <b>Response Inspector</b>
+            <span class="s6-sim">SIMULATED · NO REQUESTS</span>
+          </div>
+          <div class="s6-cases" role="group" aria-label="Choose HTTP response">
+            <button class="s6-case" type="button" data-s6-case="0" aria-pressed="true"><b>Case A · API</b><small>JSON with a PDF URL</small></button>
+            <button class="s6-case" type="button" data-s6-case="1" aria-pressed="false"><b>Case B · Website</b><small>HTML contains a PDF link</small></button>
+            <button class="s6-case" type="button" data-s6-case="2" aria-pressed="false"><b>Case C · Blocked</b><small>HTTP 403 returned</small></button>
+          </div>
+          <div class="s6-inspector-grid">
+            <div class="s6-inspector-left">
+              <div class="s6-code-header"><b>RESPONSE BODY</b><span id="s6-response-type">HTTP 200 · application/json</span></div>
+              <pre class="s6-code s6-response-code"><code id="s6-response-code">Loading example...</code></pre>
+            </div>
+            <div class="s6-inspector-right">
+              <div class="s6-overline">YOUR DECISION</div>
+              <h4 id="s6-question">What should Python do next?</h4>
+              <div class="s6-answers" role="group" aria-label="Choose your answer">
+                <button class="s6-answer" type="button" data-s6-answer="0" aria-pressed="false"></button>
+                <button class="s6-answer" type="button" data-s6-answer="1" aria-pressed="false"></button>
+                <button class="s6-answer" type="button" data-s6-answer="2" aria-pressed="false"></button>
+              </div>
+              <div class="s6-feedback" id="s6-feedback" role="status" aria-live="polite" hidden></div>
+            </div>
+          </div>
+          <p class="s6-footnote">The examples are simplified. Real publisher websites may use different HTML, redirects or access rules.</p>
+        </div>
+
+        <div class="s6-head">
+          <div class="s6-label">03 / CODE EXPERIMENT</div>
+          <h3>From HTML to a <em>PDF link.</em></h3>
+          <p>Try extracting a URL from two common HTML patterns. The highlight represents which part Python finds; <code>urljoin()</code> converts a relative path into a complete address.</p>
+        </div>
+        <div class="s6-parser" id="s6-parser">
+          <div class="s6-parser-left">
+            <span class="s6-subhead">WEBPAGE HTML · TEACHING EXAMPLE</span>
+            <div class="s6-tabs" role="group" aria-label="Choose HTML link pattern">
+              <button type="button" data-s6-pattern="meta" aria-pressed="true">Metadata tag</button>
+              <button type="button" data-s6-pattern="anchor" aria-pressed="false">Download link</button>
+            </div>
+            <pre class="s6-code s6-html" data-s6-html="meta"><code>&lt;html&gt;
+  &lt;head&gt;
+    <span class="s6-target">&lt;meta name="citation_pdf_url"
+          content="/files/paper.pdf"&gt;</span>
+  &lt;/head&gt;
+&lt;/html&gt;</code></pre>
+            <pre class="s6-code s6-html" data-s6-html="anchor" hidden><code>&lt;html&gt;
+  &lt;body&gt;
+    <span class="s6-target">&lt;a href="paper.pdf"&gt;
+      Download PDF
+    &lt;/a&gt;</span>
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            <div class="s6-buttons">
+              <button class="s6-primary" type="button" id="s6-extract-run">Find PDF Link →</button>
+              <button class="s6-secondary" type="button" id="s6-extract-reset">Reset ↺</button>
+            </div>
+          </div>
+          <div class="s6-parser-right">
+            <span class="s6-subhead">PYTHON · BEAUTIFULSOUP</span>
+            <p>Assume <code>page_url = "https://example.org/article/123"</code> and <code>soup</code> is the parsed HTML.</p>
+            <pre class="s6-code s6-python"><code id="s6-python-code">Loading...</code></pre>
+            <div class="s6-extracted" role="status" aria-live="polite">
+              <span>EXTRACTED RESULT</span>
+              <code id="s6-output-url">Waiting for extraction</code>
+              <small id="s6-output-info">Click Find PDF Link to inspect the HTML.</small>
+            </div>
+          </div>
+        </div>
+        <p class="s6-parser-note"><strong>Important:</strong> Extracting a URL is not downloading a file. The next HTTP request may return a PDF, HTML, a redirect or an error. The real Python script also checks a downloaded file using PyMuPDF.</p>
+
+        <div class="s6-head">
+          <div class="s6-label">04 / THINK LIKE A DEVELOPER</div>
+          <h3>What can a download <em>really prove?</em></h3>
+          <p>Three common mistakes when automating research downloads.</p>
+        </div>
+        <div class="s6-realities">
+          <article class="s6-reality">
+            <small>ACCESS</small>
+            <h4>HTTP 403 ≠ Paywall</h4>
+            <p>The server rejected the request. We cannot conclude why. Respect <code>robots.txt</code> and use permitted alternative sources or manual links.</p>
+          </article>
+          <article class="s6-reality">
+            <small>FILE VALIDATION</small>
+            <h4>HTTP 200 ≠ Valid PDF</h4>
+            <p>A successful HTTP response might contain an HTML login page. Check the PDF signature and confirm the file opens correctly.</p>
+          </article>
+          <article class="s6-reality">
+            <small>ACADEMIC QUALITY</small>
+            <h4>Downloaded ≠ Reliable</h4>
+            <p>A real paper may be irrelevant or retracted. OpenAlex's <code>is_retracted</code> flag is useful, but never replaces academic verification.</p>
+          </article>
+        </div>
+
+        <div class="s6-handoff">
+          <div>
+            <div class="s6-label">05 / YOUR TURN</div>
+            <h3>Run the real PDF Finder.</h3>
+            <p>Use the Student README for the exact commands, <code>papers/</code> output, <code>pdf_manifest.csv</code> statuses and manual follow-up tasks. No extra environment setup here.</p>
+          </div>
+          <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md#section-6--web-scraping--automatic-pdf-downloading" target="_blank" rel="noopener noreferrer">Open Section 6 README ↗</a>
+        </div>
+
+        <div class="s6-next">
+          <div><span class="s6-overline">COMING NEXT · SECTION 07</span><strong>Build the Complete Research Agent</strong><p>We'll integrate the separate capabilities into one complete project in the next section.</p></div>
+          <a href="#s7">See what's next →</a>
+        </div>
       </section>
+
       <section class="s2-section s2-roadmap" id="s7">
-        <div class="s2-section-head"><div><span class="s2-index">SECTION 07 / MCP + MULTI-AGENT</span><h3>Connecting Tools and Specialized Agents</h3><p>An introduction to standard tool interfaces and when multiple agents may be useful.</p></div></div>
+        <div class="s2-section-head"><div><span class="s2-index">SECTION 07 / COMING NEXT</span><h3>Build the Complete Research Agent</h3><p>Bring the existing research capabilities together into a complete project. This lesson will be developed next.</p></div></div>
+      </section>
+      <section class="s2-section s2-roadmap" id="s8">
+        <div class="s2-section-head"><div><span class="s2-index">SECTION 08 / AGENT ECOSYSTEM</span><h3>LangGraph · MCP · Multi-Agent</h3><p>Concepts and terminology: agent orchestration, tool protocols, and specialized agents.</p></div></div>
       </section>
       <footer class="footer"><span>AI for Media · Workshop 03</span><span>Python starter scripts are supplied in the course repository.</span></footer>
     </main>
