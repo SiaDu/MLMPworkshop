@@ -14,7 +14,7 @@ import requests
 
 from .comparison import append_review, table_summary
 from .legacy import load_script
-from .storage import Library, read_csv, timestamp, safe_slug, pdf_sha256
+from .storage import Library, read_csv, timestamp, pdf_sha256, paper_id
 
 
 class ResearchPipeline:
@@ -69,6 +69,8 @@ class ResearchPipeline:
         papers = read_csv(records_path)
         new_count, library_total = self.library.merge_papers(papers)
         info = json.loads(log_path.read_text(encoding="utf-8"))
+        self.library.state["latest_search_ids"] = [paper_id(paper) for paper in papers]
+        self.library.state["latest_download_paths"] = []
         self.library.state["search_history"].append({
             "at": timestamp(), "topic": topic.strip(),
             "requested": count, "found": len(papers),
@@ -86,13 +88,18 @@ class ResearchPipeline:
             "note": "Paper metadata is not the paper's full text.",
         }
 
-    def download(self, limit: int = 0) -> dict:
-        """Download or reuse open PDFs for metadata records, logging each failure."""
+    def download(self, limit: int = 0, latest_search_only: bool = True) -> dict:
+        """Download open PDFs; by default restrict to the most recent search."""
         if not 0 <= limit <= 30:
-            raise ValueError("limit must be between 0 and 30 (0 = all records).")
-        entries = read_csv(self.library.paper_csv)
-        if not entries:
+            raise ValueError("limit must be between 0 and 30 (0 = all selected records).")
+        all_entries = list(enumerate(read_csv(self.library.paper_csv), start=1))
+        if not all_entries:
             return {"status": "NO_PAPERS", "message": "Search for papers first, or place a PDF in papers/."}
+        recent_ids = set(self.library.state.get("latest_search_ids") or [])
+        if latest_search_only and recent_ids:
+            entries = [(i, row) for i, row in all_entries if paper_id(row) in recent_ids]
+        else:
+            entries = all_entries
         if limit:
             entries = entries[:limit]
         downloader = load_script(str(self.root), "06")
@@ -100,8 +107,9 @@ class ResearchPipeline:
         session.headers.update({"User-Agent": downloader.USER_AGENT})
         robots = downloader.RobotsPolicy(session)
         outcome = {"DOWNLOADED": 0, "EXISTING": 0, "FAILED": 0}
-        for index, row in enumerate(entries, start=1):
-            print(f"[DOWNLOAD {index}/{len(entries)}] {row.get('title', '')[:70]}", flush=True)
+        available_filenames = []
+        for count_index, (index, row) in enumerate(entries, start=1):
+            print(f"[DOWNLOAD {count_index}/{len(entries)}] {row.get('title', '')[:70]}", flush=True)
             try:
                 result = downloader.process_paper(
                     session, robots, row, index, self.library.papers,
@@ -117,12 +125,17 @@ class ResearchPipeline:
                     "error": f"Unexpected {type(error).__name__}; manual review needed.",
                 })
             outcome[result["status"]] += 1
+            if result["status"] in {"DOWNLOADED", "EXISTING"} and result.get("pdf_path"):
+                available_filenames.append(Path(result["pdf_path"]).name)
             # Commit per paper: an interruption does not lose previous results.
             self.library.merge_download_report([result])
+            self.library.state["latest_download_paths"] = available_filenames
+            self.library.save()
             print(f"  [{result['status']}] {result.get('pdf_path') or result.get('error', '')[:100]}")
         return {
             "processed": len(entries), **outcome,
             "available": outcome["DOWNLOADED"] + outcome["EXISTING"],
+            "scope": "latest_search" if latest_search_only and recent_ids else "all_metadata",
             "manifest": "pdf_manifest.csv",
             "pdf_folder": "papers/",
         }
@@ -195,6 +208,30 @@ class ResearchPipeline:
             "results": results,
             "comparison_table": str(self.library.comparison_csv.relative_to(self.root)),
             "still_pending": len(self.library.pending()),
+        }
+
+    def analyse_latest_downloads(self) -> dict:
+        """Analyse only PDFs obtained for the most recent download batch.
+
+        Intended for multi-tool tasks such as 'search, download, make a table'.
+        Older, unrelated local PDFs are not included.
+        """
+        names = list(dict.fromkeys(self.library.state.get("latest_download_paths") or []))
+        results = []
+        for name in names[:30]:
+            try:
+                result = self.analyse_one(name)
+            except Exception as error:
+                result = {"status": "FAILED", "filename": name,
+                          "error": f"{type(error).__name__}: {str(error)[:160]}"}
+            results.append(result)
+        return {
+            "selected": len(names[:30]),
+            "analysed": sum(item["status"] == "ANALYSED" for item in results),
+            "already_analysed": sum(item["status"] == "ALREADY_ANALYSED" for item in results),
+            "failed": sum(item["status"] == "FAILED" for item in results),
+            "results": results,
+            "comparison_table": str(self.library.comparison_csv.relative_to(self.root)),
         }
 
     def analyse_only_new_one(self) -> dict:
