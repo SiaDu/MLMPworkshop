@@ -1,0 +1,52 @@
+name: Workshop Navigation and Titles
+
+on:
+  push:
+    paths:
+      - "docs/workshop03/index.html"
+      - "docs/workshop03/app.js"
+      - "docs/workshop03/styles.css"
+      - "tests/workshop_navigation.test.js"
+      - ".github/workflows/workshop-navigation.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: JavaScript syntax
+        run: node --check docs/workshop03/app.js
+      - name: Sidebar scrollspy regression
+        run: node tests/workshop_navigation.test.js
+      - name: Check navigation names equal Section 4–8 primary headings
+        run: |
+          python - <<'PY'
+          import re
+          from html import unescape
+          from pathlib import Path
+
+          html = Path("docs/workshop03/index.html").read_text(encoding="utf-8")
+          css = Path("docs/workshop03/styles.css").read_text(encoding="utf-8")
+
+          def plain(fragment):
+              return re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", "", fragment))).strip()
+
+          for number in range(4, 9):
+              nav = re.search(r'<a href="#s%s" class="nav-item">(.+?)</a>' % number, html)
+              heading = re.search(r'<h2 id="s%s-title">(.+?)</h2>' % number, html)
+              assert nav and heading, f"Missing section {number} heading or navigation link"
+              nav_name = plain(nav.group(1)).removeprefix(f"{number:02d}").strip()
+              title = plain(heading.group(1))
+              assert nav_name == title, (number, nav_name, title)
+              section = html.split('id="s%s"' % number)[1]
+              intro = section.split('class="lesson-subtitle"', 1)
+              assert len(intro) == 2, f"Missing subtitle in Section {number}"
+          assert html.count('class="lesson-subtitle"') == 5
+          assert ".nav-item:hover:not(.active)" in css
+          assert ".lesson-subtitle" in css
+          print("Sections 4–8 sidebar labels exactly match primary headings; all subtitles present.")
+          PY
