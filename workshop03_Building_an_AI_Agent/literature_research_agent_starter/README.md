@@ -574,16 +574,43 @@ The other **four** CSV columns are bibliography metadata. The script also tries 
 
 ### Part C — Run the script
 
-Download the new zip (link not availabel yet). The ZIP includes the updated `pyproject.toml`,`05_rag.py`,`06.py(haven't decide name)`. Move these file into your `literature_research_agent_starter\` directory (replace the `pyproject.toml`). Use list to check. Then install the extra dependencies and activate the environment:
+**Download the additional workshop files** and add them to your existing starter project:
+
+**[⬇ Download workshop03_added_files.zip](https://raw.githubusercontent.com/SiaDu/MLMPworkshop/main/workshop03_Building_an_AI_Agent/workshop03_added_files.zip)**
+
+1. Download `workshop03_added_files.zip`, then **Extract Here** on your Desktop.
+2. Copy the **contents of the extracted folder** into your existing `literature_research_agent_starter/` directory. Keep the same folder structure; replace the older `pyproject.toml` when prompted.
+3. Do **not** create a second nested starter project, or delete your existing `papers/`, `outputs/` or `state/` folders.
+4. Confirm the added files. **Section 5** uses `05_rag.py`; **Section 6** uses `06_pdf_finder.py`; **Section 7** uses `07_research_agent.py` and the `research_agent/` package. If a later-section file is missing from your extracted ZIP, get its current version from the [GitHub starter directory](https://github.com/SiaDu/MLMPworkshop/tree/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter).
+
+The project structure for the later sections is:
+
+```text
+literature_research_agent_starter/
+├── 01_first_api_call.py ... 04_research_agent.py
+├── 05_rag.py
+├── 06_pdf_finder.py
+├── 07_research_agent.py
+├── tools.py
+├── pyproject.toml                 # Updated dependencies
+├── research_agent/                # Section 7 Python modules
+├── papers/                        # Your own PDFs
+├── outputs/                       # Created by the programs
+└── state/                         # Created by Section 7
+```
+
+Update dependencies in the **same** starter environment:
 
 ```bash
+cd ~/Desktop/literature_research_agent_starter
 pwd
-# Should be "/home/yourID/Desktop/literature_research_agent_starter"
 ls
-source .venv/bin/activate
 uv sync
+source .venv/bin/activate
 python -c "import os; print('API key is set' if os.getenv('GEMINI_API_KEY') else 'Missing API key')"
 ```
+
+`outputs/` and `state/` are generated at runtime; it is normal if they do not exist yet.
 
 Run the analysis on **your own PDF**:
 
@@ -778,3 +805,171 @@ If `research_status` is `RETRACTED`, inspect the original retraction notice befo
 | `RETRACTED` | Verify the paper's status before including it in academic work. |
 
 For conceptual explanations and an interactive HTML Parsing demonstration, return to [Section 6 — Web Scraping](https://siadu.github.io/MLMPworkshop/workshop03/#s6).
+
+---
+
+# Section 7 — Complete Literature Research Agent
+
+**Hands-on guide.** Section 7 combines the paper search (Section 4), single-paper RAG analysis (Section 5), and automatic open-PDF downloading (Section 6) into **one natural-language terminal Agent**.
+
+**Your goal:** Ask the Agent for a research task from **any starting point**, then check the cumulative method comparison table. There is no requirement to start with a new search when you already have a PDF.
+
+## Part A — Start the Agent
+
+Use the **existing** `literature_research_agent_starter/` folder and environment. If `07_research_agent.py` or `research_agent/` is missing, follow the additional-files instructions in Section 5, Part C.
+
+```bash
+cd ~/Desktop/literature_research_agent_starter
+source .venv/bin/activate
+python 07_research_agent.py
+```
+
+The terminal displays:
+
+```text
+Literature Research Agent — Section 7
+Search papers, download open PDFs, analyse papers, or update the method table.
+You can add a PDF to papers/ and ask to analyse only that file.
+Type 'exit' or 'quit' to stop; 'help' for examples.
+
+You:
+```
+
+**Type the natural-language request after `You:`** (not as a new Linux command). The Agent can choose Python tools and use their results to decide which tool to call next.
+
+Type `help` to see sample requests, or `exit` / `quit` to stop. Restarting the program does **not** delete your local research files.
+
+### Optional terminal commands
+
+To inspect existing files **without a Gemini API request**:
+
+```bash
+python 07_research_agent.py --status
+```
+
+To send just one request and exit:
+
+```bash
+python 07_research_agent.py --once "Show my research library status"
+```
+
+Interactive requests and `--once` use the existing `GEMINI_API_KEY` from Section 2; `--status` does not.
+
+## Part B — Choose Where to Start
+
+The Agent can start with a search, existing metadata, or a PDF you added manually. Try these instructions at the `You:` prompt:
+
+| Starting point | Example natural-language request |
+| --- | --- |
+| **Complete workflow** | `Find 10 papers about speech-driven facial animation since 2022, download available PDFs and create a method comparison table.` |
+| **Search only** | `Find 5 papers about AI facial animation since 2023.` |
+| **Download papers** | `Download available open PDFs from my latest paper search.` |
+| **One manual PDF** | `I added TOG2024Pan.pdf to papers/. Analyse only this PDF and add it to the table.` |
+| **All new local PDFs** | `Analyse all unprocessed PDFs in papers/ and update the table.` |
+| **One unspecified new PDF** | `Analyse the only new PDF I added to papers/.` |
+| **Check results** | `Show my research library status and method comparison table.` |
+| **Review failures** | `Show failed PDF downloads and their manual links.` |
+
+### Example 1 — Full workflow
+
+At `You:`:
+
+```text
+Find 2 papers about speech-driven facial animation since 2022,
+download available PDFs and add them to the method comparison table.
+```
+
+A successful run may include these tool names:
+
+```text
+[TOOL] search_papers
+[TOOL] download_open_pdfs
+[DOWNLOAD 1/2] ...
+[TOOL] analyse_latest_downloads
+[RAG] Analysing ...
+[EXPORT] outputs/.../literature_review.csv
+[TOOL] show_method_table
+```
+
+Your actual results will differ. A search returning **10 paper records** does not mean 10 PDFs could be downloaded or analysed. Report the numbers for **found**, **available PDF**, **analysed**, and **failed** separately.
+
+The complete workflow processes the **latest search/download batch**, rather than re-analysing all your unrelated old PDFs. An instruction such as “find 2 more” is not a guarantee of two *new-to-your-library* papers: search results may include existing records. Inspect the reported new-record count.
+
+### Example 2 — Manually add a PDF and analyse only that paper
+
+1. Place a **permitted, text-based PDF** directly in your existing `papers/` folder.
+2. Type its **exact filename**:
+
+```text
+I added TOG2024Pan.pdf to papers/.
+Analyse only this PDF and add it to the method comparison table.
+```
+
+`paper.pdf` and `paper.pdf.pdf` are different filenames. If you are unsure, ask `List my local PDFs and their filenames.`
+
+If several PDFs remain unprocessed, “analyse the only new PDF” may return `NEED_FILENAME`. Specify which file you want; do not rely on the Agent guessing.
+
+### Example 3 — Resume existing work
+
+You can close the program and return later:
+
+```text
+Analyse all unprocessed PDFs in my papers folder.
+```
+
+The Agent uses each PDF's **SHA-256 hash** to recognise a previously completed analysis. An unchanged analysed PDF can be skipped without spending tokens on another RAG run.
+
+## Part C — Inspect the Results
+
+```text
+literature_research_agent_starter/
+├── papers.csv                         # Cumulative metadata (Section 7)
+├── pdf_manifest.csv                   # Cumulative download report
+├── papers/
+│   ├── TOG2024Pan.pdf                 # Manually added PDF
+│   └── paper_012_example.pdf          # Example downloaded PDF
+├── outputs/
+│   ├── TOG2024Pan/
+│   │   ├── literature_review.csv      # Individual 13-column review row
+│   │   ├── evidence.json              # Extracted evidence and page references
+│   │   └── paper.bib                  # If verified metadata is available
+│   └── method_comparison.csv          # Cumulative review of analysed PDFs
+└── state/
+    ├── library.json                   # Saved analysis status
+    └── searches/                      # Per-search plans and logs
+```
+
+Open **`outputs/method_comparison.csv`** in VS Code or a spreadsheet application. Its columns contain the **13 Section 5 review fields**, plus `PDF SHA256` and `PDF Filename`, which identify the analysed file.
+
+When a new PDF is successfully analysed, the Agent adds **one row**. Existing rows (including your manual corrections and added spreadsheet columns) are preserved. A previously analysed unchanged PDF should not produce a duplicate row.
+
+To audit an answer, locate the original paper's `outputs/<pdf_name>/evidence.json` and compare two fields with the actual passages and pages in the PDF.
+
+**Current limitation:** The Agent does **not** have a dedicated tool to import the contents of an old `literature_review.csv` into `method_comparison.csv` without re-running RAG. If an older analysis was created before Section 7 started tracking it, the Agent may analyse its PDF again in order to add its row.
+
+## Part D — Your Tasks
+
+**Required:**
+
+1. Start the Agent. Choose **one PDF already in `papers/`**, ask it to analyse only that file, and check whether its method-table row is added or already exists.
+2. Ask the Agent to find **two papers** on a research topic, download the available open PDFs, and update the method comparison table. Record the number found, downloaded, analysed and unavailable.
+3. Open `outputs/method_comparison.csv` and the corresponding `evidence.json`. Verify **two extracted fields** against the original PDF.
+4. Stop and restart the program; ask for the library status and confirm your existing table is still available.
+
+**Optional:** Add one new PDF manually and verify that it adds just one method-table row without changing manually corrected cells in older rows.
+
+## Part E — Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| `07_research_agent.py` or `research_agent/` missing | Copy the additional workshop files into the **existing** starter directory (Section 5, Part C). |
+| `GEMINI_API_KEY` missing | Follow Section 2. Never publish your API key. |
+| `Cannot send a request, as the client has been closed` | Update **both** `07_research_agent.py` and `research_agent/agent.py` from the current [starter repository](https://github.com/SiaDu/MLMPworkshop/tree/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter); restart. |
+| `No such PDF in papers/` | Check the exact spelling and extension; ask the Agent to list local PDFs. |
+| `NEED_FILENAME` | More than one PDF is awaiting analysis. Supply the exact filename. |
+| `ALREADY_ANALYSED` | The PDF is already tracked; the existing table row should be preserved. |
+| Not all searched papers appear in the table | The full-text PDF may not have been available or analysis may have failed. Check `pdf_manifest.csv` and the terminal log. |
+| Gemini `429` / `503` or incomplete run | Check quota and API availability. Local results can be reused when you retry, but review the state before repeating a large task. |
+| Method/table contents appear incorrect | Verify `evidence.json` and the original PDF. The LLM may misinterpret papers; a valid evidence ID does not guarantee factual support. |
+
+**Academic check:** Do not cite the generated method table without verifying the original papers. Unavailable PDFs are not grounds for inventing methods, datasets, metrics or references.
