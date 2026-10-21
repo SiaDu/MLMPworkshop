@@ -524,31 +524,16 @@ References: [OpenAlex filtering documentation](https://help.openalex.org/api/fil
 
 ### Part A — Prepare your own paper
 
-1. Choose a paper relevant to your AI for Media survey. It can be from Section 4's `papers.csv` or from your own search.
-2. Download an appropriately licensed/openly accessible paper **lawfully**. Use a PDF with selectable text rather than a scanned image. Avoid sending restricted or confidential material to third-party cloud APIs without permission.
-3. enter your `literature_research_agent_starter/` directory in Terminal, make a new folder `papers/`
+1. Choose a paper relevant to your AI for Media survey, either from Section 4's `papers.csv` or from your own search.
+2. Get a PDF that you can access and are allowed to process with the Gemini API. Choose one with selectable text rather than a scanned image. Do not upload confidential material without permission.
+3. Open your existing project folder and create `papers/` if needed:
 
 ```bash
-# if you put the directory in Desktop
-cd Desktop/literature_research_agent_starter 
-mkdir papers
-```
-4. Place it in the new `papers/` folder inside the **existing** `literature_research_agent_starter/` directory:
-
-```text
-literature_research_agent_starter/
-├── README.md
-├── pyproject.toml
-├── 01_first_api_call.py
-├── 02_structured_output.py
-├── 03_function_calling.py
-├── 04_research_agent.py
-├── tools.py
-└── papers/
-    └── my_paper.pdf   ← your own downloaded paper
+cd ~/Desktop/literature_research_agent_starter
+mkdir -p papers
 ```
 
-**Only the PDF path is required.** 
+4. Place your PDF in `papers/`, for example `papers/my_paper.pdf`. You will use this file path in Part C.
 
 ### Part B — Understand the workflow
 
@@ -568,7 +553,7 @@ Python checks that cited IDs exist and exports the results
 literature_review.csv + evidence.json (+ paper.bib if available)
 ```
 
-The other **four** CSV columns are bibliography metadata. The script also tries to find a DOI on the first pages, matches the paper using OpenAlex, and requests BibTeX using DOI Content Negotiation. Section 4's `papers.csv` may be reused as an optional metadata cache, but **does not contain full paper text**.
+Four of the CSV columns contain publication details. The script tries to identify the paper using its DOI or OpenAlex; Section 4's `papers.csv` can help with this, but it does **not** contain the full paper text.
 
 **RAG** means **Retrieval-Augmented Generation**. Python retrieves text passages first; Gemini then answers using those passages. **BM25** searches for matching words.
 
@@ -578,10 +563,11 @@ The other **four** CSV columns are bibliography metadata. The script also tries 
 
 **[⬇ Download workshop03_added_files.zip](https://raw.githubusercontent.com/SiaDu/MLMPworkshop/main/workshop03_Building_an_AI_Agent/workshop03_added_files.zip)**
 
-1. Download `workshop03_added_files.zip`, then **Extract Here** on your Desktop.
-2. Copy the **contents of the extracted folder** into your existing `literature_research_agent_starter/` directory. Keep the same folder structure; replace the older `pyproject.toml` when prompted.
-3. Do **not** create a second nested starter project, or delete your existing `papers/`, `outputs/` or `state/` folders.
-4. Confirm the added files. **Section 5** uses `05_rag.py`; **Section 6** uses `06_pdf_finder.py`; **Section 7** uses `07_research_agent.py` and the `research_agent/` package. If a later-section file is missing from your extracted ZIP, get its current version from the [GitHub starter directory](https://github.com/SiaDu/MLMPworkshop/tree/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter).
+1. Download and extract the ZIP on your Desktop.
+2. Copy the extracted files into your **existing** `literature_research_agent_starter/` folder. Replace `pyproject.toml` when prompted; keep your own `papers/`, `outputs/` and `state/` data.
+3. Check that `05_rag.py` is present. Sections 6–7 also use `06_pdf_finder.py`, `07_research_agent.py` and `research_agent/`. If a file is missing from the ZIP, get it from the [GitHub starter folder](https://github.com/SiaDu/MLMPworkshop/tree/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter).
+
+**Important:** Copy the files into the existing project, not into a second nested `literature_research_agent_starter/` folder.
 
 The project structure for the later sections is:
 
@@ -610,7 +596,7 @@ source .venv/bin/activate
 python -c "import os; print('API key is set' if os.getenv('GEMINI_API_KEY') else 'Missing API key')"
 ```
 
-`outputs/` and `state/` are generated at runtime; it is normal if they do not exist yet.
+The programs create `outputs/` and `state/` when needed.
 
 Run the analysis on **your own PDF**:
 
@@ -628,7 +614,7 @@ python 05_rag.py --pdf "papers/my_paper.pdf" --doi "10.1234/your-doi"
 
 The DOI above is a **placeholder, not a real DOI**. Replace it with your paper's DOI.
 
-Follow the terminal log: `[PDF]` → `[CHUNK]` → `[RETRIEVE]` → `[EVIDENCE]` → `[METADATA]` → `[EXPORT]`. The Retriever is ordinary Python, and Gemini generates the analysis.
+Watch the terminal for `[PDF]`, `[RETRIEVE]` and `[EXPORT]` to check that the script processed the PDF and saved its output.
 
 ### Part D — Inspect the output
 
@@ -653,7 +639,7 @@ Contributions, Limitations, Future Work
 
 `Dataset Name` is the dataset identifier; `Dataset Description` explains the data. `Model` names the model or architecture.
 
-**Bibliographic metadata is optional.** The PDF's title is extracted separately from the first page by Gemini, and checked against the first pages before OpenAlex matching. No verified DOI means no fabricated BibTeX; other fields may still be analysed. A missing `paper.bib` is therefore not a failed RAG run.
+**Note:** If the paper's details cannot be verified, `paper.bib` may be missing. This does not mean RAG analysis failed.
 
 ### Part E — Verify two fields (required)
 
@@ -679,12 +665,11 @@ If a field is `Not found in retrieved evidence`, it means **the current retrieva
 | `Not found in retrieved evidence` | Review the PDF and `FIELD_QUERIES` in `05_rag.py`; keyword retrieval has limits. |
 | Wrong answer or citation | Check the referenced page, correct your own notes and report the problem. |
 
-### Advanced challenges (optional, No starter code or solutions are provided. Try to design and implement your own approach.)
+### Advanced Challenge (Optional)
 
-- Compare BM25 with Embedding-based semantic search on the *same* PDF.
-- Use OpenAlex to find an appropriately licensed PDF URL automatically.
-- Process multiple PDFs and append each paper's row to an aggregate CSV.
-- Integrate Section 4 (paper discovery) and Section 5 (RAG analysis) in Section 6's LangGraph instructor demonstration.
+No starter code or solution is provided. Try your own approach.
+
+- Compare BM25 with embedding-based semantic search on the *same* PDF.
 
 Documentation: [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/) · [rank-bm25](https://pypi.org/project/rank-bm25/) · [Gemini Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output) · [OpenAlex](https://developers.openalex.org/) · [Crossref DOI Content Negotiation](https://www.crossref.org/documentation/retrieve-metadata/content-negotiation/).
 
@@ -722,7 +707,9 @@ python 06_pdf_finder.py --input papers.csv
 
 The script creates `papers/` if necessary, saves readable PDFs there and writes the download report to `pdf_manifest.csv`. It leaves `papers.csv` unchanged.
 
-The script first tries OpenAlex's open PDF links, then other open locations through Semantic Scholar / Europe PMC, then permitted paper landing pages. It does not scrape Google Scholar or bypass website access restrictions. An optional `OPENALEX_API_KEY` can make OpenAlex's cached PDFs available, but no new key is required for this task.
+The script first checks PDF links returned by OpenAlex, Semantic Scholar and Europe PMC. If needed, it checks paper webpages for a PDF link. It does not automatically scrape Google Scholar or bypass access restrictions.
+
+**Optional:** `OPENALEX_API_KEY` may enable additional OpenAlex cached PDFs. No new API key is required for this task.
 
 ## Part B — Check the Results
 
@@ -743,8 +730,8 @@ The terminal prints a status for **each** processed paper:
 | Status | What to do |
 | --- | --- |
 | `DOWNLOADED` | Open the newly downloaded PDF in `papers/`. |
-| `EXISTING` | The local PDF was already present and validated. **Do not download it again.** |
-| `FAILED` | Check `error` and `manual_url` in `pdf_manifest.csv`. The next paper is still processed. |
+| `EXISTING` | A valid PDF is already in `papers/`; no new download is needed. |
+| `FAILED` | Check `error` and `manual_url` in `pdf_manifest.csv`. The script continues to the next paper. |
 
 Example of a *possible* summary (your results will differ):
 
@@ -760,15 +747,12 @@ Open the report in a spreadsheet application or VS Code. Each processed paper oc
 
 | Column | What it contains |
 | --- | --- |
-| `title` / `doi` / `openalex_url` | Paper identity from the search / lookup |
-| `status` | `DOWNLOADED`, `EXISTING` or `FAILED` |
-| `pdf_path` | Local path to a valid PDF (if available) |
-| `source_pdf_url` | Successful new PDF download URL |
-| `candidate_pdf_url` | One attempted PDF link, even if downloading failed |
-| `manual_url` | Paper page for manual follow-up |
-| `scholar_url` | Google Scholar **manual** search link |
+| `title` / `doi` / `openalex_url` | Paper details |
+| `status` / `pdf_path` | Download result and local PDF path |
+| `source_pdf_url` / `candidate_pdf_url` | Successful download link / attempted PDF link |
+| `manual_url` / `scholar_url` | Paper page / Google Scholar link for manual checking |
 | `research_status` | `RETRACTED`, `NOT_FLAGGED` or `UNKNOWN` |
-| `error` | Details recorded when automatic downloading failed |
+| `error` | Reason recorded for a failed download, if known |
 
 **Important:** Each run **rewrites** `pdf_manifest.csv`. Running with `--limit 5` creates a five-paper report; the later full run replaces it with a report for all input rows. Valid PDFs already in `papers/` are reused.
 
@@ -776,29 +760,29 @@ If `research_status` is `RETRACTED`, inspect the original retraction notice befo
 
 ## Part C — Handle Failed Downloads
 
-1. Filter `pdf_manifest.csv` for rows with `status = FAILED`.
-2. Read `error` and check `candidate_pdf_url`, if present.
-3. Open `manual_url` in your browser. If necessary, follow `scholar_url` and search for a permitted version **manually**.
-4. If you obtain a legally accessible PDF, save it inside your project's `papers/` directory. Do not circumvent paywalls, logins, CAPTCHAs or `robots.txt`.
+1. Filter `pdf_manifest.csv` for `FAILED` rows.
+2. Read `error` and check whether `candidate_pdf_url` contains a link.
+3. Open `manual_url` in your browser. You can also try `scholar_url` to look for an available PDF.
+4. If you find a PDF you can access and are allowed to use, save it in `papers/`. Respect login, payment and website access restrictions; do not bypass them.
 
-**Be precise:** HTTP 403 means automated access was rejected; it does not prove the paper is behind a paywall. If the reason is not clear, write **unknown** rather than guessing.
+**Note:** A PDF may require login or payment, but downloads can also fail for technical reasons. HTTP 403 only tells you that the request was rejected; it does **not** prove there is a paywall.
 
 ## Part D — Your Tasks
 
 **Required:**
 1. Run `06_pdf_finder.py` for all papers in your `papers.csv`.
 2. Open `pdf_manifest.csv` and count how many papers have `DOWNLOADED`, `EXISTING` and `FAILED`. Check one local PDF opens correctly.
-3. Select one `FAILED` row. Report its `error` and whether a PDF URL was found. Use `manual_url` to investigate, without bypassing website restrictions.
+3. Choose one `FAILED` row. Read `error`, check whether `candidate_pdf_url` contains a link, and open `manual_url` to look for the paper yourself.
 
-**Optional:** Open a permitted academic webpage, inspect the HTML source for `citation_pdf_url` or a PDF `<a>` element, and compare what you see with the automatic report.
+**Optional:** Open a paper webpage you can access. Check its HTML for `citation_pdf_url` or a PDF `<a>` link, and compare it with the automatic report.
 
 ### Troubleshooting
 
 | Problem | Action |
 | --- | --- |
 | `papers.csv` not found | Run Section 4 and check the current working directory. |
-| HTTP `403` / `robots.txt disallows automated access` | Use the manual links; do not bypass restrictions. |
-| HTTP `429` | Stop repeated attempts; the source may be rate-limiting. |
+| HTTP `403` / `robots.txt disallows automated access` | Automated access was blocked. Use the manual links and respect access restrictions. |
+| HTTP `429` | Stop repeated requests; the website may be limiting access. |
 | `No PDF link found in HTML` | Inspect `manual_url` yourself; the website might use another page structure. |
 | `Response was not a PDF file` | The server returned another format, possibly HTML. |
 | `EXISTING` | No action needed; a valid local PDF was found. |
@@ -861,14 +845,14 @@ The Agent can start with a search, existing metadata, or a PDF you added manuall
 
 | Starting point | Example natural-language request |
 | --- | --- |
-| **Complete workflow** | `Find 10 papers about speech-driven facial animation since 2022, download available PDFs and create a method comparison table.` |
 | **Search only** | `Find 5 papers about AI facial animation since 2023.` |
-| **Download papers** | `Download available open PDFs from my latest paper search.` |
-| **One manual PDF** | `I added TOG2024Pan.pdf to papers/. Analyse only this PDF and add it to the table.` |
-| **All new local PDFs** | `Analyse all unprocessed PDFs in papers/ and update the table.` |
-| **One unspecified new PDF** | `Analyse the only new PDF I added to papers/.` |
+| **Download papers** | `Download available PDFs from my latest search.` |
+| **New local PDFs** | `Analyse all unprocessed PDFs in papers/.` |
+| **One new PDF** | `Analyse the only new PDF I added to papers/.` |
 | **Check results** | `Show my research library status and method comparison table.` |
-| **Review failures** | `Show failed PDF downloads and their manual links.` |
+| **Check failures** | `Show failed PDF downloads and their manual links.` |
+
+For a complete workflow or a specific manual PDF, follow the two examples below.
 
 ### Example 1 — Full workflow
 
@@ -891,13 +875,13 @@ A successful run may include these tool names:
 [TOOL] show_method_table
 ```
 
-Your actual results will differ. A search returning **10 paper records** does not mean 10 PDFs could be downloaded or analysed. Report the numbers for **found**, **available PDF**, **analysed**, and **failed** separately.
+Your results will vary. Check how many papers were **found**, how many PDFs were **downloaded**, and how many were **successfully analysed**. Finding two papers does not guarantee two full-text analyses.
 
-The complete workflow processes the **latest search/download batch**, rather than re-analysing all your unrelated old PDFs. An instruction such as “find 2 more” is not a guarantee of two *new-to-your-library* papers: search results may include existing records. Inspect the reported new-record count.
+This workflow processes the **latest search/download batch**. If you ask for “two more”, check `new_unique_papers`: some search results may already be in your library.
 
 ### Example 2 — Manually add a PDF and analyse only that paper
 
-1. Place a **permitted, text-based PDF** directly in your existing `papers/` folder.
+1. Place a text-based PDF you can access and are allowed to use directly in `papers/`.
 2. Type its **exact filename**:
 
 ```text
@@ -905,19 +889,9 @@ I added TOG2024Pan.pdf to papers/.
 Analyse only this PDF and add it to the method comparison table.
 ```
 
-`paper.pdf` and `paper.pdf.pdf` are different filenames. If you are unsure, ask `List my local PDFs and their filenames.`
+`paper.pdf` and `paper.pdf.pdf` are different filenames. If unsure, ask `List my local PDFs and their filenames.` If several PDFs are unprocessed, the Agent may ask for a filename instead of choosing one.
 
-If several PDFs remain unprocessed, “analyse the only new PDF” may return `NEED_FILENAME`. Specify which file you want; do not rely on the Agent guessing.
-
-### Example 3 — Resume existing work
-
-You can close the program and return later:
-
-```text
-Analyse all unprocessed PDFs in my papers folder.
-```
-
-The Agent uses each PDF's **SHA-256 hash** to recognise a previously completed analysis. An unchanged analysed PDF can be skipped without spending tokens on another RAG run.
+**Resume later:** You can restart the Agent and ask it to analyse unprocessed PDFs. Python uses each file's **SHA-256 hash** to skip unchanged PDFs it has already analysed.
 
 ## Part C — Inspect the Results
 
@@ -939,11 +913,9 @@ literature_research_agent_starter/
     └── searches/                      # Per-search plans and logs
 ```
 
-Open **`outputs/method_comparison.csv`** in VS Code or a spreadsheet application. Its columns contain the **13 Section 5 review fields**, plus `PDF SHA256` and `PDF Filename`, which identify the analysed file.
+Open **`outputs/method_comparison.csv`**. It contains the 13 Section 5 fields plus `PDF SHA256` and `PDF Filename` to identify each file. New analyses add rows; existing rows and manual edits are preserved.
 
-When a new PDF is successfully analysed, the Agent adds **one row**. Existing rows (including your manual corrections and added spreadsheet columns) are preserved. A previously analysed unchanged PDF should not produce a duplicate row.
-
-To audit an answer, locate the original paper's `outputs/<pdf_name>/evidence.json` and compare two fields with the actual passages and pages in the PDF.
+To check an answer, open the paper's `outputs/<pdf_name>/evidence.json` and compare it with the original PDF.
 
 **Current limitation:** The Agent does **not** have a dedicated tool to import the contents of an old `literature_review.csv` into `method_comparison.csv` without re-running RAG. If an older analysis was created before Section 7 started tracking it, the Agent may analyse its PDF again in order to add its row.
 
@@ -952,7 +924,7 @@ To audit an answer, locate the original paper's `outputs/<pdf_name>/evidence.jso
 **Required:**
 
 1. Start the Agent. Choose **one PDF already in `papers/`**, ask it to analyse only that file, and check whether its method-table row is added or already exists.
-2. Ask the Agent to find **two papers** on a research topic, download the available open PDFs, and update the method comparison table. Record the number found, downloaded, analysed and unavailable.
+2. Ask the Agent to find **two papers** on a topic, download available PDFs, and update the method comparison table. Check how many were found, downloaded and analysed.
 3. Open `outputs/method_comparison.csv` and the corresponding `evidence.json`. Verify **two extracted fields** against the original PDF.
 4. Stop and restart the program; ask for the library status and confirm your existing table is still available.
 
@@ -968,7 +940,7 @@ To audit an answer, locate the original paper's `outputs/<pdf_name>/evidence.jso
 | `No such PDF in papers/` | Check the exact spelling and extension; ask the Agent to list local PDFs. |
 | `NEED_FILENAME` | More than one PDF is awaiting analysis. Supply the exact filename. |
 | `ALREADY_ANALYSED` | The PDF is already tracked; the existing table row should be preserved. |
-| Not all searched papers appear in the table | The full-text PDF may not have been available or analysis may have failed. Check `pdf_manifest.csv` and the terminal log. |
+| Not all searched papers appear in the table | Some PDFs may not be available, or analysis may have failed. Check `pdf_manifest.csv` and the terminal log. |
 | Gemini `429` / `503` or incomplete run | Check quota and API availability. Local results can be reused when you retry, but review the state before repeating a large task. |
 | Method/table contents appear incorrect | Verify `evidence.json` and the original PDF. The LLM may misinterpret papers; a valid evidence ID does not guarantee factual support. |
 
