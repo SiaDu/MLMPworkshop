@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="./section04.css">
   <link rel="stylesheet" href="./section05.css">
   <link rel="stylesheet" href="./section06.css">
+  <link rel="stylesheet" href="./section07.css">
   <link rel="stylesheet" href="./branding.css">
   <script src="./app.js" defer></script>
   <script src="./section02.js" defer></script>
@@ -19,6 +20,7 @@
   <script src="./section04.js" defer></script>
   <script src="./section05.js" defer></script>
   <script src="./section06.js" defer></script>
+  <script src="./section07.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -897,13 +899,188 @@ from urllib.parse import urljoin</code></pre>
           <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md#section-6--web-scraping--automatic-pdf-downloading" target="_blank" rel="noopener noreferrer">Open Section 6 README ↗</a>
         </div>
         <div class="s6-next">
-          <div><span class="s6-overline">COMING NEXT · SECTION 07</span><strong>Build the Complete Research Agent</strong><p>Next, we will integrate the capabilities into one complete project.</p></div>
-          <a href="#s7">See what's next →</a>
+          <div><span class="s6-overline">NEXT · SECTION 07</span><strong>Use All Three Capabilities in One Agent</strong><p>Connect search, open-PDF downloading and RAG with natural-language tool selection.</p></div>
+          <a href="#s7">Explore Section 7 →</a>
         </div>
       </section>
 
-      <section class="s2-section s2-roadmap" id="s7">
-        <div class="s2-section-head"><div><span class="s2-index">SECTION 07 / COMING NEXT</span><h3>Build the Complete Research Agent</h3><p>Bring the existing research capabilities together into a complete project. This lesson will be developed next.</p></div></div>
+      <section class="s7-section" id="s7" aria-labelledby="s7-title">
+        <div class="s7-kicker">SECTION 07 <span>/ COMPLETE RESEARCH AGENT</span></div>
+        <h2 id="s7-title">One Agent. <em>Many Research Tasks.</em></h2>
+        <p class="s7-lead">We have already built paper search, PDF downloading and RAG analysis. Now we connect these capabilities so <strong>Gemini can choose which Python tool to use</strong> based on a student's request — without running every step manually.</p>
+
+        <div class="s7-head">
+          <div class="s7-label">A / FROM SCRIPTS TO AN AGENT</div>
+          <h3>From Separate Scripts <em>to One Agent.</em></h3>
+          <p>In Sections 4–6, you ran different scripts for different research tasks. Section 4 already used LLM Function Calling within a paper-search workflow. Section 7 extends that idea: the LLM can route a request <strong>across search, download, analysis and reporting tools.</strong></p>
+        </div>
+
+        <div class="s7-comparison">
+          <article class="s7-compare-panel">
+            <div class="s7-compare-label">BEFORE / SEPARATE ENTRY POINTS</div>
+            <h4>You choose each script.</h4>
+            <div class="s7-compare-flow" aria-label="Separate scripts must be selected and run by the user">
+              <div class="s7-node">04_research_agent.py · Search</div>
+              <div class="s7-flow-arrow" aria-hidden="true">↓</div>
+              <div class="s7-node">06_pdf_finder.py · Download</div>
+              <div class="s7-flow-arrow" aria-hidden="true">↓</div>
+              <div class="s7-node">05_rag.py · Analyse one PDF</div>
+            </div>
+            <p>The user decides which script to run and when. Each script has its own entry point.</p>
+          </article>
+          <article class="s7-compare-panel s7-agent-panel">
+            <div class="s7-compare-label">NOW / SHARED TOOLS</div>
+            <h4>Gemini chooses the next tool.</h4>
+            <div class="s7-compare-flow" aria-label="One agent routes natural language to different reusable tools">
+              <div class="s7-node">Terminal · Natural Language</div>
+              <div class="s7-flow-arrow" aria-hidden="true">↓</div>
+              <div class="s7-node s7-node-active">Gemini · Function Calling</div>
+              <div class="s7-flow-arrow" aria-hidden="true">↓</div>
+              <div class="s7-node">Selected Python Tool → Result</div>
+            </div>
+            <p>The LLM chooses among reusable Python tools and can decide what to do next after receiving a result.</p>
+          </article>
+        </div>
+        <div class="s7-section-map" aria-label="Section 7 source file responsibilities">
+          <b>HOW THE CODE IS ORGANISED</b>
+          <code>07_research_agent.py</code><span>Terminal</span>
+          <code>agent.py</code><span>LLM + tools</span>
+          <code>pipeline.py</code><span>Research operations</span>
+          <code>storage.py</code><span>Saved state</span>
+        </div>
+
+        <div class="s7-head">
+          <div class="s7-label">B / AGENT DECISION MAKING</div>
+          <h3>One Agent. <em>Different Tools.</em></h3>
+          <p>A student might want a full research workflow, an analysis of one manually added PDF, or just a list of failed downloads. <strong>The correct starting tool depends on the request.</strong> Choose a scenario and step through the possible tool calls.</p>
+        </div>
+
+        <div class="s7-route" id="s7-tool-demo">
+          <div class="s7-bar">
+            <span class="s7-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <strong>Agent Tool Router</strong>
+            <span class="s7-sim">SIMULATED · NO API REQUESTS</span>
+          </div>
+          <div class="s7-case-tabs" role="group" aria-label="Select a natural language task">
+            <button type="button" data-s7-case="0" aria-pressed="true">Full Research</button>
+            <button type="button" data-s7-case="1" aria-pressed="false">One Manual PDF</button>
+            <button type="button" data-s7-case="2" aria-pressed="false">Pending PDFs</button>
+            <button type="button" data-s7-case="3" aria-pressed="false">Download Failures</button>
+          </div>
+          <div class="s7-user-card">
+            <span class="s7-small-heading">USER · NATURAL LANGUAGE</span>
+            <p id="s7-case-prompt">Choose a scenario to inspect tool routing.</p>
+          </div>
+          <div class="s7-route-center"><span aria-hidden="true">✳</span> GEMINI CHOOSES A TOOL <span aria-hidden="true">↓</span></div>
+          <div class="s7-route-grid">
+            <div class="s7-tool-path" id="s7-tool-path" aria-label="Possible Python tool sequence">
+              <div class="s7-tool-step"><span class="s7-tool-n">01</span><div class="s7-tool-detail"><strong>Loading tools...</strong></div></div>
+            </div>
+            <div class="s7-route-right">
+              <span class="s7-route-step-counter" id="s7-route-count">TOOL 1 / 1</span>
+              <h4>Why this tool?</h4>
+              <div class="s7-why">
+                <p id="s7-route-why" aria-live="polite">Choose a scenario to see the reasoning.</p>
+              </div>
+              <span class="s7-small-heading">WHAT THIS SCENARIO TEACHES</span>
+              <p id="s7-route-takeaway"></p>
+              <div class="s7-route-controls">
+                <button type="button" class="s7-secondary" id="s7-route-prev" disabled>← Previous</button>
+                <button type="button" class="s7-primary" id="s7-route-next">Next tool →</button>
+                <button type="button" class="s7-secondary" id="s7-route-reset">Reset ↺</button>
+              </div>
+            </div>
+          </div>
+          <p class="s7-route-footnote">These are illustrative tool paths based on the actual Section 7 tool names. Gemini may choose a different sequence depending on tool results. This demonstration does not contact APIs or modify files.</p>
+        </div>
+
+        <div class="s7-head">
+          <div class="s7-label">C / STATE MANAGEMENT</div>
+          <h3>How Does the Agent <em>Remember Its Work?</em></h3>
+          <p>Gemini's conversation alone is not enough to track files between program runs. Python stores research state in <code>state/library.json</code>, reads files in <code>papers/</code>, and records finished analysis in <code>method_comparison.csv</code>. A PDF's <strong>SHA-256 fingerprint</strong> helps identify unchanged files.</p>
+        </div>
+        <div class="s7-state-lab" id="s7-state-demo">
+          <div class="s7-state-bar">
+            <span class="s7-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <strong>Incremental Research Library</strong>
+            <span>SIMULATED FILES</span>
+          </div>
+          <p class="s7-state-intro">Imagine your library already contains three analysed PDFs. Add one new paper, analyse it, then try analysing it again. Watch the stored state and table rows change.</p>
+          <div class="s7-state-stats" aria-live="polite">
+            <div class="s7-stat"><span>PDF FILES</span><strong id="s7-state-pdfs">3</strong></div>
+            <div class="s7-stat"><span>PENDING ANALYSIS</span><strong id="s7-state-pending">0</strong></div>
+            <div class="s7-stat"><span>METHOD TABLE ROWS</span><strong id="s7-state-rows">3</strong></div>
+          </div>
+          <div class="s7-state-columns">
+            <div class="s7-state-column">
+              <span class="s7-small-heading">papers/ · LOCAL PDF FILES</span>
+              <div class="s7-file-list">
+                <div>paper_A.pdf</div>
+                <div>paper_B.pdf</div>
+                <div>paper_C.pdf</div>
+                <div class="s7-new-file" id="s7-state-new-file" hidden>TOG2024Pan.pdf · NEW</div>
+              </div>
+            </div>
+            <div class="s7-state-column">
+              <span class="s7-small-heading">outputs/method_comparison.csv</span>
+              <div class="s7-compare-rows">
+                <div>Row A · Paper A (manually corrected)</div>
+                <div>Row B · Paper B</div>
+                <div>Row C · Paper C</div>
+                <div class="s7-new-row" id="s7-state-new-row" hidden>Row D · TOG2024Pan</div>
+              </div>
+            </div>
+          </div>
+          <div class="s7-state-buttons">
+            <button type="button" class="s7-primary" id="s7-state-add">1 · Add New PDF</button>
+            <button type="button" class="s7-primary" id="s7-state-analyse" disabled>2 · Analyse New PDF</button>
+            <button type="button" class="s7-secondary" id="s7-state-replay" disabled>3 · Analyse Again</button>
+            <button type="button" class="s7-secondary" id="s7-state-reset">Reset ↺</button>
+          </div>
+          <div class="s7-state-activity" id="s7-state-activity" aria-live="polite">
+            <span class="s7-small-heading">PYTHON STATE / TOOL RESULT</span>
+            <p class="s7-state-message" id="s7-state-message">3 PDFs already analysed.</p>
+          </div>
+        </div>
+        <p class="s7-state-note"><strong>Persistent state is stored by Python, not remembered by the LLM.</strong> Existing method-table rows (including manual edits) are preserved when new analyses are appended. This is a simulation; the controls above do not create real files.</p>
+
+        <div class="s7-head">
+          <div class="s7-label">D / FAILURES &amp; LIMITATIONS</div>
+          <h3>Making Decisions <em>Doesn't Guarantee Success.</em></h3>
+          <p>An Agent can decide which tool to try next, but it cannot guarantee access to a paper, successful PDF extraction, or correct scientific interpretation.</p>
+        </div>
+        <div class="s7-limits">
+          <div class="s7-limits-numbers" aria-label="Illustrative results for a ten-paper search">
+            <div class="s7-limit-stat"><strong>10</strong><span>PAPER RECORDS FOUND</span></div>
+            <div class="s7-limit-stat"><strong>6</strong><span>PDFs AVAILABLE</span></div>
+            <div class="s7-limit-stat"><strong>6</strong><span>FULL-TEXT ANALYSES</span></div>
+            <div class="s7-limit-stat"><strong>4</strong><span>NEED MANUAL FOLLOW-UP</span></div>
+          </div>
+          <div class="s7-limit-copy">
+            <p><strong>Metadata ≠ Full text.</strong> If four PDFs are unavailable, the Agent must report that those papers were not analysed from full text. It must not invent missing research methods.</p>
+            <p><strong>Evidence needs review.</strong> RAG output and valid evidence IDs are not proof of scientific accuracy. Verify important claims against the original PDFs.</p>
+            <p><strong>Current implementation:</strong> Section 7 can analyse local PDFs and append results; it does not yet have a dedicated tool to import a previous <code>literature_review.csv</code> without re-running RAG.</p>
+          </div>
+        </div>
+
+        <div class="s7-handoff">
+          <div>
+            <div class="s7-label">E / YOUR TURN</div>
+            <h3>Run Your Complete Research Agent.</h3>
+            <p>Start <code>07_research_agent.py</code> in the terminal. Try a complete research request, analyse a manually added PDF, then check the cumulative table. The README contains the commands, folder structure and troubleshooting steps.</p>
+          </div>
+          <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md#section-7--complete-literature-research-agent" target="_blank" rel="noopener noreferrer">Open Section 7 README ↗</a>
+        </div>
+
+        <div class="s7-keyideas" aria-label="Three takeaways">
+          <article class="s7-keyidea"><strong>Tool Calling</strong><p>The LLM chooses which Python function to request.</p></article>
+          <article class="s7-keyidea"><strong>Orchestration</strong><p>Tool results can inform the Agent's next action.</p></article>
+          <article class="s7-keyidea"><strong>State Management</strong><p>Python records previous work to avoid repeating completed tasks.</p></article>
+        </div>
+        <div class="s7-next">
+          <div><b>Next: Agent Ecosystem</b><small>Section 8 · LangGraph, MCP and Multi-Agent concepts</small></div>
+          <a href="#s8">Go to Section 8 →</a>
+        </div>
       </section>
       <section class="s2-section s2-roadmap" id="s8">
         <div class="s2-section-head"><div><span class="s2-index">SECTION 08 / AGENT ECOSYSTEM</span><h3>LangGraph · MCP · Multi-Agent</h3><p>Concepts and terminology: agent orchestration, tool protocols, and specialized agents.</p></div></div>
