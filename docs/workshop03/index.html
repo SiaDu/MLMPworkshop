@@ -690,64 +690,178 @@ python 03_function_calling.py</code></pre></div>
 </section>
       <section class="s6-section" id="s6" aria-labelledby="s6-title">
         <div class="s6-kicker">SECTION 06 <span>/ WEB SCRAPING</span></div>
-        <h2 id="s6-title">From Metadata to <em>PDFs.</em></h2>
-        <p class="s6-lead">Your paper search returns <strong>metadata</strong> — but where is the actual document? Learn how Python requests a webpage, identifies a PDF link and checks whether a download is real. <strong>No LLM is needed.</strong></p>
-        <div class="s6-input" aria-label="Section 6 inputs and outputs">
-          <b>SECTION 04</b><code>papers.csv</code><span aria-hidden="true">→</span>
-          <b>PYTHON</b><code>06_pdf_finder.py</code><span aria-hidden="true">→</span>
-          <b>SECTION 06 OUTPUT</b><code>papers/*.pdf</code>
+        <h2 id="s6-title">Find a PDF with <em>Web Scraping.</em></h2>
+        <p class="s6-lead">A research paper webpage may show a <strong>Download PDF</strong> link. How can Python find that link <strong>inside the webpage's code</strong> — without asking an LLM to read the page?</p>
+
+        <div class="s6-head">
+          <div class="s6-label">A / WHAT IS WEB SCRAPING?</div>
+          <h3>From a webpage to <em>structured information.</em></h3>
+          <p><strong>Web Scraping</strong> means using code to extract specific information from a webpage's HTML. A browser displays the page; Python can inspect the HTML elements behind it.</p>
+        </div>
+        <div class="s6-page-compare" aria-label="Compare a browser view with HTML source code">
+          <div class="s6-browser">
+            <div class="s6-mini-bar"><span aria-hidden="true">◉ ◉ ◉</span><code>example.org/article/123</code></div>
+            <div class="s6-browser-content">
+              <span class="s6-mini-eyebrow">WHAT A STUDENT SEES</span>
+              <h4>Research Paper Title</h4>
+              <p>Example authors · Published 2025</p>
+              <div class="s6-fake-link" aria-label="Illustrative Download PDF link">↓ &nbsp; Download PDF</div>
+            </div>
+          </div>
+          <div class="s6-compare-arrow" aria-hidden="true">⇄</div>
+          <div class="s6-source">
+            <span class="s6-mini-eyebrow">WHAT PYTHON SEES IN HTML</span>
+            <pre><code>&lt;html&gt;
+  &lt;body&gt;
+    <span class="s6-green-code">&lt;a href="/files/paper.pdf"&gt;</span>
+      Download PDF
+    <span class="s6-green-code">&lt;/a&gt;</span>
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            <p><strong>href</strong> contains the link we want.</p>
+          </div>
+        </div>
+        <div class="s6-request-lesson">
+          <span class="s6-method">1 · requests.get(page_url)</span>
+          <span aria-hidden="true">→</span>
+          <span class="s6-method">2 · response.text</span>
+          <span aria-hidden="true">→</span>
+          <span class="s6-method">3 · BeautifulSoup</span>
+          <span aria-hidden="true">→</span>
+          <span class="s6-method">4 · Extract href</span>
+        </div>
+        <p class="s6-clarify"><strong>Web Scraping vs. Web Crawling:</strong> Scraping extracts data from a page. Crawling systematically discovers and follows links across many pages. Our PDF Finder performs <strong>targeted scraping</strong> on known paper pages; it is <strong>not</strong> a general-purpose web crawler.</p>
+
+        <div class="s6-head">
+          <div class="s6-label">B / OUR PDF FINDER</div>
+          <h3>When do we use <em>an API or Web Scraping?</em></h3>
+          <p>Our input is <code>papers.csv</code> from Section 4. The program checks structured academic APIs <strong>before</strong> parsing webpages. A PDF download is a separate HTTP request — it is not itself Web Scraping.</p>
+        </div>
+        <div class="s6-flow" role="img" aria-label="PDF Finder logic: from papers.csv, query OpenAlex API for JSON metadata. Attempt direct open-access PDF URLs first. If they fail, query Semantic Scholar and Europe PMC APIs for other open sources. If these also fail, inspect permitted landing-page HTML with BeautifulSoup to extract a PDF link. Download and validate any candidate PDF; save a valid file or report failure.">
+          <div class="s6-flow-node s6-flow-input">
+            <span>INPUT</span><strong>papers.csv</strong><small>DOI or OpenAlex ID</small>
+          </div>
+          <div class="s6-flow-down" aria-hidden="true">↓</div>
+          <div class="s6-flow-node s6-flow-api">
+            <span>API · JSON</span><strong>OpenAlex</strong><small>Find open PDF URLs + landing-page URLs</small>
+          </div>
+          <div class="s6-flow-down" aria-hidden="true">↓</div>
+          <div class="s6-flow-decision"><strong>Working direct PDF?</strong></div>
+          <div class="s6-flow-branches">
+            <div class="s6-flow-branch">
+              <div class="s6-flow-branch-label s6-yes">YES ↓</div>
+              <div class="s6-flow-node s6-flow-download">
+                <span>HTTP · PDF BYTES</span><strong>Download directly</strong><small>No HTML Scraping needed</small>
+              </div>
+            </div>
+            <div class="s6-flow-branch">
+              <div class="s6-flow-branch-label s6-no">NO / FAILED ↓</div>
+              <div class="s6-flow-node s6-flow-api">
+                <span>MORE APIs · JSON</span><strong>Semantic Scholar / Europe PMC</strong><small>Try alternative open PDF URLs first</small>
+              </div>
+              <div class="s6-flow-down" aria-hidden="true">↓ IF STILL FAILED</div>
+              <div class="s6-flow-node s6-flow-scrape">
+                <span>WEB SCRAPING · HTML</span><strong>BeautifulSoup</strong><small>Inspect permitted landing pages → PDF link</small>
+              </div>
+              <div class="s6-flow-down" aria-hidden="true">↓ IF A LINK IS FOUND</div>
+              <div class="s6-flow-node s6-flow-download">
+                <span>HTTP · PDF BYTES</span><strong>Download PDF</strong><small>From extracted URL</small>
+              </div>
+            </div>
+          </div>
+          <div class="s6-flow-join" aria-hidden="true">↓</div>
+          <div class="s6-flow-node s6-flow-output">
+            <span>VALIDATE + REPORT</span><strong>Readable PDF → papers/</strong>
+            <small>Otherwise FAILED + manual links → pdf_manifest.csv</small>
+          </div>
+        </div>
+        <div class="s6-flow-legend">
+          <span><i class="s6-legend-api"></i> API request returns JSON</span>
+          <span><i class="s6-legend-scrape"></i> Web Scraping parses HTML</span>
+          <span><i class="s6-legend-download"></i> HTTP download requests PDF bytes</span>
+        </div>
+        <p class="s6-flow-note">The diagram focuses on the source-search path. In the actual script, a validated local PDF is marked <code>EXISTING</code> and reused before any network lookup. Failed searches do not stop the next paper.</p>
+
+        <div class="s6-head">
+          <div class="s6-label">C / STEP-BY-STEP CODE LAB</div>
+          <h3>How does Python find <em>the PDF URL?</em></h3>
+          <p>Follow the code <strong>one line at a time</strong>. Watch how Python moves from HTML text → a matching element → a relative path → a complete PDF URL. Switch between a <code>&lt;meta&gt;</code> tag and a <code>&lt;a&gt;</code> link.</p>
+        </div>
+        <div class="s6-parser" id="s6-parser">
+          <div class="s6-parser-top">
+            <span class="s6-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <strong>HTML Parsing Walkthrough</strong>
+            <span class="s6-sim">SIMULATED · NO NETWORK</span>
+          </div>
+          <div class="s6-parser-tabs" role="group" aria-label="Choose HTML structure">
+            <button type="button" data-s6-pattern="meta" aria-pressed="true">Metadata tag: &lt;meta&gt;</button>
+            <button type="button" data-s6-pattern="anchor" aria-pressed="false">Download link: &lt;a&gt;</button>
+          </div>
+          <div class="s6-parser-grid">
+            <div class="s6-parser-col">
+              <span class="s6-subhead">WEBPAGE SOURCE · HTML</span>
+              <p class="s6-site-address"><strong>page_url</strong> = <code>https://example.org/article/123</code></p>
+              <pre class="s6-code s6-html" data-s6-html="meta"><code>&lt;html&gt;
+  &lt;head&gt;
+    <span class="s6-target">&lt;meta name="citation_pdf_url"
+          <span class="s6-target-attr">content="/files/paper.pdf"</span>&gt;</span>
+  &lt;/head&gt;
+&lt;/html&gt;</code></pre>
+              <pre class="s6-code s6-html" data-s6-html="anchor" hidden><code>&lt;html&gt;
+  &lt;body&gt;
+    <span class="s6-target">&lt;a <span class="s6-target-attr">href="paper.pdf"</span>&gt;
+      Download PDF
+    &lt;/a&gt;</span>
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+              <p class="s6-html-explain">HTML <strong>tags</strong> describe elements. <strong>Attributes</strong> such as <code>href</code> and <code>content</code> hold values we can extract.</p>
+            </div>
+            <div class="s6-parser-col">
+              <span class="s6-subhead">PYTHON · FOLLOW THE HIGHLIGHTED LINE</span>
+              <pre class="s6-code s6-python"><code id="s6-python-code"><span class="s6-step-line" data-s6-line="0">response = requests.get(page_url)</span>
+<span class="s6-step-line" data-s6-line="1">soup = BeautifulSoup(response.text, "html.parser")</span>
+<span class="s6-step-line" data-s6-line="2">tag = soup.find("meta", attrs={"name": "citation_pdf_url"})</span>
+<span class="s6-step-line" data-s6-line="3">path = tag.get("content")</span>
+<span class="s6-step-line" data-s6-line="4">pdf_url = urljoin(page_url, path)</span></code></pre>
+              <div class="s6-step-result" aria-live="polite">
+                <div class="s6-step-topline"><span>LINE EXPLANATION</span><strong id="s6-step-position">0 / 5</strong></div>
+                <p id="s6-step-description">Click Start walkthrough to execute the first line.</p>
+                <span class="s6-subhead">PYTHON RESULT</span>
+                <code id="s6-output-url">Waiting to start...</code>
+              </div>
+              <div class="s6-buttons">
+                <button class="s6-secondary" type="button" id="s6-step-prev" disabled>← Previous</button>
+                <button class="s6-primary" type="button" id="s6-step-next">Start walkthrough →</button>
+                <button class="s6-secondary" type="button" id="s6-step-reset">Reset ↺</button>
+              </div>
+            </div>
+          </div>
+          <p class="s6-footnote">Teaching example: the real <code>06_pdf_finder.py</code> also handles other HTML patterns, broken URLs, redirects, access rules and failed downloads. The walkthrough does not execute Python or contact real websites.</p>
         </div>
 
         <div class="s6-head">
-          <div class="s6-label">A / UNDERSTAND</div>
-          <h3>One HTTP request. <em>Three possible responses.</em></h3>
-          <p>In Section 3 you called OpenAlex through <code>requests.get()</code>. Web scraping often starts with the <em>same</em> Python request — but the server may return JSON, HTML, or file bytes.</p>
-        </div>
-        <div class="s6-types" aria-label="Compare response types">
-          <article class="s6-type s6-type-accent">
-            <small>01 / API · JSON</small>
-            <h4>Structured data</h4>
-            <p>An API gives Python named fields, such as a paper's PDF URL.</p>
-            <code>response.json()</code>
-          </article>
-          <article class="s6-type">
-            <small>02 / WEBPAGE · HTML</small>
-            <h4>Page structure</h4>
-            <p>BeautifulSoup reads HTML elements and extracts attributes.</p>
-            <code>BeautifulSoup(response.text)</code>
-          </article>
-          <article class="s6-type">
-            <small>03 / DOWNLOAD · PDF</small>
-            <h4>File content</h4>
-            <p>Python saves the returned bytes and validates the PDF.</p>
-            <code>response.content</code>
-          </article>
-        </div>
-        <p class="s6-note"><strong>Key idea:</strong> If an API already provides a working PDF URL, there is no reason to scrape HTML. Scraping is useful when the link is hidden inside a webpage. A URL alone does not guarantee a successful download.</p>
-
-        <div class="s6-head">
-          <div class="s6-label">B / INTERACTIVE LAB</div>
-          <h3>HTTP Response <em>Inspector.</em></h3>
-          <p>Choose a server response. Examine what Python receives, then decide the correct next step. All examples are simulated and require no API key.</p>
+          <div class="s6-label">D / UNDERSTAND HTTP RESULTS</div>
+          <h3>What does the server <em>actually return?</em></h3>
+          <p>Now that you know the workflow, test whether you can interpret JSON, HTML and an HTTP error. Each is a response to a <strong>different request</strong> in a real PDF Finder.</p>
         </div>
         <div class="s6-inspector" id="s6-inspector">
           <div class="s6-bar">
             <span class="s6-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-            <b>Response Inspector</b>
+            <b>HTTP Response Inspector</b>
             <span class="s6-sim">SIMULATED · NO REQUESTS</span>
           </div>
           <div class="s6-cases" role="group" aria-label="Choose HTTP response">
-            <button class="s6-case" type="button" data-s6-case="0" aria-pressed="true"><b>Case A · API</b><small>JSON with a PDF URL</small></button>
-            <button class="s6-case" type="button" data-s6-case="1" aria-pressed="false"><b>Case B · Website</b><small>HTML contains a PDF link</small></button>
-            <button class="s6-case" type="button" data-s6-case="2" aria-pressed="false"><b>Case C · Blocked</b><small>HTTP 403 returned</small></button>
+            <button class="s6-case" type="button" data-s6-case="0" aria-pressed="true"><b>Case A · API</b><small>JSON with PDF URL</small></button>
+            <button class="s6-case" type="button" data-s6-case="1" aria-pressed="false"><b>Case B · Webpage</b><small>HTML with PDF link</small></button>
+            <button class="s6-case" type="button" data-s6-case="2" aria-pressed="false"><b>Case C · Blocked</b><small>HTTP 403</small></button>
           </div>
           <div class="s6-inspector-grid">
             <div class="s6-inspector-left">
-              <div class="s6-code-header"><b>RESPONSE BODY</b><span id="s6-response-type">HTTP 200 · application/json</span></div>
-              <pre class="s6-code s6-response-code"><code id="s6-response-code">Loading example...</code></pre>
+              <div class="s6-code-header"><b>RESPONSE EXAMPLE</b><span id="s6-response-type">HTTP 200 · application/json</span></div>
+              <pre class="s6-code s6-response-code"><code id="s6-response-code">Loading...</code></pre>
             </div>
             <div class="s6-inspector-right">
-              <div class="s6-overline">YOUR DECISION</div>
+              <div class="s6-overline">CHOOSE THE CORRECT INTERPRETATION</div>
               <h4 id="s6-question">What should Python do next?</h4>
               <div class="s6-answers" role="group" aria-label="Choose your answer">
                 <button class="s6-answer" type="button" data-s6-answer="0" aria-pressed="false"></button>
@@ -757,89 +871,32 @@ python 03_function_calling.py</code></pre></div>
               <div class="s6-feedback" id="s6-feedback" role="status" aria-live="polite" hidden></div>
             </div>
           </div>
-          <p class="s6-footnote">The examples are simplified. Real publisher websites may use different HTML, redirects or access rules.</p>
         </div>
-
-        <div class="s6-head">
-          <div class="s6-label">C / CODE EXPERIMENT</div>
-          <h3>From HTML to a <em>PDF link.</em></h3>
-          <p>Try extracting a URL from two common HTML patterns. The highlight represents which part Python finds; <code>urljoin()</code> converts a relative path into a complete address.</p>
-        </div>
-        <div class="s6-parser" id="s6-parser">
-          <div class="s6-parser-left">
-            <span class="s6-subhead">WEBPAGE HTML · TEACHING EXAMPLE</span>
-            <div class="s6-tabs" role="group" aria-label="Choose HTML link pattern">
-              <button type="button" data-s6-pattern="meta" aria-pressed="true">Metadata tag</button>
-              <button type="button" data-s6-pattern="anchor" aria-pressed="false">Download link</button>
-            </div>
-            <pre class="s6-code s6-html" data-s6-html="meta"><code>&lt;html&gt;
-  &lt;head&gt;
-    <span class="s6-target">&lt;meta name="citation_pdf_url"
-          content="/files/paper.pdf"&gt;</span>
-  &lt;/head&gt;
-&lt;/html&gt;</code></pre>
-            <pre class="s6-code s6-html" data-s6-html="anchor" hidden><code>&lt;html&gt;
-  &lt;body&gt;
-    <span class="s6-target">&lt;a href="paper.pdf"&gt;
-      Download PDF
-    &lt;/a&gt;</span>
-  &lt;/body&gt;
-&lt;/html&gt;</code></pre>
-            <div class="s6-buttons">
-              <button class="s6-primary" type="button" id="s6-extract-run">Find PDF Link →</button>
-              <button class="s6-secondary" type="button" id="s6-extract-reset">Reset ↺</button>
-            </div>
-          </div>
-          <div class="s6-parser-right">
-            <span class="s6-subhead">PYTHON · BEAUTIFULSOUP</span>
-            <p>Assume <code>page_url = "https://example.org/article/123"</code> and <code>soup</code> is the parsed HTML.</p>
-            <pre class="s6-code s6-python"><code id="s6-python-code">Loading...</code></pre>
-            <div class="s6-extracted" role="status" aria-live="polite">
-              <span>EXTRACTED RESULT</span>
-              <code id="s6-output-url">Waiting for extraction</code>
-              <small id="s6-output-info">Click Find PDF Link to inspect the HTML.</small>
-            </div>
+        <div class="s6-result-table">
+          <div class="s6-result-table-title">WHAT THE PROGRAM CAN CONFIRM</div>
+          <div class="s6-result-scroll">
+            <table>
+              <thead><tr><th scope="col">Observed result</th><th scope="col">✓ What we know</th><th scope="col">✗ What we cannot conclude</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">HTTP 403</th><td>Server rejected the request.</td><td>Whether payment or login is required.</td></tr>
+                <tr><th scope="row">HTTP 200</th><td>HTTP request succeeded.</td><td>Whether the response contains a valid PDF.</td></tr>
+                <tr><th scope="row">PDF validated</th><td>Local PDF can be opened and read.</td><td>Whether the research is relevant, reliable or retracted.</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <p class="s6-parser-note"><strong>Important:</strong> Extracting a URL is not downloading a file. The next HTTP request may return a PDF, HTML, a redirect or an error. The real Python script also checks a downloaded file using PyMuPDF.</p>
-
-        <div class="s6-head">
-          <div class="s6-label">D / UNDERSTAND THE RESULTS</div>
-          <h3>What Does Each Result <em>Actually Tell Us?</em></h3>
-          <p>A program can verify what happened, but it cannot always explain why.</p>
-        </div>
-        <div class="s6-realities">
-          <article class="s6-reality">
-            <small>HTTP STATUS</small>
-            <h4>HTTP 403</h4>
-            <div class="s6-reality-fact"><b class="s6-know">✓ WHAT WE KNOW</b><p>The server rejected the request.</p></div>
-            <div class="s6-reality-fact"><b class="s6-unknown">✗ WHAT WE CANNOT CONCLUDE</b><p>Whether the paper requires payment or login.</p></div>
-          </article>
-          <article class="s6-reality">
-            <small>HTTP STATUS</small>
-            <h4>HTTP 200</h4>
-            <div class="s6-reality-fact"><b class="s6-know">✓ WHAT WE KNOW</b><p>The HTTP request succeeded.</p></div>
-            <div class="s6-reality-fact"><b class="s6-unknown">✗ WHAT WE CANNOT CONCLUDE</b><p>Whether the returned content is a valid PDF.</p></div>
-          </article>
-          <article class="s6-reality">
-            <small>FILE VALIDATION</small>
-            <h4>PDF Validated</h4>
-            <div class="s6-reality-fact"><b class="s6-know">✓ WHAT WE KNOW</b><p>The PDF can be opened and read.</p></div>
-            <div class="s6-reality-fact"><b class="s6-unknown">✗ WHAT WE CANNOT CONCLUDE</b><p>Whether the research is relevant, reliable or retracted.</p></div>
-          </article>
-        </div>
+        <p class="s6-results-note">A PDF link is not a guarantee of a PDF file. The script validates downloaded files with PyMuPDF, respects site restrictions, and records failures for manual review instead of guessing their causes.</p>
 
         <div class="s6-handoff">
           <div>
             <div class="s6-label">E / YOUR TURN</div>
             <h3>Run the real PDF Finder.</h3>
-            <p>Use the Student README for the exact commands, <code>papers/</code> output, <code>pdf_manifest.csv</code> statuses and manual follow-up tasks. No extra environment setup here.</p>
+            <p>The student README covers the actual <code>06_pdf_finder.py</code> commands, downloaded <code>papers/</code> files and <code>pdf_manifest.csv</code> report. Use it as an operation guide after the concepts.</p>
           </div>
           <a href="https://github.com/SiaDu/MLMPworkshop/blob/main/workshop03_Building_an_AI_Agent/literature_research_agent_starter/README.md#section-6--web-scraping--automatic-pdf-downloading" target="_blank" rel="noopener noreferrer">Open Section 6 README ↗</a>
         </div>
-
         <div class="s6-next">
-          <div><span class="s6-overline">COMING NEXT · SECTION 07</span><strong>Build the Complete Research Agent</strong><p>We'll integrate the separate capabilities into one complete project in the next section.</p></div>
+          <div><span class="s6-overline">COMING NEXT · SECTION 07</span><strong>Build the Complete Research Agent</strong><p>Next, we will integrate the capabilities into one complete project.</p></div>
           <a href="#s7">See what's next →</a>
         </div>
       </section>
