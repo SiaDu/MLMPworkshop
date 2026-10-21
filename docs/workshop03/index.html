@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="./section05.css">
   <link rel="stylesheet" href="./section06.css">
   <link rel="stylesheet" href="./section07.css">
+  <link rel="stylesheet" href="./section08.css">
   <link rel="stylesheet" href="./branding.css">
   <script src="./app.js" defer></script>
   <script src="./section02.js" defer></script>
@@ -21,6 +22,7 @@
   <script src="./section05.js" defer></script>
   <script src="./section06.js" defer></script>
   <script src="./section07.js" defer></script>
+  <script src="./section08.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -1107,8 +1109,205 @@ from urllib.parse import urljoin</code></pre>
           <a href="#s8">Go to Section 8 →</a>
         </div>
       </section>
-      <section class="s2-section s2-roadmap" id="s8">
-        <div class="s2-section-head"><div><span class="s2-index">SECTION 08 / AGENT ECOSYSTEM</span><h3>LangGraph · MCP · Multi-Agent</h3><p>Concepts and terminology: agent orchestration, tool protocols, and specialized agents.</p></div></div>
+      <section class="s8-section" id="s8" aria-labelledby="s8-title">
+        <div class="s8-kicker">SECTION 08 <span>/ AGENT ECOSYSTEM</span></div>
+        <h2 id="s8-title">Beyond a Single Agent. <em>Know the Ecosystem.</em></h2>
+        <p class="s8-lead">You've built a working Research Agent using Gemini and Python. What are <strong>LangGraph, MCP, Agent Skills and Multi-Agent Systems</strong> — and when would you actually need them? This section is a guide to common terms, <strong>not a coding exercise.</strong></p>
+
+        <div class="s8-category-map" aria-label="Four different kinds of Agent technology">
+          <div class="s8-category"><span>FRAMEWORK</span><strong>How to build and coordinate it</strong><small>LangChain · LangGraph</small></div>
+          <div class="s8-category"><span>PROTOCOL &amp; GUIDANCE</span><strong>How to connect and instruct it</strong><small>MCP · Skills · A2A</small></div>
+          <div class="s8-category"><span>ARCHITECTURE</span><strong>How it decides and collaborates</strong><small>Multi-Agent · ReAct · Memory</small></div>
+          <div class="s8-category"><span>RELIABILITY</span><strong>How to keep it useful and safe</strong><small>HITL · Guardrails · Evals · Tracing</small></div>
+        </div>
+        <p class="s8-takeaway"><strong>First distinction:</strong> These are not alternative LLMs. They are frameworks, protocols, architectural patterns and techniques built around models and tools.</p>
+
+        <div class="s8-head">
+          <div class="s8-label">A / AGENT FRAMEWORKS</div>
+          <h3>How do developers <em>organise complex Agents?</em></h3>
+          <p>In Section 7, our own Python code coordinates Gemini and research tools. Frameworks can make that organisation easier as applications grow.</p>
+        </div>
+
+        <div class="s8-framework-grid">
+          <article class="s8-framework">
+            <div class="s8-term-kicker"><span class="s8-symbol">LC</span><span>FRAMEWORK / COMPONENTS</span></div>
+            <h4>LangChain</h4>
+            <p>A framework with reusable building blocks for model interactions, tool use, retrieval and Agent applications.</p>
+            <div class="s8-framework-foot"><span>WHEN WOULD I USE IT?</span><p>When I want existing integrations and abstractions instead of wiring every component myself.</p></div>
+          </article>
+          <article class="s8-framework s8-framework-emphasis">
+            <div class="s8-term-kicker"><span class="s8-symbol">LG</span><span>FRAMEWORK / ORCHESTRATION</span></div>
+            <h4>LangGraph</h4>
+            <p>A framework for <strong>stateful Agent workflows</strong> with nodes, transitions, branching, checkpoints and resumable execution.</p>
+            <div class="s8-framework-foot"><span>WHEN WOULD I USE IT?</span><p>When a research pipeline needs complex branching, human approval or reliable resumption after interruption.</p></div>
+          </article>
+        </div>
+        <div class="s8-mini-diagram">
+          <div class="s8-mini-head">EXAMPLE / A STATEFUL GRAPH</div>
+          <div class="s8-mini-graph" aria-label="An example graph that searches, checks for PDFs, then analyses or reports failures">
+            <div class="s8-graph-node">Search</div>
+            <span class="s8-graph-arrow" aria-hidden="true">→</span>
+            <div class="s8-graph-node s8-graph-decision">PDF available?</div>
+            <span class="s8-graph-arrow" aria-hidden="true">↗</span>
+            <div class="s8-graph-pair">
+              <div><span>YES</span><strong>Analyse</strong></div>
+              <div><span>NO</span><strong>Report failure</strong></div>
+            </div>
+          </div>
+          <p><strong>Our Section 7 Agent does not require LangGraph.</strong> Its bounded tool-calling loop already handles simpler tasks. Frameworks become useful when orchestration requirements grow.</p>
+        </div>
+
+        <div class="s8-head">
+          <div class="s8-label">B / CONNECTIONS &amp; PROTOCOLS</div>
+          <h3>How does an Agent <em>connect to other capabilities?</em></h3>
+          <p>Tools, protocols and reusable instructions solve different problems. Do not confuse <strong>giving an Agent a capability</strong> with <strong>telling it how to perform a task.</strong></p>
+        </div>
+
+        <div class="s8-connection-grid">
+          <article class="s8-connection s8-connection-wide">
+            <div class="s8-term-kicker"><span class="s8-symbol">M</span><span>STANDARD PROTOCOL</span></div>
+            <h4>Model Context Protocol <span>(MCP)</span></h4>
+            <p>A standard way for an AI application to discover and use capabilities made available by external servers — including tools and resources.</p>
+            <div class="s8-protocol-visual" aria-label="AI application connects through MCP to external servers">
+              <span class="s8-protocol-box">AI application</span>
+              <span class="s8-protocol-link">MCP ↔</span>
+              <span class="s8-protocol-box">External tools / resources</span>
+            </div>
+            <p class="s8-lesson-comparison"><strong>Remember Section 3:</strong> We passed our own <code>search_papers()</code> Python function directly to Gemini. MCP is a standard interface for connecting to capabilities from separate systems.</p>
+          </article>
+          <article class="s8-connection">
+            <div class="s8-term-kicker"><span class="s8-symbol">S</span><span>REUSABLE INSTRUCTIONS</span></div>
+            <h4>Agent Skills</h4>
+            <p>Reusable task instructions and supporting resources that guide an Agent through specialised work.</p>
+            <div class="s8-detail-example"><strong>Example</strong><span>An Academic Review Skill tells the Agent how to screen papers and organise evidence.</span></div>
+            <p class="s8-card-distinction"><strong>Skill = know-how.</strong> Tool = something the software can execute.</p>
+          </article>
+          <article class="s8-connection">
+            <div class="s8-term-kicker"><span class="s8-symbol">A</span><span>AGENT INTEROPERABILITY</span></div>
+            <h4>Agent2Agent <span>(A2A)</span></h4>
+            <p>A protocol for different Agent systems to communicate, exchange task information and collaborate.</p>
+            <div class="s8-detail-example"><strong>Example</strong><span>A Research Agent delegates a specialised task to an Agent operated by another system.</span></div>
+            <p class="s8-card-distinction"><strong>MCP:</strong> Agent/application ↔ external capabilities. <strong>A2A:</strong> Agent ↔ Agent.</p>
+          </article>
+        </div>
+
+        <div class="s8-head">
+          <div class="s8-label">C / AGENT ARCHITECTURE</div>
+          <h3>How can Agents <em>plan, collaborate and remember?</em></h3>
+          <p>Agent architecture is about dividing responsibilities and organising decisions. More complexity is not automatically better.</p>
+        </div>
+
+        <article class="s8-feature">
+          <div class="s8-feature-copy">
+            <div class="s8-term-kicker"><span class="s8-symbol">MA</span><span>ARCHITECTURAL PATTERN</span></div>
+            <h4>Multi-Agent Systems</h4>
+            <p>Multiple Agents take on distinct roles and coordinate their results. For example, one searches papers, another analyses methods, and a third reviews extracted evidence.</p>
+            <p class="s8-caution"><strong>The trade-off:</strong> More Agents mean more coordination, cost and chances for errors to spread. A single capable Agent is often enough.</p>
+          </div>
+          <div class="s8-multi-diagram" aria-label="Example: research coordinator delegates to Search, Reading and Review Agents">
+            <div class="s8-multi-head">Research Coordinator</div>
+            <div class="s8-multi-lines" aria-hidden="true">↙ <span>↓</span> ↘</div>
+            <div class="s8-multi-roles"><span>Search Agent</span><span>Reading Agent</span><span>Review Agent</span></div>
+          </div>
+        </article>
+
+        <div class="s8-architecture-grid">
+          <article class="s8-info-card">
+            <div class="s8-term-kicker"><span class="s8-symbol">↻</span><span>DECISION PATTERNS</span></div>
+            <h4>ReAct vs. Plan-and-Execute</h4>
+            <div class="s8-pattern">
+              <strong>ReAct</strong><p>Choose an action → observe its result → choose the next action. Adapt step by step.</p>
+              <div class="s8-pattern-line">ACT → OBSERVE → ACT AGAIN</div>
+            </div>
+            <div class="s8-pattern">
+              <strong>Plan-and-Execute</strong><p>Create a plan → execute its steps → replan if needed. Useful for longer structured tasks.</p>
+              <div class="s8-pattern-line">PLAN → EXECUTE → REPLAN</div>
+            </div>
+            <p class="s8-card-distinction">These describe decision organisation, not new foundation models.</p>
+          </article>
+          <article class="s8-info-card">
+            <div class="s8-term-kicker"><span class="s8-symbol">CM</span><span>CONTEXT &amp; STORAGE</span></div>
+            <h4>Context Engineering &amp; Memory</h4>
+            <div class="s8-pattern">
+              <strong>Context Engineering</strong><p>Choose what instructions, retrieved evidence and tool results the model receives on each call.</p>
+            </div>
+            <div class="s8-pattern">
+              <strong>Memory / Persistent State</strong><p>Save or retrieve information for later work — possibly across separate terminal sessions.</p>
+            </div>
+            <p class="s8-card-distinction"><strong>Section 7 example:</strong> <code>state/library.json</code> stores PDF analysis status. That is Python-managed state, not the LLM remembering on its own.</p>
+          </article>
+        </div>
+        <div class="s8-extra"><strong>Another term you may meet: Agentic RAG.</strong> The Agent can decide when to retrieve information, what to search for and whether to retrieve again. It builds on the RAG approach from Section 5.</div>
+
+        <div class="s8-head">
+          <div class="s8-label">D / RELIABLE AGENTS</div>
+          <h3>How do we know an Agent is <em>safe and useful?</em></h3>
+          <p>Getting a plausible answer is not the same as completing a trustworthy task. These techniques keep people in control and help developers find problems.</p>
+        </div>
+
+        <div class="s8-reliability-grid">
+          <article class="s8-reliability">
+            <div class="s8-term-kicker"><span class="s8-symbol">H</span><span>HUMAN OVERSIGHT</span></div>
+            <h4>Human-in-the-Loop <span>(HITL)</span></h4>
+            <p>Pause at important decisions for human approval, correction or review.</p>
+            <div class="s8-detail-example"><strong>Research example</strong><span>Approve relevant papers before the Agent spends tokens analysing them.</span></div>
+          </article>
+          <article class="s8-reliability">
+            <div class="s8-term-kicker"><span class="s8-symbol">G</span><span>BOUNDARIES</span></div>
+            <h4>Guardrails &amp; Permissions</h4>
+            <p>Use tool permissions, input checks and execution limits to restrict what the Agent can do.</p>
+            <div class="s8-detail-example"><strong>Research example</strong><span>Only allow PDF reads inside <code>papers/</code>, with a limit on tool calls.</span></div>
+          </article>
+          <article class="s8-reliability">
+            <div class="s8-term-kicker"><span class="s8-symbol">E</span><span>MEASURING RESULTS</span></div>
+            <h4>Agent Evaluation <span>(Evals)</span></h4>
+            <p>Test whether the Agent achieves real goals across different cases, not just whether its answer sounds convincing.</p>
+            <div class="s8-detail-example"><strong>Research example</strong><span>Did it find real papers, avoid duplicates and produce the requested table?</span></div>
+          </article>
+          <article class="s8-reliability">
+            <div class="s8-term-kicker"><span class="s8-symbol">T</span><span>DIAGNOSING BEHAVIOUR</span></div>
+            <h4>Observability &amp; Tracing</h4>
+            <p>Inspect the sequence of tool calls, results, errors and timing to understand what happened.</p>
+            <div class="s8-detail-example"><strong>Research example</strong><span>Read the <code>[TOOL]</code>, <code>[RAG]</code> and <code>[EXPORT]</code> log messages.</span></div>
+          </article>
+        </div>
+
+        <div class="s8-head">
+          <div class="s8-label">E / WHICH TECHNOLOGY WOULD YOU USE?</div>
+          <h3>Match the Problem <em>to the Technology.</em></h3>
+          <p>You don't need to memorise implementation details. Read each real-world requirement, then choose which concept best addresses it.</p>
+        </div>
+
+        <div class="s8-quiz" id="s8-quiz">
+          <div class="s8-quiz-bar">
+            <span class="s8-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <strong>Agent Technology Check</strong>
+            <span class="s8-quiz-offline">INTERACTIVE · NO API</span>
+          </div>
+          <div class="s8-progress-track" aria-hidden="true"><div id="s8-progress-fill" class="s8-progress-fill"></div></div>
+          <div class="s8-quiz-body" id="s8-question-panel">
+            <div class="s8-quiz-meta"><span id="s8-question-counter">QUESTION 1 / 7</span><span id="s8-quiz-progress">Choose the best match.</span></div>
+            <h4 id="s8-question">Loading the first question...</h4>
+            <div class="s8-choices" id="s8-choices" role="group" aria-label="Possible technologies"></div>
+            <div class="s8-feedback" id="s8-feedback" role="status" aria-live="polite" hidden></div>
+            <div class="s8-quiz-controls"><button type="button" class="s8-next" id="s8-next" disabled>Next question →</button></div>
+          </div>
+          <div class="s8-result" id="s8-result" aria-live="polite" hidden>
+            <span class="s8-result-eyebrow">CONCEPT CHECK COMPLETE</span>
+            <div class="s8-score"><strong id="s8-score">0 / 7</strong><span>correct answers</span></div>
+            <p>The goal is recognising when a technology is useful — not memorising code or treating every tool as interchangeable.</p>
+            <button type="button" class="s8-next" id="s8-restart">Try Again ↺</button>
+          </div>
+          <p class="s8-quiz-footnote">All questions are local demonstrations. This quiz does not access Gemini or store your answers.</p>
+          <span class="s8-visually-hidden" id="s8-total">7</span>
+        </div>
+
+        <div class="s8-final">
+          <span>THE MAIN IDEA</span>
+          <h3>Choose Technology <em>for the Problem</em> — Not the Hype.</h3>
+          <p>Our Section 7 Research Agent already works without LangGraph, MCP or multiple Agents. These technologies become useful when you need additional integrations, more complex coordination or stronger operational controls.</p>
+          <a href="#s7">Revisit the Research Agent ↗</a>
+        </div>
       </section>
       <footer class="footer"><span>AI for Media · Workshop 03</span><span>Python starter scripts are supplied in the course repository.</span></footer>
     </main>
