@@ -123,7 +123,14 @@ def create_agent(pipeline: ResearchPipeline, model: str | None = None):
             maximum_remote_calls=12
         ),
     )
-    return client.chats.create(
-        model=model or os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
-        config=config,
-    )
+    try:
+        chat = client.chats.create(
+            model=model or os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
+            config=config,
+        )
+    except BaseException:
+        client.close()
+        raise
+    # IMPORTANT: The chat alone does not keep genai.Client alive reliably.
+    # Return both and retain the client until the terminal session finishes.
+    return client, chat
