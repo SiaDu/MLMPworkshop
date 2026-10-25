@@ -9,3 +9,5 @@ wheels/
 # Virtual environments
 .venv
 .ipynb_checkpoints
+# Keep teacher answer notebooks out of the public repository
+*_Answers_PRIVATE.ipynb
