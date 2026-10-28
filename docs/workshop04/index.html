@@ -21,6 +21,16 @@ pre{background:#091b2a;border:1px solid #2d5064;border-radius:11px;padding:15px 
 .gd-gradient-card svg{display:block;width:100%;height:auto;max-height:230px;background:#0c1a29;border:1px solid #28485c;border-radius:10px}
 .gd-gradient-card p{font-size:14px;line-height:1.65;margin:12px 0 0}
 @media(max-width:760px){.gd-gradient-viz{grid-template-columns:1fr}}
+
+/* Resolution-independent motion animation in Section 00 */
+.motion-player{border:1px solid #325367;border-radius:14px;background:#0c1a29;overflow:hidden}
+.motion-vector{display:block;width:100%;height:auto;max-height:400px;aspect-ratio:900/330}
+.motion-playback{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px;background:#101f30;border-top:1px solid #315062}
+.motion-playback button{white-space:nowrap}
+.motion-progress{display:flex;flex-direction:column;gap:5px;min-width:180px;flex:1;color:var(--sub);font-size:12px}
+.motion-progress input{width:100%;accent-color:var(--mint);cursor:pointer;margin:0}
+.motion-position{font-size:13px;color:#bdece4;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:680px){.motion-playback{gap:10px}.motion-progress{flex-basis:100%;order:3}.motion-position{margin-left:auto}.motion-vector{max-height:unset}}
 </style>
 </head>
 <body>
@@ -32,8 +42,37 @@ pre{background:#091b2a;border:1px solid #2d5064;border-radius:11px;padding:15px 
 <section class="lesson" id="s00"><div class="section-kicker">SECTION 00 · MOTION DATA</div><h2>Motion Data</h2>
 <p class="lede">A character moves horizontally. We record its horizontal position at 11 frames. Our first model uses <b>time (x)</b> to predict <b>position (y)</b>. Each time–position pair is one sample.</p>
 <div class="panel"><h3>Watch the horizontal motion</h3>
-<video controls playsinline preload="metadata" aria-label="One character moving horizontally at roughly constant speed" style="display:block;width:100%;border-radius:12px;background:#071626;max-height:400px" src="data:video/mp4;base64,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AAAHfQAAAGF1ZHRhAAAAWW1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALGlsc3QAAAAkqXRvbwAAABxkYXRhAAAAAQAAAABMYXZmNjEuNy4xMDMAAAAIZnJlZQAAGcNtZGF0AAACrQYF//+p3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE2NCByMzEwOCAzMWUxOWY5IC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAyMyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTEgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9MiBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0wIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MCA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0wIHRocmVhZHM9NyBsb29rYWhlYWRfdGhyZWFkcz0xIHNsaWNlZF90aHJlYWRzPTAgbnI9MCBkZWNpbWF0ZT0xIGludGVybGFjZWQ9MCBibHVyYXlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTMgYl9weXJhbWlkPTIgYl9hZGFwdD0xIGJfYmlhcz0wIGRpcmVjdD0xIHdlaWdodGI9MSBvcGVuX2dvcD0wIHdlaWdodHA9MSBrZXlpbnQ9MjUwIGtleWludF9taW49MjUgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD0xMCByYz1jcmYgbWJ0cmVlPTEgY3JmPTM4LjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAVAZYiEADf/7IN5qj/BZs1Xr5/mRMbFLcpX0Fe5H98pAAADAAADAAD6P3m3Y5xnwAEQI2J0uvBMsEAbfEzlTXRGhHvo/AiUHHVKMCFb7ZsoXtIUv9B4WeLPRF6l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"></video>
-<p class="small">The video shows one horizontal motion. The plotted data use the eleven sampled measurements; small differences in position represent measurement variation.</p></div>
+<div class="motion-player" aria-label="Interactive vector animation of a ball moving horizontally">
+<svg id="motionVideoSvg" class="motion-vector" viewBox="0 0 900 330" role="img" aria-labelledby="motionSvgTitle motionSvgDesc">
+  <title id="motionSvgTitle">Ball moving from left to right</title>
+  <desc id="motionSvgDesc">A sharp vector animation of a ball moving horizontally across a numbered position scale, corresponding to frames 0 through 30 at 30 frames per second.</desc>
+  <defs>
+    <linearGradient id="motionSceneBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#122c40"/><stop offset="1" stop-color="#091725"/></linearGradient>
+    <radialGradient id="motionBallPaint" cx="35%" cy="25%" r="80%"><stop offset="0" stop-color="#fff2d6"/><stop offset="0.22" stop-color="#ffd19d"/><stop offset="0.62" stop-color="#f3a65f"/><stop offset="1" stop-color="#b76645"/></radialGradient>
+    <filter id="motionBallShadow" x="-60%" y="-70%" width="220%" height="240%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="900" height="330" rx="14" fill="url(#motionSceneBg)"/>
+  <path d="M90 70 V264 M193 70 V264 M296 70 V264 M399 70 V264 M501 70 V264 M604 70 V264 M707 70 V264 M810 70 V264" stroke="#27475c" stroke-width="1" stroke-dasharray="4 9" opacity=".75"/>
+  <text x="36" y="39" fill="#e8f6fd" font-size="17" font-weight="700">Horizontal motion</text>
+  <text x="864" y="39" fill="#9bbdce" font-size="13" text-anchor="end">30 fps · 1 second</text>
+  <path d="M90 244 H810" stroke="#203d50" stroke-width="16" stroke-linecap="round"/>
+  <path d="M90 239 H810" stroke="#66e6cf" stroke-width="3" stroke-linecap="round" opacity=".95"/>
+  <g fill="#9ebcc9" font-size="13" text-anchor="middle"><text x="90" y="280">0</text><text x="193" y="280">1</text><text x="296" y="280">2</text><text x="399" y="280">3</text><text x="501" y="280">4</text><text x="604" y="280">5</text><text x="707" y="280">6</text><text x="810" y="280">7</text></g>
+  <text x="450" y="308" fill="#a8c0cf" font-size="14" text-anchor="middle">Horizontal position y (scene units)</text>
+  <g id="motionBall" transform="translate(246 0)">
+    <ellipse cx="0" cy="242" rx="29" ry="9" fill="#000" opacity=".45" filter="url(#motionBallShadow)"/>
+    <circle cx="0" cy="211" r="26" fill="url(#motionBallPaint)" stroke="#ffdda9" stroke-width="1.2"/>
+    <circle cx="-9" cy="200" r="7" fill="#fff8df" opacity=".55"/>
+  </g>
+</svg>
+<div class="motion-playback">
+  <button class="action" type="button" id="motionPlay" aria-label="Play ball animation">▶ Play</button>
+  <button class="action secondary" type="button" id="motionReplay">↺ Replay</button>
+  <label class="motion-progress" for="motionSeek"><span>Frame <output id="motionFrame">0</output> / 30</span><input type="range" id="motionSeek" min="0" max="30" step="1" value="0" aria-label="Scrub through animation frames"/></label>
+  <output class="motion-position" id="motionReadout">0.00 s · position 1.52</output>
+</div>
+</div>
+<p class="small">Move through frames 0–30 at 30 fps. The ball follows the eleven sampled positions shown below, with smooth movement between samples.</p></div>
 <div class="panel"><h3>Motion data</h3><svg viewBox="0 0 760 315" class="graph" id="motionGraph" role="img" aria-label="Measured horizontal positions versus time"></svg>
 <div class="gridwrap"><table class="tracetable"><thead><tr><th>Frame</th><th>Time x (s)</th><th>Position y</th></tr></thead><tbody id="motionDataRows"></tbody></table></div></div>
 <h3>Why use time in seconds?</h3><p>At <b>30 fps</b>, frame 15 happens after <b>0.5 seconds</b>. So <code>x = frame / fps</code>. This changes the unit from frames to seconds; it is not a requirement of linear regression.</p>
@@ -258,6 +297,55 @@ function svgEl(tag,attrs={},parent=null){const el=document.createElementNS(SVG,t
 function graph(id,yValues,lines=[],opt={}){const svg=$(id);svg.innerHTML='';const W=760,H=+(svg.getAttribute('viewBox').split(' ')[3]);const m={l:66,r:28,t:22,b:47},h=H-m.t-m.b,w=W-m.l-m.r;const values=[...yValues,...lines.flatMap(l=>l.y)];let minY=opt.minY===undefined?Math.min(0,...values):opt.minY;let maxY=opt.maxY===undefined?Math.max(5.5,...values)+.4:opt.maxY;if(!Number.isFinite(minY)||!Number.isFinite(maxY)||minY===maxY){minY=0;maxY=1}const px=x=>m.l+x*w;const py=y=>m.t+(maxY-y)/(maxY-minY)*h;
  for(let i=0;i<=5;i++){const y=minY+(maxY-minY)*i/5;svgEl('line',{x1:m.l,y1:py(y),x2:W-m.r,y2:py(y),stroke:'#31516a','stroke-width':.8},svg);const t=svgEl('text',{x:m.l-11,y:py(y)+4,'text-anchor':'end'},svg);t.textContent=txt(y,1)}for(let i=0;i<=5;i++){const x=i/5;svgEl('line',{x1:px(x),y1:m.t,x2:px(x),y2:m.t+h,stroke:'#253e53','stroke-width':.7},svg);const t=svgEl('text',{x:px(x),y:H-23,'text-anchor':'middle'},svg);t.textContent=txt(x,1)}
  for(const l of lines){const d=l.y.map((y,i)=>`${i?'L':'M'}${px(xs[i]).toFixed(2)},${py(y).toFixed(2)}`).join(' ');svgEl('path',{d,stroke:l.color||'#ffc177','stroke-width':2.7,fill:'none','stroke-linecap':'round'},svg)}if(opt.residual&&lines.length){const model=lines[0].y;for(let i=0;i<xs.length;i++)svgEl('line',{x1:px(xs[i]),y1:py(yValues[i]),x2:px(xs[i]),y2:py(model[i]),stroke:'#f5a2bc','stroke-width':1.7,'stroke-dasharray':'4 3'},svg)}for(let i=0;i<xs.length;i++){const sel=i===opt.highlight;svgEl('circle',{cx:px(xs[i]),cy:py(yValues[i]),r:sel?8:4.5,fill:sel?'#77e9aa':'#7cafff',stroke:sel?'#ecfff4':'#111e2b','stroke-width':sel?2:1},svg)}const xa=svgEl('text',{x:W/2,y:H-5,'text-anchor':'middle'},svg);xa.textContent='Time x (seconds)';const ya=svgEl('text',{x:8,y:17},svg);ya.textContent='Horizontal position y'}
+
+// Section 00: crisp vector playback synced to the 11 recorded positions.
+// The dataset contains frames 0, 3, ..., 30 (30 fps). Interpolate between samples.
+const motionBall=$('motionBall'),motionSeek=$('motionSeek'),motionPlay=$('motionPlay');
+let motionFrameValue=0,motionIsPlaying=false,motionRequest=0,motionStart=0;
+function motionPositionAt(frame){
+  const f=Math.min(30,Math.max(0,frame));
+  const i=Math.min(Math.floor(f/3),lin.length-2);
+  const fraction=(f-frames[i])/(frames[i+1]-frames[i]);
+  return lin[i]+fraction*(lin[i+1]-lin[i]);
+}
+function drawMotion(frame){
+  motionFrameValue=Math.min(30,Math.max(0,frame));
+  const position=motionPositionAt(motionFrameValue);
+  const screenX=90+720*position/7;
+  motionBall.setAttribute('transform',`translate(${screenX.toFixed(3)} 0)`);
+  motionSeek.value=String(Math.round(motionFrameValue));
+  $('motionFrame').textContent=String(Math.round(motionFrameValue));
+  $('motionReadout').textContent=`${(motionFrameValue/30).toFixed(2)} s · position ${position.toFixed(2)}`;
+}
+function pauseMotion(){
+  motionIsPlaying=false;
+  if(motionRequest)cancelAnimationFrame(motionRequest);
+  motionRequest=0;
+  motionPlay.textContent='▶ Play';
+  motionPlay.setAttribute('aria-label','Play ball animation');
+}
+function motionTick(now){
+  if(!motionIsPlaying)return;
+  const f=(now-motionStart)*30/1000;
+  drawMotion(f);
+  if(f>=30){pauseMotion();return}
+  motionRequest=requestAnimationFrame(motionTick);
+}
+function startMotion(){
+  if(motionIsPlaying)return;
+  if(motionFrameValue>=30)drawMotion(0);
+  motionStart=performance.now()-motionFrameValue*1000/30;
+  motionIsPlaying=true;
+  motionPlay.textContent='❚❚ Pause';
+  motionPlay.setAttribute('aria-label','Pause ball animation');
+  motionRequest=requestAnimationFrame(motionTick);
+}
+motionPlay.addEventListener('click',()=>motionIsPlaying?pauseMotion():startMotion());
+$('motionReplay').addEventListener('click',()=>{pauseMotion();drawMotion(0);startMotion()});
+motionSeek.addEventListener('input',()=>{pauseMotion();drawMotion(Number(motionSeek.value))});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&motionIsPlaying)pauseMotion()});
+drawMotion(0);
+
 function motion(){const ys=lin;graph('motionGraph',ys,[],{minY:0,maxY:7});$('motionDataRows').innerHTML=frames.map((f,i)=>`<tr><td>${f}</td><td>${txt(xs[i],1)}</td><td>${txt(ys[i],2)}</td></tr>`).join('')} motion();
 function fillMat(id,data,cols){const el=$(id);el.innerHTML='';el.style.gridTemplateColumns=`repeat(${cols},auto)`;for(const v of data){const s=document.createElement('span');s.textContent=typeof v==='number'?txt(v,2):v;el.appendChild(s)}}
 function matRender(){const N=+$('nSamples').value,F=+$('nFeatures').value;$('nSamplesLabel').textContent=N;const rows=Array.from({length:N},(_,i)=>F===1?[2*i+1]:[2*i+1,2*i+2]);const w=F===1?[2]:[2,3];const out=rows.map(r=>r.reduce((s,v,j)=>s+v*w[j],1));fillMat('matX',rows.flat(),F);fillMat('matW',w,1);fillMat('matY',out,1);$('matXShape').textContent=`(${N}, ${F})`;$('matWShape').textContent=`(${F},)`;$('matYShape').textContent=`(${N},)`;$('matrixExplain').innerHTML=`First, X <b>(${N}, ${F})</b> @ w <b>(${F},)</b> gives one value per row. Then add b = 1 to every value using broadcasting. Output shape: <b>(${N},)</b>.`}
