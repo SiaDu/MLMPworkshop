@@ -109,11 +109,8 @@ print(other)            # prints None</code></pre>
 <section class="lesson" id="s05"><div class="section-kicker">SECTION 05 · MULTIPLE FEATURES</div><h2>Multiple Features</h2>
 <p class="lede">We now use a small <b>synthetic house-price dataset</b>. A house has a size and an age. Both can affect its price. We predict <b>one price</b> using two input features.</p>
 <div class="two-formulas"><div class="formula" style="font-size:20px">One input: ŷ = wx₁ + b</div><div class="formula" style="font-size:20px">Two inputs: ŷ = w₁x₁ + w₂x₂ + b</div></div>
-<p><b>x₁ = house size</b>, <b>x₂ = house age</b>, and <b>ŷ = predicted house price</b>. These are different input features, not two copies of the same number.</p>
-<div class="panel"><h3>Explore the house data</h3><p>Select a house to see its size, age and price. The data are made for this lesson, not taken from the housing market.</p>
-<div class="controls"><div class="control"><label for="houseStep">House: <b id="houseStepLabel">1</b> / 11</label><input id="houseStep" type="range" min="0" max="10" value="0" step="1"></div></div>
-<svg viewBox="0 0 760 300" class="graph" id="houseGraph" role="img" aria-label="House size and age compared with price"></svg><div class="note" id="houseExplain"></div>
-<div class="gridwrap"><table class="tracetable"><thead><tr><th>House</th><th>Size (m²)</th><th>Age (years)</th><th>Price (£)</th></tr></thead><tbody id="houseDataRows"></tbody></table></div></div>
+<p><b>x₁ = house size</b>, <b>x₂ = house age</b>, and <b>ŷ = predicted house price</b>.</p>
+<div class="panel"><h3>House data</h3><p>These are simulated data for this lesson, not actual housing market prices.</p><div class="gridwrap"><table class="tracetable"><thead><tr><th>House</th><th>Size (m²)</th><th>Age (years)</th><th>Price (£)</th></tr></thead><tbody id="houseDataRows"></tbody></table></div></div>
 <div class="panel"><h3>Feature scaling</h3><p>Size is measured in square metres and age in years. To make the numerical ranges closer, divide size by 100 and age by 50. <b>We still have two input features.</b></p>
 <div class="two-formulas"><div class="formula" style="font-size:17px">size_x = size_m2 / 100</div><div class="formula" style="font-size:17px">age_x = age_years / 50</div></div><p class="small">Prices in the Notebook use £100,000 units, so a target value of 2.41 means £241,000.</p></div>
 <div class="panel"><h3>Compare one feature with two features</h3><p>Both models predict the <b>same house price</b>. One uses size only; the other uses both size and age.</p>
@@ -156,17 +153,6 @@ const houseSize=[55,75,90,110,125,145,160,65,100,135,175];
 const houseAge=[5,30,12,40,8,25,45,42,3,35,15];
 const sizeX=houseSize.map(v=>v/100),ageX=houseAge.map(v=>v/50);
 const housePrice=houseSize.map((v,i)=>1.5+1.8*sizeX[i]-.8*ageX[i]);
-function houseScene(){const i=+$('houseStep').value;const svg=$('houseGraph');svg.innerHTML='';const W=760;
- const x=110+houseSize[i]*2.2,base=242,top=base-110;
- svgEl('line',{x1:60,y1:base,x2:700,y2:base,stroke:'#8ca7ba','stroke-width':2},svg);
- svgEl('rect',{x:110,y:top,width:houseSize[i]*2.2,height:110,rx:5,fill:'#267a9a','fill-opacity':'.35',stroke:'#66e6cf','stroke-width':2},svg);
- svgEl('path',{d:`M98,${top} L${(110+x)/2},${top-55} L${x+12},${top}`,fill:'none',stroke:'#ffc177','stroke-width':3},svg);
- svgEl('rect',{x:155,y:base-47,width:36,height:47,fill:'#d0a773'},svg);
- const cap=svgEl('text',{x:W/2,y:30,'text-anchor':'middle','font-size':18},svg);cap.textContent=`House ${i+1} · ${houseSize[i]} m² · ${houseAge[i]} years`;
- const pr=svgEl('text',{x:W/2,y:274,'text-anchor':'middle','font-size':16},svg);pr.textContent=`Price: £${Math.round(housePrice[i]*100000).toLocaleString('en-GB')}`;
- $('houseStepLabel').textContent=i+1;$('houseExplain').innerHTML=`Size: <b>${houseSize[i]} m²</b> → size_x = <b>${txt(sizeX[i],2)}</b>. Age: <b>${houseAge[i]} years</b> → age_x = <b>${txt(ageX[i],2)}</b>. Target price: <b>${txt(housePrice[i],3)}</b> (£100k units).`;
-}
-$('houseStep').oninput=houseScene;houseScene();
 $('houseDataRows').innerHTML=houseSize.map((v,i)=>`<tr><td>${i+1}</td><td>${v}</td><td>${houseAge[i]}</td><td>£${Math.round(housePrice[i]*1e5).toLocaleString('en-GB')}</td></tr>`).join('');
 function fitHouses(){let w=0,b=0,v=[0,0],c=0;for(let epoch=0;epoch<1500;epoch++){
  let e1=sizeX.map((x,i)=>w*x+b-housePrice[i]),dw=2*e1.reduce((s,e,i)=>s+e*sizeX[i],0)/11,db=2*e1.reduce((s,e)=>s+e,0)/11;w-=.1*dw;b-=.1*db;
