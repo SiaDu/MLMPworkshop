@@ -15,6 +15,12 @@ pre{background:#091b2a;border:1px solid #2d5064;border-radius:11px;padding:15px 
 .gd-math-cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}.gd-math-cases .formula{white-space:normal}
 .gd-example-table td:last-child{font-weight:750;color:var(--mint)}
 @media(max-width:760px){.gd-pair,.gd-math-cases{grid-template-columns:1fr}.gd-chain{display:grid;grid-template-columns:1fr;gap:4px}.gd-arrow{justify-self:center;transform:rotate(90deg)}}
+.gd-gradient-viz{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0 12px}
+.gd-gradient-card{background:#132639;border:1px solid #315063;border-radius:14px;padding:17px;min-width:0}
+.gd-gradient-card h4{font-size:16px;color:#f0faff;margin:0 0 10px}
+.gd-gradient-card svg{display:block;width:100%;height:auto;max-height:230px;background:#0c1a29;border:1px solid #28485c;border-radius:10px}
+.gd-gradient-card p{font-size:14px;line-height:1.65;margin:12px 0 0}
+@media(max-width:760px){.gd-gradient-viz{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -122,8 +128,40 @@ print(other)            # prints None</code></pre>
 <div class="gd-info"><strong>Ordinary derivative: d</strong><span>One input: f(t) = t²</span><div class="formula" style="font-size:18px;margin:8px 0">df/dt = 2t</div><small>How f changes as t changes.</small></div>
 <div class="gd-info"><strong>Partial derivative: ∂</strong><span>Two parameters: ŷ = wx + b</span><div class="formula" style="font-size:18px;margin:8px 0">∂ŷ/∂w = x</div><small>Change w; keep x and b fixed.</small></div>
 </div>
-<p>We want the two <b>gradients</b> ∂L/∂w and ∂L/∂b: how the loss changes when we change w or b.</p>
-<div class="equationsteps"><div><b>Positive gradient (+):</b> Increasing the parameter slightly increases the loss. A small step in the other direction can reduce it.</div><div><b>Negative gradient (−):</b> Increasing the parameter slightly decreases the loss. A small step in that direction can reduce it.</div><div><b>Zero gradient (0):</b> The loss is locally flat with respect to that parameter.</div></div>
+<p>We want the two <b>gradients</b> ∂L/∂w and ∂L/∂b: how the loss changes when we change w or b. The sign of a gradient tells us which direction reduces the loss <em>locally</em>.</p>
+<div class="gd-gradient-viz" aria-label="Comparison of positive and negative gradients">
+  <div class="gd-gradient-card">
+    <h4>Positive gradient (+)</h4>
+    <svg viewBox="0 0 340 170" role="img" aria-labelledby="gdPositiveTitle gdPositiveDesc">
+      <title id="gdPositiveTitle">Positive gradient: loss increases as the parameter increases</title>
+      <desc id="gdPositiveDesc">The orange loss line rises to the right. A green arrow points down and left from the marked position, showing a direction of lower loss.</desc>
+      <defs><marker id="gdPositiveArrow" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L6 3 L0 6 Z" fill="#77e9aa"/></marker></defs>
+      <path d="M36 12 V145 H321" stroke="#748ea3" stroke-width="1.5" fill="none"/>
+      <text x="10" y="15" fill="#a8c0cf" font-size="12">Loss</text>
+      <text x="267" y="163" fill="#a8c0cf" font-size="12">Parameter</text>
+      <path d="M55 130 L304 28" stroke="#ffc177" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <circle cx="177" cy="80" r="6" fill="#ffc177" stroke="#0c1a29" stroke-width="2"/>
+      <path d="M164 85 L110 107" stroke="#77e9aa" stroke-width="3.5" stroke-linecap="round" fill="none" marker-end="url(#gdPositiveArrow)"/>
+    </svg>
+    <p>Increasing the parameter increases the loss. <b>Move left</b> to reduce it.</p>
+  </div>
+  <div class="gd-gradient-card">
+    <h4>Negative gradient (−)</h4>
+    <svg viewBox="0 0 340 170" role="img" aria-labelledby="gdNegativeTitle gdNegativeDesc">
+      <title id="gdNegativeTitle">Negative gradient: loss decreases as the parameter increases</title>
+      <desc id="gdNegativeDesc">The orange loss line falls to the right. A green arrow points down and right from the marked position, showing a direction of lower loss.</desc>
+      <defs><marker id="gdNegativeArrow" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L6 3 L0 6 Z" fill="#77e9aa"/></marker></defs>
+      <path d="M36 12 V145 H321" stroke="#748ea3" stroke-width="1.5" fill="none"/>
+      <text x="10" y="15" fill="#a8c0cf" font-size="12">Loss</text>
+      <text x="267" y="163" fill="#a8c0cf" font-size="12">Parameter</text>
+      <path d="M55 26 L305 128" stroke="#ffc177" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <circle cx="177" cy="76" r="6" fill="#ffc177" stroke="#0c1a29" stroke-width="2"/>
+      <path d="M191 82 L247 105" stroke="#77e9aa" stroke-width="3.5" stroke-linecap="round" fill="none" marker-end="url(#gdNegativeArrow)"/>
+    </svg>
+    <p>Increasing the parameter decreases the loss. <b>Move right</b> to reduce it.</p>
+  </div>
+</div>
+<p class="small">These show <b>local directions</b> at the marked points. The gradient may change as the parameter moves. A <b>zero gradient</b> means the loss is locally flat with respect to that parameter.</p>
 
 <h3>Step 3 · Follow the chain of changes</h3>
 <p>Changing w affects the loss <b>indirectly</b>, through prediction and error.</p>
