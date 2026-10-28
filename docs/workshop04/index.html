@@ -289,6 +289,29 @@ function houseCompare(){const svg=$('houseCompareGraph');svg.innerHTML='';const 
  $('houseOneLoss').textContent=txt(mse(housePrice,trainedHouses.one),4);$('houseTwoLoss').textContent=txt(mse(housePrice,trainedHouses.two),6);$('houseWeights').textContent=trainedHouses.w.map(v=>txt(v,2)).join(', ');
 }houseCompare();
 function gradDetail(){const which=+$('focusFeature').value,N=3;const cols=[sizeX.slice(0,N),ageX.slice(0,N)],err=housePrice.slice(0,N).map(v=>-v);const vals=cols.map(col=>col.reduce((s,v,i)=>s+v*err[i],0));fillMat('gradXT',cols.flat(),N);fillMat('gradE',err,1);fillMat('gradResult',vals,1);const feature=which===0?'size_x':'age_x';$('gradExplain').innerHTML=`<b>${feature}</b>: add (feature × error) across three houses: ${cols[which].map((v,i)=>`(${txt(v,2)} × ${txt(err[i],2)})`).join(' + ')} = <b>${txt(vals[which],4)}</b>. Multiply by 2/3 for the MSE gradient <b>${txt(vals[which]*2/3,4)}</b>.`;[...$('gradXT').children].forEach((el,i)=>{el.style.opacity=Math.floor(i/N)===which?'1':'.4';el.style.borderColor=Math.floor(i/N)===which?'#77e9aa':'#456a80'})}$('focusFeature').onchange=gradDetail;gradDetail();
-const links=[...document.querySelectorAll('#nav a')];const obs=new IntersectionObserver(entries=>{const yes=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio);if(yes.length){const id='#'+yes[0].target.id;links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')===id))}},{rootMargin:'-10% 0px -60% 0px',threshold:[0,.1,.2,.4]});document.querySelectorAll('.lesson').forEach(el=>obs.observe(el));
+const links=[...document.querySelectorAll('#nav a')];
+const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+function updateActiveNav(){
+  const activationLine=Math.max(80,window.innerHeight*0.2);
+  let current=sections[0];
+  for(const section of sections){
+    if(section.getBoundingClientRect().top<=activationLine)current=section;
+    else break;
+  }
+  if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-4)current=sections[sections.length-1];
+  if(current)links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+current.id));
+}
+let navUpdatePending=false;
+window.addEventListener('scroll',()=>{
+  if(navUpdatePending)return;
+  navUpdatePending=true;
+  requestAnimationFrame(()=>{updateActiveNav();navUpdatePending=false});
+},{passive:true});
+window.addEventListener('resize',updateActiveNav);
+window.addEventListener('load',updateActiveNav);
+links.forEach(link=>link.addEventListener('click',()=>{
+  links.forEach(a=>a.classList.toggle('active',a===link));
+}));
+updateActiveNav();
 </script>
 </body></html>
