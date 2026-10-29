@@ -31,7 +31,10 @@ pre{background:#091b2a;border:1px solid #2d5064;border-radius:11px;padding:15px 
 .motion-progress input{width:100%;accent-color:var(--mint);cursor:pointer;margin:0}
 .motion-position{font-size:13px;color:#bdece4;font-variant-numeric:tabular-nums;white-space:nowrap}
 @media(max-width:680px){.motion-playback{gap:10px}.motion-progress{flex-basis:100%;order:3}.motion-position{margin-left:auto}.motion-vector{max-height:unset}}
+.math-display{font-size:18px;text-align:center;overflow-x:auto}.math-display mjx-container[display="true"]{margin:.65em 0!important}.gd-optional{border:1px solid #315063;border-radius:13px;padding:15px 17px;background:#112638;margin:18px 0 25px}.gd-optional summary{font-weight:750;color:var(--mint);cursor:pointer}.gd-optional[open] summary{margin-bottom:18px}
 </style>
+<script>window.MathJax={tex:{inlineMath:[['\(','\)']],displayMath:[['\[','\]']]}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
 <div class="mobile-top"><span class="mark">WORKSHOP 04</span><a href="#top">Top ↑</a></div>
@@ -76,7 +79,7 @@ pre{background:#091b2a;border:1px solid #2d5064;border-radius:11px;padding:15px 
 <div class="panel"><h3>Motion data</h3><svg viewBox="0 0 760 315" class="graph" id="motionGraph" role="img" aria-label="Measured horizontal positions versus time"></svg>
 <div class="gridwrap"><table class="tracetable"><thead><tr><th>Frame</th><th>Time x (s)</th><th>Position y</th></tr></thead><tbody id="motionDataRows"></tbody></table></div></div>
 <h3>Why use time in seconds?</h3><p>At <b>30 fps</b>, frame 15 happens after <b>0.5 seconds</b>. So <code>x = frame / fps</code>. This changes the unit from frames to seconds; it is not a requirement of linear regression.</p>
-<div class="formula" style="font-size:20px">x = frame / fps &nbsp; · &nbsp; 15 / 30 = 0.5 s</div>
+<div class="formula" style="font-size:20px">x = frame / fps &nbsp; = &nbsp; 15 / 30 = 0.5 s</div>
 <div class="note" style="margin-top:24px"><b>Next:</b> Go to Jupyter Notebook · <b>Section 00 — Motion Data.</b></div>
 </section>
 <section class="lesson" id="s01"><div class="section-kicker">SECTION 01 · PYTHON FOUNDATIONS</div><h2>Python Foundations</h2><p class="lede">Python uses variables, lists, conditions, loops, and functions. These are the building blocks of the model you will write in the Notebook.</p>
@@ -137,10 +140,10 @@ print(other)            # prints None</code></pre>
 <div class="grid2"><div class="panel"><h3><code>*</code> vs <code>@</code></h3><div class="formula" style="font-size:17px">[1, 2] * [10, 20] = [10, 40]</div><div class="formula" style="font-size:17px">[1, 2] @ [10, 20] = 50</div><p><code>*</code> keeps the products separate; <code>@</code> adds them.</p></div><div class="panel"><h3>Matrix @ matrix</h3><div class="formula" style="font-size:15px">[[1, 2, 3], [4, 5, 6]]<br>@ [[1, 2], [0, 1], [2, 0]]<br>= [[7, 4], [16, 13]]</div><p>Shape <b>(2, 3) @ (3, 2) → (2, 2)</b>.</p></div></div>
 <div class="note" style="margin-top:24px"><b>Next:</b> Go to Jupyter Notebook · <b>Section 02 — NumPy & Shapes.</b></div>
 </section>
-<section class="lesson" id="s03"><div class="section-kicker">SECTION 03 · PREDICTION & LOSS</div><h2>Prediction & Loss</h2><p class="lede">A linear model predicts horizontal position from time in seconds. Change the <span class="term">weight</span> and <span class="term">bias</span> to move the prediction line. See how far it is from the data points.</p>
-<div class="formula">ŷ = wx + b</div><div class="vocab"><div><strong>x — input</strong><small>Time in seconds (0 to 1 in this dataset).</small></div><div><strong>ŷ — prediction</strong><small>The position calculated by the model.</small></div><div><strong>w — weight</strong><small>The slope: how much the prediction changes when x rises by 1.</small></div><div><strong>b — bias</strong><small>The predicted position at x = 0.</small></div></div>
+<section class="lesson" id="s03"><div class="section-kicker">SECTION 03 · PREDICTION & LOSS</div><h2>Prediction & Loss</h2><p class="lede">A linear model predicts horizontal position from time in seconds. You already know how to change a line’s <b>slope</b> and shift it <b>up or down</b>. In machine learning these same controls are called <b>weight</b> (w) and <b>bias</b> (b).</p>
+<div class="formula math-display">\[\hat y=wx+b\]</div><div class="note"><b>Same line, new names:</b> <b>w</b> (weight) controls the <b>slope</b> — how steeply the line rises or falls. <b>b</b> (bias) shifts the entire line <b>up or down</b> without changing the slope. These are the controls you already used.</div><div class="vocab"><div><strong>x — input</strong><small>Time in seconds (0 to 1 in this dataset).</small></div><div><strong>ŷ — prediction</strong><small>The position calculated by the model.</small></div><div><strong>w — weight</strong><small>The slope: how much the prediction changes when x rises by 1.</small></div><div><strong>b — bias</strong><small>The predicted position at x = 0.</small></div></div>
 <div class="panel"><h3>Try a weight and bias</h3><div class="controls"><div class="control"><label for="fitW">Weight w: <b id="fitWLabel">3.0</b></label><input id="fitW" type="range" min="-1" max="8" value="3" step="0.1"></div><div class="control"><label for="fitB">Bias b: <b id="fitBLabel">0.0</b></label><input id="fitB" type="range" min="-1" max="4" value="0" step="0.1"></div><button class="action secondary" id="fitReset">Reset</button></div><svg viewBox="0 0 760 315" class="graph" id="fitGraph" role="img" aria-label="Linear regression predictions compared with measured horizontal positions"></svg><div class="statrow"><div class="stat"><small>MSE (loss)</small><strong id="fitLoss">–</strong></div><div class="stat"><small>Model</small><strong id="fitFormula">ŷ = 3x + 0</strong></div></div><div class="legend" style="margin-top:12px"><span><i class="dot" style="background:var(--blue)"></i>Measured position</span><span><i class="dot" style="background:var(--orange)"></i>Prediction</span><span><i class="dot" style="background:var(--pink)"></i>Residual</span></div></div>
-<h3>How do we measure the error?</h3><p>The <b>residual</b> for each sample is the predicted position minus the measured position. The loss combines residuals into one number.</p><div class="formula">error<sub>i</sub> = ŷ<sub>i</sub> − y<sub>i</sub><br>loss = MSE = (1/N) Σ<sub>i=1…N</sub> (error<sub>i</sub>)²</div><div class="equationsteps"><div><b>1. Subtract:</b> Find the residual for each sample.</div><div><b>2. Square:</b> Positive and negative residuals cannot cancel.</div><div><b>3. Take the mean:</b> Sum squared residuals and divide by N samples.</div></div>
+<h3>How do we measure the error?</h3><p>The <b>residual</b> for each sample is the predicted position minus the measured position. The loss combines residuals into one number.</p><div class="formula math-display">\[\mathrm{error}_i=\hat y_i-y_i\]\[\mathrm{Loss}=\mathrm{MSE}=\frac{1}{N}\sum_{i=1}^{N}(\hat y_i-y_i)^2\]</div><div class="equationsteps"><div><b>1. Subtract:</b> Find the residual for each sample.</div><div><b>2. Square:</b> Positive and negative residuals cannot cancel.</div><div><b>3. Take the mean:</b> Sum squared residuals and divide by N samples.</div></div>
 
 <div class="note" style="margin-top:24px"><b>Next:</b> Go to Jupyter Notebook · <b>Section 03 — Prediction & Loss.</b></div>
 </section>
@@ -202,7 +205,7 @@ print(other)            # prints None</code></pre>
 </div>
 <p class="small">These show <b>local directions</b> at the marked points. The gradient may change as the parameter moves. A <b>zero gradient</b> means the loss is locally flat with respect to that parameter.</p>
 
-<h3>Step 3 · Follow the chain of changes</h3>
+<h3>Step 3 · Follow the chain of changes</h3><p><b>Start with the numbers, not calculus.</b> Let x = 2, y = 5, w = 1 and b = 0. Increase only w by 0.1. Keep the input, correct answer and bias unchanged. Watch how the change moves through the model.</p>
 <p>Changing w affects the loss <b>indirectly</b>, through prediction and error.</p>
 <div class="gd-chain" aria-label="Changing weight affects prediction, then error, then loss">
 <div class="gd-node"><small>Weight</small><b>w: 1 → 1.1</b></div><span class="gd-arrow" aria-hidden="true">→</span>
@@ -210,18 +213,18 @@ print(other)            # prints None</code></pre>
 <div class="gd-node"><small>Error</small><b>−3 → −2.8</b></div><span class="gd-arrow" aria-hidden="true">→</span>
 <div class="gd-node"><small>Loss</small><b>9 → 7.84</b></div>
 </div>
-<p>At our original values (x = 2, error = −3), the <b>local rates of change</b> are:</p>
+<div class="equationsteps"><div><b>1 · Prediction:</b> w increases by 0.1. Because x = 2, the prediction increases by 0.1 × 2 = <b>0.2</b>.</div><div><b>2 · Error:</b> y stays at 5. Error also increases by <b>0.2</b>, from −3 to −2.8. That brings the error closer to zero.</div><div><b>3 · Loss:</b> square the error. The loss decreases from 9 to 7.84, a decrease of <b>1.16</b>.</div></div><p>Now we want a rule that works for <em>very small changes</em>. A derivative is the local rate of change. At our original values (x = 2, error = −3), the three local rates are:</p>
 <table class="tracetable"><thead><tr><th>Relationship</th><th>Rate</th><th>Meaning</th></tr></thead><tbody>
 <tr><td>w → Prediction</td><td><b>2</b></td><td>Changing w slightly changes prediction twice as much.</td></tr>
 <tr><td>Prediction → Error</td><td><b>1</b></td><td>Prediction and signed error change by the same amount.</td></tr>
 <tr><td>Error → Loss</td><td><b>−6</b></td><td>Near error = −3, increasing error slightly decreases loss.</td></tr>
 </tbody></table>
-<p>Multiply the three rates to find how w affects the loss:</p>
+<p>Each row describes one link in the chain. Multiply the three rates to get the overall effect of w on the loss. This is the <b>Chain Rule</b>:</p>
 <div class="formula">2 × 1 × (−6) = <b>−12</b></div>
 <p>This multiplication is the <b>Chain Rule</b>. It combines the rates of change along the chain. The negative result means a <em>small</em> increase in w will initially lower the loss.</p>
 <div class="note"><b>Small changes matter:</b> The derivative is a local rate, not the exact loss change for a large step. In Step 1 we increased w by 0.1, so the exact change in loss is −1.16 rather than −12 × 0.1 = −1.2.</div>
 
-<h3>Step 4 · Calculate the gradients</h3>
+<h3>Step 4 · Calculate the gradients (Optional)</h3><p>You do not need the full differentiation to use Gradient Descent. Here are the <b>final equations for one sample</b>:</p><div class="two-formulas"><div class="formula math-display">\[dw=2\,\mathrm{error}\,x\]</div><div class="formula math-display">\[db=2\,\mathrm{error}\]</div></div><p>These tell us how changing the weight (slope) or bias (vertical shift) affects the squared error. Expand the details only if you want to see where they come from.</p><details class="gd-optional"><summary>Show the differentiation rules and Chain Rule derivation</summary>
 <p>How did we get the rates <b>2</b>, <b>1</b> and <b>−6</b>? We use four basic differentiation rules:</p>
 <table class="tracetable"><thead><tr><th>Rule</th><th>Example</th><th>Derivative</th></tr></thead><tbody>
 <tr><td>1. Constant → 0</td><td>f(t) = 5</td><td>df/dt = 0</td></tr>
@@ -242,11 +245,11 @@ print(other)            # prints None</code></pre>
 <div class="formula" style="font-size:19px">∂L/∂b = (2 × error) × 1 × 1<br><b>db = 2 × error</b></div>
 <div class="panel"><h3>Try the numbers</h3><p>With x = 2 and error = −3:</p><div class="two-formulas"><div class="formula" style="font-size:18px">dw = 2 × (−3) × 2 = <b>−12</b></div><div class="formula" style="font-size:18px">db = 2 × (−3) = <b>−6</b></div></div><p class="small">These formulas are for a single sample's squared error. Next, we average across all samples.</p></div>
 
-<h3>Step 5 · From one sample to many samples</h3>
+</details><h3>Step 5 · From one sample to many samples</h3>
 <p>Real datasets contain many training samples. Our loss is <b>Mean Squared Error (MSE)</b>: average the squared errors across all N samples.</p>
-<div class="formula">MSE = (1/N) Σ<sub>i=1…N</sub> (error<sub>i</sub>)²</div>
+<div class="formula math-display">\[\mathrm{MSE}=\frac{1}{N}\sum_{i=1}^{N}(\mathrm{error}_i)^2\]</div>
 <p>Calculate each sample's contribution to dw and db, then take the average:</p>
-<div class="two-formulas"><div class="formula" style="font-size:18px">dw = (2/N) Σ(error<sub>i</sub> × x<sub>i</sub>)</div><div class="formula" style="font-size:18px">db = (2/N) Σ(error<sub>i</sub>)</div></div>
+<div class="two-formulas"><div class="formula math-display">\[dw=\frac{2}{N}\sum_{i=1}^{N}\mathrm{error}_i x_i\]</div><div class="formula math-display">\[db=\frac{2}{N}\sum_{i=1}^{N}\mathrm{error}_i\]</div></div>
 <p><b>N</b> is the number of samples; <b>Σ</b> means add the values across all samples. The 2 comes from differentiating the square, and 1/N comes from averaging.</p>
 <div class="note"><b>Why do some courses use 1/N instead of 2/N?</b><p>Some courses define the loss as <b>J = MSE/2</b>. This removes the factor of 2 from the gradient formulas. Both losses have the same optimal parameters, but MSE/2 produces gradients that are <b>half as large</b> at the same parameter values (for example, −6 instead of −12). This workshop and the Notebook use <b>MSE</b>, so our gradient formulas keep the 2.</p></div>
 
