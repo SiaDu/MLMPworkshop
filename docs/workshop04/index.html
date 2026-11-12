@@ -273,10 +273,6 @@ print(other)            # prints None</code></pre>
 <div class="panel"><h3>House data</h3><p>These are simulated data for this lesson, not actual housing market prices.</p><div class="gridwrap"><table class="tracetable"><thead><tr><th>House</th><th>Size (m²)</th><th>Age (years)</th><th>Price (£)</th></tr></thead><tbody id="houseDataRows"></tbody></table></div></div>
 <div class="panel"><h3>Feature scaling</h3><p>Size is measured in square metres and age in years. To make the numerical ranges closer, divide size by 100 and age by 50. <b>We still have two input features.</b></p>
 <div class="two-formulas"><div class="formula" style="font-size:17px">size_x = size_m2 / 100</div><div class="formula" style="font-size:17px">age_x = age_years / 50</div></div><p class="small">Prices in the Notebook use £100,000 units, so a target value of 2.41 means £241,000.</p></div>
-<div class="panel"><h3>Compare one feature with two features</h3><p>Both models predict the <b>same house price</b>. One uses size only; the other uses both size and age.</p>
-<svg viewBox="0 0 760 315" class="graph" id="houseCompareGraph" role="img" aria-label="House-price predictions from one or two input features"></svg>
-<div class="legend" style="margin-top:12px"><span><i class="dot" style="background:var(--blue)"></i>Observed price</span><span><i class="dot" style="background:var(--orange)"></i>Size only</span><span><i class="dot" style="background:var(--mint)"></i>Size + age</span></div>
-<div class="statrow"><div class="stat"><small>One-feature MSE</small><strong id="houseOneLoss">—</strong></div><div class="stat"><small>Two-feature MSE</small><strong id="houseTwoLoss">—</strong></div><div class="stat"><small>Two-feature weights</small><strong id="houseWeights">—</strong></div></div></div>
 <h3>Matrix gradients with two features</h3><p>The two columns of <code>X</code> contain scaled size and scaled age. Each feature needs its own weight gradient. Transpose the matrix with <code>X.T</code> to combine each feature with the errors.</p>
 <div class="panel"><div class="controls"><div class="control"><label for="focusFeature">Inspect a feature</label><select id="focusFeature"><option value="0">Feature 1: size_x</option><option value="1">Feature 2: age_x</option></select></div></div>
 <div class="formula" style="font-size:19px">dw = (2/N) Xᵀ @ error</div>
@@ -363,21 +359,6 @@ const houseAge=[5,30,12,40,8,25,45,42,3,35,15];
 const sizeX=houseSize.map(v=>v/100),ageX=houseAge.map(v=>v/50);
 const housePrice=houseSize.map((v,i)=>1.5+1.8*sizeX[i]-.8*ageX[i]);
 $('houseDataRows').innerHTML=houseSize.map((v,i)=>`<tr><td>${i+1}</td><td>${v}</td><td>${houseAge[i]}</td><td>£${Math.round(housePrice[i]*1e5).toLocaleString('en-GB')}</td></tr>`).join('');
-function fitHouses(){let w=0,b=0,v=[0,0],c=0;for(let epoch=0;epoch<1500;epoch++){
- let e1=sizeX.map((x,i)=>w*x+b-housePrice[i]),dw=2*e1.reduce((s,e,i)=>s+e*sizeX[i],0)/11,db=2*e1.reduce((s,e)=>s+e,0)/11;w-=.1*dw;b-=.1*db;
- let e2=sizeX.map((x,i)=>v[0]*x+v[1]*ageX[i]+c-housePrice[i]),d0=2*e2.reduce((s,e,i)=>s+e*sizeX[i],0)/11,d1=2*e2.reduce((s,e,i)=>s+e*ageX[i],0)/11,d2=2*e2.reduce((s,e)=>s+e,0)/11;v[0]-=.1*d0;v[1]-=.1*d1;c-=.1*d2;
-}return {one:sizeX.map(x=>w*x+b),two:sizeX.map((x,i)=>v[0]*x+v[1]*ageX[i]+c),w:v,b:c}}
-const trainedHouses=fitHouses();
-function houseCompare(){const svg=$('houseCompareGraph');svg.innerHTML='';const W=760,H=315,m={l:66,r:28,t:22,b:48},pw=W-m.l-m.r,ph=H-m.t-m.b;
- const px=v=>m.l+(v-45)/(185-45)*pw,py=v=>m.t+(4.8-v)/(4.8-1.5)*ph;
- for(let j=0;j<=5;j++){const v=1.5+(4.8-1.5)*j/5;svgEl('line',{x1:m.l,y1:py(v),x2:W-m.r,y2:py(v),stroke:'#31516a','stroke-width':.8},svg);const lab=svgEl('text',{x:m.l-10,y:py(v)+4,'text-anchor':'end'},svg);lab.textContent=txt(v,1)}
- for(let j=0;j<=5;j++){const v=50+j*25;let lab=svgEl('text',{x:px(v),y:H-22,'text-anchor':'middle'},svg);lab.textContent=v}
- const indices=houseSize.map((_,i)=>i).sort((a,b)=>houseSize[a]-houseSize[b]);const d=indices.map((i,j)=>`${j?'L':'M'}${px(houseSize[i])},${py(trainedHouses.one[i])}`).join(' ');
- svgEl('path',{d,stroke:'#ffc177','stroke-width':3,fill:'none'},svg);
- houseSize.forEach((x,i)=>{svgEl('circle',{cx:px(x),cy:py(housePrice[i]),r:5.5,fill:'#7aaafc'},svg);let cx=px(x),cy=py(trainedHouses.two[i]);svgEl('line',{x1:cx-5,y1:cy-5,x2:cx+5,y2:cy+5,stroke:'#66e6cf','stroke-width':2.5},svg);svgEl('line',{x1:cx-5,y1:cy+5,x2:cx+5,y2:cy-5,stroke:'#66e6cf','stroke-width':2.5},svg)});
- let lab=svgEl('text',{x:W/2,y:H-5,'text-anchor':'middle'},svg);lab.textContent='House size (m²)';
- $('houseOneLoss').textContent=txt(mse(housePrice,trainedHouses.one),4);$('houseTwoLoss').textContent=txt(mse(housePrice,trainedHouses.two),6);$('houseWeights').textContent=trainedHouses.w.map(v=>txt(v,2)).join(', ');
-}houseCompare();
 function gradDetail(){const which=+$('focusFeature').value,N=3;const cols=[sizeX.slice(0,N),ageX.slice(0,N)],err=housePrice.slice(0,N).map(v=>-v);const vals=cols.map(col=>col.reduce((s,v,i)=>s+v*err[i],0));fillMat('gradXT',cols.flat(),N);fillMat('gradE',err,1);fillMat('gradResult',vals,1);const feature=which===0?'size_x':'age_x';$('gradExplain').innerHTML=`<b>${feature}</b>: add (feature × error) across three houses: ${cols[which].map((v,i)=>`(${txt(v,2)} × ${txt(err[i],2)})`).join(' + ')} = <b>${txt(vals[which],4)}</b>. Multiply by 2/3 for the MSE gradient <b>${txt(vals[which]*2/3,4)}</b>.`;[...$('gradXT').children].forEach((el,i)=>{el.style.opacity=Math.floor(i/N)===which?'1':'.4';el.style.borderColor=Math.floor(i/N)===which?'#77e9aa':'#456a80'})}$('focusFeature').onchange=gradDetail;gradDetail();
 const links=[...document.querySelectorAll('#nav a')];
 const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
