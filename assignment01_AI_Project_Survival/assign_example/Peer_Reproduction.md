@@ -1,6 +1,6 @@
 **Reviewer:**
 
-Peer Repo: https://github.com/SiaDu/MLMPworkshop/blob/main/workshop02_AI_Project_Survival/README.md
+Peer Repo: 
 
 Reproduction result: PASS
 
