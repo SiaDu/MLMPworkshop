@@ -691,7 +691,7 @@ Reproduce one pretrained inference and document exactly how you did it.
 Submit to your `MLMPworkshop` repository:
 
 ```text
-workshop02_AI_Project_Survival/
+assign1_AI_Project_Survival/
 ├── README.md
 └── evidence/
     ├── input.*
