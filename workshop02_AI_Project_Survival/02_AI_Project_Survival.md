@@ -191,7 +191,7 @@ Usually do not commit:
 ✗ .venv/
 ✗ large datasets
 ✗ large checkpoints
-✗ generated outputs
+✗ large or unnecessary generated outputs
 ✗ API keys / secrets
 ```
 
@@ -200,6 +200,8 @@ Why not `.venv/`?
 - it is large;
 - it is machine-specific;
 - it should be recreated from the environment definition.
+
+Small input and output evidence files required for Assignment 1 **should be committed**.
 
 That is what `.gitignore` is for.
 
@@ -656,6 +658,8 @@ The AI coding agent should not make changes for you in this workshop.
 
 # 7. Homework — Reproducibility Test
 
+**Assignment 1 — AI Project Survival (4 marks)**
+
 Running the project once in class is not enough.
 
 The homework has **two parts**:
@@ -691,12 +695,21 @@ Reproduce one pretrained inference and document exactly how you did it.
 Submit to your `MLMPworkshop` repository:
 
 ```text
-assign1_AI_Project_Survival/
+assignment01_AI_Project_Survival/
 ├── README.md
+├── Peer_Reproduction.md
 └── evidence/
     ├── input.*
     └── output.*
 ```
+
+Follow the [Assignment 1 Example](../assignment01_AI_Project_Survival/assign_example/) for the expected structure:
+
+- `README.md` — Your inference setup, exact commands, troubleshooting and AI assistance record.
+- `Peer_Reproduction.md` — Your partner's reproduction result, feedback and changes after review.
+- `evidence/` — The example input and its generated output.
+
+The `assign_example/` folder is a reference only. In your own repository, place the three required components directly in `assignment01_AI_Project_Survival/`.
 
 Do **not** submit:
 
@@ -712,7 +725,9 @@ model caches
 ### Project
 
 ```text
-Repository:
+Repository URL:
+
+Exact commit:
 
 Inference task:
 ```
@@ -760,9 +775,9 @@ Which AI coding agent did you use?:
 
 What advice did it give?:
 
-What command or fix did you choose to run yourself?:
+What command or fix did you apply yourself?:
 
-How did you verify the result?:
+How did you verify the result yourself?:
 ```
 
 ---
@@ -775,25 +790,33 @@ Your partner must start from a **fresh clone** and try to reproduce your result 
 
 Do not give extra instructions unless the README is incomplete.
 
-The reviewer records:
+The reviewer must record the result in a separate file called **`Peer_Reproduction.md`**, using the following format:
 
 ```text
-**Reviewer:**
+Reviewer:
+
+Repository reviewed:
 
 Reproduction result: PASS / FAIL
 
 If FAIL:
-
 Failed step:
-
 Missing information:
-
 Suggested fix:
+
+Changes made after peer review:
 ```
+
+The reviewer should test using a fresh working environment without reusing the original student's virtual environment.
 
 ## Final step
 
 Use the peer feedback to update your own README.
+
+- If the result is **FAIL**, correct the instructions and record what you changed.
+- If the result is **PASS**, record **No changes needed** if no corrections were necessary.
+
+Save `Peer_Reproduction.md` alongside your README in the assignment folder.
 
 Your final README should contain enough information for another person to reproduce the inference without asking you for help.
 
