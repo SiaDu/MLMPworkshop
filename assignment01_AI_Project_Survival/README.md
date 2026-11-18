@@ -2,7 +2,17 @@
 
 Complete this assignment in **your own `MLMPworkshop` GitHub repository**, using `assignment01_AI_Project_Survival/`.
 
-Follow [Workshop 02 — AI Project Survival](../workshop02_AI_Project_Survival/02_AI_Project_Survival.md#7-homework--reproducibility-test) for the two parts: **Build and Document (3 marks)** and **Peer Reproduction (1 mark)**.
+Follow [Workshop 02 — AI Project Survival](../workshop02_AI_Project_Survival/02_AI_Project_Survival.md#7-homework--reproducibility-test) for the two parts: **Build and Document (4 marks)** and **Peer Reproduction (1 mark)**.
+
+## Assessment (5 marks)
+
+- **Part 1 — Build and Document (4 marks)**
+  - Task 1 — Successful Inference: **1 mark**
+  - Task 2 — Reproducible Documentation: **2 marks**
+  - Task 3 — Troubleshooting and Verification: **1 mark**
+- **Part 2 — Peer Reproduction (1 mark)**
+  - Task 4 — Peer Testing: **0.5 marks**
+  - Task 5 — Improve Your Documentation: **0.5 marks**
 
 ## Required submission structure
 
