@@ -658,9 +658,19 @@ The AI coding agent should not make changes for you in this workshop.
 
 # 7. Homework — Reproducibility Test
 
-**Assignment 1 — AI Project Survival (4 marks)**
+**Assignment 1 — AI Project Survival (5 marks)**
 
 Running the project once in class is not enough.
+
+**Assessment breakdown (5 marks):**
+
+- **Part 1 — Build and Document (4 marks)**
+  - Task 1 — Successful Inference: **1 mark**
+  - Task 2 — Reproducible Documentation: **2 marks**
+  - Task 3 — Troubleshooting and Verification: **1 mark**
+- **Part 2 — Peer Reproduction (1 mark)**
+  - Task 4 — Peer Testing: **0.5 marks**
+  - Task 5 — Improve Your Documentation: **0.5 marks**
 
 The homework has **two parts**:
 
